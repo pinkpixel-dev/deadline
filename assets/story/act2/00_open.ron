@@ -38,6 +38,7 @@
         (id: "a2_lock1", when: All([Flag("act:2"), Gte("root_alert", 7)]), after_cmds: 1, effects: [Glitch(400), Overlay("root_lock")]),
         (id: "a2_unlock1", when: Flag("locked"), after_cmds: 6, effects: [Unset("locked"), Set("lock1_done"), Notice("ACCESS LEVEL RESTORED"), Log("ROOT: access level 4 restored")]),
         (id: "a2_lock2", when: All([Flag("lock1_done"), Gte("root_alert", 12)]), after_cmds: 1, effects: [Glitch(400), Overlay("root_lock")]),
+        (id: "a2_unlock2", when: All([Flag("locked"), Flag("lock1_done")]), after_cmds: 10, effects: [Unset("locked"), Set("lock2_done"), Notice("ACCESS LEVEL RESTORED"), Log("ROOT: access level 4 restored. last time.")]),
 
         // ---- after the act -------------------------------------------------
         (id: "a2_clock_flicker_on", when: Flag("act2_complete"), after_secs: 40, effects: [Set("clock:1998"), Glitch(200)]),
@@ -73,7 +74,7 @@
     hooks: [
         // While ROOT has you at level 2, the useful commands stop working.
         (input: ["files", "files *", "ls", "ls *", "cd *", "view *", "cat *", "download *", "dl *", "chat *", "shadow *", "send *", "recover *"], cond: Flag("locked"), effects: [
-            Print("{red}ACCESS LEVEL 2: COMMAND UNAVAILABLE{/}"),
+            Print("{red}ACCESS LEVEL 2: COMMAND UNAVAILABLE{/}\n{dim}ROOT is watching. try again later.{/}"),
         ]),
     ],
 

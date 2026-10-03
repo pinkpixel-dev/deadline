@@ -177,6 +177,29 @@ fn act_one_endings_pick_the_act_two_route() {
 }
 
 #[test]
+fn both_root_lockouts_lift_after_a_while() {
+    let mut a = app();
+    a.st.act = 2;
+    a.st.act_started = 2;
+    a.st.set("act:2");
+    a.st.fired.insert("a2_open".into());
+    for (alert, waits) in [(7, 6), (12, 10)] {
+        a.st.set_var("root_alert", alert);
+        cmd(&mut a, "users");
+        cmd(&mut a, "users");
+        dismiss(&mut a);
+        assert!(a.st.has("locked"), "ROOT locks you at root_alert {alert}");
+        cmd(&mut a, "files");
+        assert!(screen(&a).contains("try again later"), "the lockout says it is temporary");
+        for _ in 0..waits {
+            cmd(&mut a, "users");
+        }
+        assert!(!a.st.has("locked"), "the lockout at root_alert {alert} lifts");
+    }
+    assert!(a.st.has("lock2_done"));
+}
+
+#[test]
 fn null_errands_unlock_in_order() {
     let mut a = app();
     a.st.set("act:2");

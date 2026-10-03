@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.1 - October 3, 2026
+
+### 🐛 Fixes
+
+- ROOT's second Act II lockout (at `root_alert` 12) never lifted, so `download`, `recover`, `chat`, `send` and the file commands stayed blocked for the rest of the act. It now lifts after 10 commands, and existing saves stuck in it recover the same way
+- The blocked-command message now adds `ROOT is watching. try again later.` so the lockout reads as temporary instead of broken
+
 ## 0.6.0 - October 3, 2026
 
 ### 🪞 Act IV: IDENTITY
