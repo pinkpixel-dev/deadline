@@ -13,7 +13,7 @@ const ENGINE_PREFIXES: &[&str] = &[
     "mail:", "mailread:", "page:", "chat:", "done:", "left:", "finger:", "overlay:", "seq:",
     "actend:", "sum:", "act:", "sent:",
 ];
-const ENGINE_FLAGS: &[&str] = &["restored"];
+const ENGINE_FLAGS: &[&str] = &["restored", "planted"];
 
 #[derive(Default)]
 struct Refs {
@@ -206,6 +206,18 @@ pub fn check(c: &Content) -> Vec<String> {
             Effect::Mail(id) if !c.mail.contains_key(id) => errs.push(format!("unknown mail: {id}")),
             Effect::Clock(t) if crate::systems::clock::parse(t).is_none() => {
                 errs.push(format!("bad clock time: {t}"))
+            }
+            Effect::PlantSnapshot(name, fx) => {
+                if crate::systems::save::clean_name(name).as_deref() != Some(name.as_str()) {
+                    errs.push(format!("planted snapshot name isn't filesystem safe: {name}"));
+                }
+                for e in fx {
+                    e.walk(&mut |x| {
+                        if !matches!(x, Effect::Set(_) | Effect::Unset(_) | Effect::Add(..) | Effect::SetVar(..) | Effect::If(..)) {
+                            errs.push(format!("planted snapshot {name} can only change state, not {x:?}"));
+                        }
+                    });
+                }
             }
             Effect::Rewind(keep) => {
                 for f in keep.iter().filter(|f| !set.contains(*f)) {

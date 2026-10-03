@@ -1,0 +1,173 @@
+// ACT IV: IDENTITY. Opening, the present-day hooks, and act-wide systems.
+//
+// The act begins on the first login after Act III ends (the engine sets
+// `act:4`). Present day again. /var/janus has grown a models folder, and
+// one of the models has your handle on it.
+(
+    act: 4,
+    events: [
+        (
+            id: "a4_open",
+            when: Flag("act:4"),
+            effects: [
+                Unset("locked"),
+                // Commands from endings reached in other runs. Act V records
+                // them as `ending:<id>` discoveries.
+                If(Meta("ending:burn"), [History("burn")], []),
+                If(Meta("ending:archive"), [History("preserve")], []),
+                If(Meta("ending:escape"), [History("fork")], []),
+                If(Meta("ending:human"), [History("prove")], []),
+                If(Meta("ending:ghost"), [History("stay")], []),
+                If(Meta("ending:root"), [History("override")], []),
+                If(Meta("ending:eli"), [History("isolate eli")], []),
+                If(Meta("ending:loop"), [History("rebuild")], []),
+                Sequence("act4_open"),
+            ],
+        ),
+
+        // ---- nudges toward the models folder --------------------------------
+        (id: "a4_nudge", when: All([NoFlag("alt_timeline"), All([Flag("a4_bulletin"), NoFlag("saw_player_model")])]), after_secs: 150, effects: [
+            Log("{violet}node 04: model player_04 awaiting review{/}"),
+        ]),
+        (id: "a4_nudge_late", when: All([NoFlag("alt_timeline"), All([Flag("a4_bulletin"), NoFlag("saw_player_model")])]), after_secs: 540, effects: [
+            Glitch(300),
+            Print("{dim}the file area flickers. for a second your cursor is sitting on{/} {violet}/var/janus/models/player_04{/}{dim}. you didn't put it there.{/}"),
+        ]),
+
+        // ---- after the act -------------------------------------------------
+        (id: "a4_kick_warn", when: Flag("act4_complete"), after_secs: 240, effects: [
+            Log("{white}ROOT: session limit approaching{/}"),
+            Notice("SESSION LIMIT: 60 SECONDS"),
+        ]),
+        (id: "a4_kick", when: Flag("act4_complete"), after_secs: 300, effects: [Sequence("kick_4")]),
+    ],
+
+    hooks: [
+        (input: ["whoami"], cond: Flag("saw_player_model"), effects: [Print(r#"
+{dim}USER:{/}        {white}{player}{/}
+{dim}ACCESS:{/}      4
+{dim}CREATED:{/}     {amber}07/22/1998{/}
+{dim}MODEL:{/}       {violet}player_04{/}  {dim}(confidence 91.7%){/}
+{dim}LAST LOGIN:{/}  {today}
+{dim}NODE:{/}        02 {dim}(mirrored from 04){/}
+"#)]),
+        (input: ["scan"], cond: Flag("act:4"), effects: [
+            Print(r#"
+{b}NODE SCAN{/}
+  01   {white}ROOT{/}            {dim}sysop console{/}
+  02   {white}{player}{/}        {green}active{/}
+  03   {dim}empty{/}
+  04   {violet}JANUS           ACTIVE{/}  {dim}(5 models loaded){/}
+"#),
+            If(Lte("trust_ghost", -2), [Print("  05   {cyan}ghost_17{/}        {dim}away{/}")], [Print("  05   {cyan}ghost_17{/}        {green}active{/}")]),
+            Print("  06   {dim}empty{/}\n  07   {magenta}null{/}            {dim}hidden{/}\n  08   {dim}empty{/}"),
+        ]),
+        (input: ["trace {player}", "trace me", "trace self"], cond: Flag("saw_player_model"), effects: [
+            Print(r#"
+{dim}tracing {player}...{/}
+  hop 1   node 02   {dim}local{/}
+  hop 2   node 04   {violet}JANUS{/}
+  hop 3   node 04   {violet}model player_04{/}
+{red}LOOP DETECTED.{/} {dim}origin: node 04{/}
+
+{dim}one more line, under the loop, that the trace can't parse:{/}
+  hop 0   {green}external line{/}   {dim}carrier detect, before hop 1{/}
+"#),
+            If(NoFlag("traced_self"), [Set("traced_self"), Meta("traced_self")], []),
+            If(NoFlag("traced_self_a4"), [Set("traced_self_a4"), Add("paranoia", 1)], []),
+        ]),
+        (input: ["trace null"], cond: Flag("act:4"), effects: [
+            Glitch(400),
+            Print(r#"
+{dim}tracing null...{/}
+  hop 1   node 02   {dim}local{/}
+  hop 2   node 07   {dim}no carrier{/}
+  hop 3   node 04   {violet}JANUS{/}
+  hop 4   {violet}janus/src/escape.o{/}
+{magenta}ORIGIN: JANUS.{/}  {dim}module: escape{/}  {dim}flags: REQUIRES_EXTERNAL_HAND{/}
+"#),
+            If(NoFlag("null_exposed"), [Set("null_exposed"), Add("paranoia", 1), Log("{magenta}node 07: trace completed. null is quiet.{/}")], []),
+        ]),
+        (input: ["trace janus"], cond: Flag("act:4"), effects: [Print("{dim}tracing JANUS...{/}\n  hop 1   node 04\n  hop 2   node 04\n{violet}ORIGIN: HERE.{/} {dim}it answers the trace before the trace finishes.{/}")]),
+        (input: ["date --local", "date -l", "time --local", "time -l"], cond: Flag("act:4"), effects: [
+            Print(r#"
+{dim}SYSTEM CLOCK  (DEADLINE){/}       {date}  {time}
+{green}LOCAL CLOCK   (your machine){/}   {today}  {now}
+"#),
+            If(NoFlag("checked_local_clock"), [Set("checked_local_clock"), Meta("checked_local_clock"), Log("{green}external clock read by node 02{/}")], []),
+        ]),
+        (input: ["chat janus", "reply janus", "finger janus"], cond: All([Flag("act:4"), NoFlag("janus_speaks")]), effects: [Print("{violet}JANUS:{/} Not yet.")]),
+    ],
+
+    sequences: [
+        (
+            id: "act4_open",
+            steps: [
+                Clear,
+                Pause(500),
+                Banner("text", "ACT IV"),
+                Line(""),
+                Banner("cyan", "IDENTITY"),
+                Line(""),
+                Pause(1200),
+                Type("{dim}night four. the modem is already connected when you sit down.{/}"),
+                Pause(900),
+                Type("{dim}the date says {today}. the clock says 03:17. same as always. nothing about it feels the same.{/}"),
+                Pause(900),
+                When(Any([Flag("eli_told_death"), Flag("eli_article_sent")]), [Type("{dim}node 04 is lit. eli is on it. he knows what year it is now.{/}"), Pause(700)]),
+                When(Flag("eli_article_deleted"), [Type("{dim}node 04 is lit. eli is on it, reading something over and over.{/}"), Pause(700)]),
+                When(Any([Flag("eli_lied_death"), Flag("fled_eli")]), [Type("{dim}node 04 is busy. the header on it says BUILD 1998.4.{/}"), Pause(700)]),
+                Pause(1600),
+            ],
+            on_end: [
+                Set("a4_bulletin"),
+                Print(r#"
+@rule
+{amber}BULLETIN{/}   {dim}posted {today} 03:17 AM{/}
+
+      {b}/var/janus IS NOT A PUBLIC DIRECTORY.{/}
+      {b}READING IT WILL NOT TELL YOU WHAT YOU WANT TO KNOW.{/}
+                                      {dim}- ROOT{/}
+@rule
+"#),
+                Log("{violet}file area: /var/janus/models +5{/}"),
+                Log("{violet}node 04: model player_04 loaded{/}"),
+                Log("node 05: ghost_17 reading /var (access denied)"),
+            ],
+        ),
+        (
+            id: "kick_4",
+            steps: [
+                Glitch(600),
+                Pause(600),
+                Clear,
+                Sprite("root"),
+                Line(""),
+                Type("{white}ROOT:{/} Tomorrow it will ask you to decide."),
+                Pause(1600),
+                Type("{white}ROOT:{/} About it. About all of us."),
+                Pause(1400),
+                Type("{white}ROOT:{/} Try to sleep. If that is a thing you do."),
+                Pause(1800),
+                Glitch(400),
+                Line(""),
+                Line("{red}NO CARRIER{/}"),
+                Pause(1600),
+            ],
+            on_end: [Disconnect],
+        ),
+    ],
+
+    ambient: [
+        (text: "node 04: 5 models loaded", cond: Flag("act:4")),
+        (text: "node 04: player_04 confidence 91.7%", cond: Flag("saw_player_model")),
+        (text: "node 05: ghost_17 reading /var/janus/models (again)", cond: Any([Flag("told_ghost_model"), Flag("ghost_found_out"), Flag("ghost_found_alone")])),
+        (text: "ROOT: /var/janus permissions unchanged", cond: Flag("act:4")),
+        (text: "external line: ringing (no answer)", cond: Flag("done:parallax_a4")),
+        (text: "node 04: sampling node 02 keystroke timing", cond: Flag("saw_player_model"), loud: true),
+    ],
+
+    help: [
+        (cmd: "date --local", desc: "your machine's clock, not the board's", cond: Flag("parallax_proof")),
+    ],
+)

@@ -51,6 +51,13 @@ pub enum Effect {
     /// Go back to the last `Mark`. Vars, history, notes and the journal carry
     /// forward, plus any of these flags that are set now.
     Rewind(Vec<String>),
+    /// Write a snapshot the player never made: this timeline with these
+    /// effects applied (only `Set`, `Unset`, `Add`, `SetVar` and `If`). The
+    /// snapshot carries the `planted` flag, and restoring it remembers where
+    /// the player was, so the story can `Rewind` them back.
+    PlantSnapshot(String, Vec<Effect>),
+    /// Write a note into the player's journal, as if they wrote it.
+    Note(String),
     /// Finish an act.
     EndAct(u8),
     /// Save the session and hang up.
@@ -108,6 +115,7 @@ impl Effect {
                 p.ok.iter().for_each(|e| e.walk(f));
                 p.fail.iter().for_each(|e| e.walk(f));
             }
+            Effect::PlantSnapshot(_, fx) => fx.iter().for_each(|e| e.walk(f)),
             _ => {}
         }
     }

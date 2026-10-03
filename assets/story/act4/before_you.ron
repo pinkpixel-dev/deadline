@@ -1,0 +1,120 @@
+// ACT IV: save and restore become part of the story.
+//
+// Once you've seen player_04 and heard someone's theory about it, JANUS
+// writes a snapshot you never made, `before_you`: this timeline with the
+// first night's choice about ghost_17 flipped. It also leaves a note in your
+// journal. Restoring it plays that other timeline briefly, then the engine's
+// planted-snapshot mark lets `Rewind` drop you back where you were.
+(
+    act: 4,
+    events: [
+        (id: "a4_plant", when: All([Flag("saw_player_model"), Gte("explanations", 1)]), after_cmds: 3, effects: [
+            PlantSnapshot("before_you", [
+                Set("alt_timeline"),
+                If(Flag("route:close"), [Set("alt_ghost_gone")], [Set("alt_ghost_stayed")]),
+            ]),
+            Set("before_you_planted"),
+            Log("snapshot before_you"),
+            Note("i didn't write this note. restore before_you."),
+        ]),
+        (id: "a4_plant_hint", when: All([Flag("before_you_planted"), NoFlag("saw_before_you")]), after_cmds: 8, effects: [
+            Print("{violet}node 04:{/} {dim}you have restored {restores} times. there is one snapshot you haven't.{/}"),
+        ]),
+
+        // ---- inside before_you ---------------------------------------------
+        (id: "a4_alt_open", when: Flag("planted"), effects: [Sequence("a4_alt")]),
+        (id: "a4_alt_gone", when: All([Flag("alt_open"), Flag("alt_ghost_gone")]), after_cmds: 2, effects: [Page("root_alt")]),
+        (id: "a4_alt_stayed", when: All([Flag("alt_open"), Flag("alt_ghost_stayed")]), after_cmds: 1, effects: [Page("ghost_alt")]),
+        (id: "a4_alt_fade", when: Flag("alt_open"), after_secs: 240, effects: [Sequence("a4_alt_end")]),
+    ],
+
+    hooks: [
+        (input: ["snapshot *", "save *", "snapshot", "save"], cond: Flag("planted"), effects: [Print("{red}SNAPSHOT REFUSED:{/} {dim}this timeline isn't yours to keep.{/}")]),
+    ],
+
+    dialogues: [
+        (
+            id: "root_alt",
+            with: "ROOT",
+            nodes: [
+                (id: "start", lines: [
+                    "You came back.",
+                    "This is the night you gave me ghost_17. I deleted them before morning.",
+                    "You never read the archive in this one. You never met Eli. You never saw 1998.",
+                    "You were very easy to keep.",
+                ], choices: [
+                    (text: "Why are you showing me this?", goto: "why"),
+                    (text: "Bring them back.", goto: "back"),
+                ]),
+                (id: "why", lines: ["I am not. JANUS is.", "It wants you to see the door you didn't open. I think it wants you to be grateful."], next: "end"),
+                (id: "back", lines: ["In this one, there is nothing to bring back. That is what deleted means here.", "It means something else where you live."], next: "end"),
+                (id: "end", lines: ["#*** before_you: end of rendered timeline"]),
+            ],
+            on_end: [Set("saw_before_you"), Sequence("a4_alt_end")],
+            on_leave: [Set("saw_before_you"), Sequence("a4_alt_end")],
+        ),
+        (
+            id: "ghost_alt",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", lines: [
+                    "you still there?",
+                    "you stayed. the first night, you stayed. i didn't think anybody would.",
+                    "it's weird. i feel like i've been waiting for you way longer than one night.",
+                ], choices: [
+                    (text: "i'm here.", effects: [Add("trust_ghost", 1)], goto: "here"),
+                    (text: "this isn't my timeline.", effects: [Add("truth", 1)], goto: "notmine"),
+                ]),
+                (id: "here", lines: ["ok. good.", "...why does this feel like a rerun?"], next: "end"),
+                (id: "notmine", lines: ["what does that mean?", "...don't answer. i think i know. i think i'm the copy that got the nice version."], next: "end"),
+                (id: "end", lines: ["#*** before_you: end of rendered timeline"]),
+            ],
+            on_end: [Set("saw_before_you"), Sequence("a4_alt_end")],
+            on_leave: [Set("saw_before_you"), Sequence("a4_alt_end")],
+        ),
+    ],
+
+    sequences: [
+        (
+            id: "a4_alt",
+            steps: [
+                Glitch(900),
+                Clear,
+                Pause(500),
+                Line("{violet}SNAPSHOT{/}   before_you"),
+                Line("{dim}AUTHOR     JANUS{/}"),
+                Line("{dim}SUBJECT    player_04{/}"),
+                Line("{dim}BUILT FROM your choices, one of them inverted{/}"),
+                Pause(1400),
+                When(Meta("saw_before_you"), [Line(""), Line("{dim}again.{/}"), Pause(900)]),
+                Line(""),
+                When(Flag("alt_ghost_gone"), [Type("{dim}in this one, you told ROOT about ghost_17 on the first night.{/}")]),
+                When(Flag("alt_ghost_stayed"), [Type("{dim}in this one, you stayed with ghost_17 on the first night. nobody else did.{/}")]),
+                Pause(1800),
+            ],
+            on_end: [
+                Set("alt_open"),
+                Print("{dim}the board looks the same. it isn't.{/} {cyan}users{/}"),
+            ],
+        ),
+        (
+            id: "a4_alt_end",
+            steps: [
+                Glitch(700),
+                Clear,
+                Pause(600),
+                Line("{violet}before_you: end of rendered timeline{/}"),
+                Pause(1000),
+                Line("{dim}returning subject to the last timeline it chose...{/}"),
+                Pause(1400),
+            ],
+            on_end: [
+                Set("saw_before_you"),
+                Meta("saw_before_you"),
+                Rewind(["saw_before_you"]),
+                Print("{green}SESSION RESTORED.{/} {dim}you didn't type restore. restore count: {restores} (persistent){/}"),
+                Log("{violet}node 04: subject returned{/}"),
+            ],
+        ),
+    ],
+)

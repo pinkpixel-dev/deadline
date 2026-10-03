@@ -1,7 +1,7 @@
 //! Story markup.
 //!
 //! Inline: `{cyan}text{/}`, `{b}`, `{dim}`, `{rev}`, `{u}`, `{player}`,
-//! `{date}`, `{today}`, `{time}`, `{var:name}`, `{word:name}`.
+//! `{date}`, `{today}`, `{now}`, `{time}`, `{var:name}`, `{word:name}`.
 //!
 //! Line directives: `@sprite name [dim|mono|glitch]`, `@banner color TEXT`,
 //! `@art name`, `@rule`. A line like `ghost_17:` becomes a colored speaker
@@ -59,6 +59,7 @@ pub fn subst(s: &str, cx: &Ctx) -> String {
             "date" => Some(clock::date_string(cx.st)),
             "today" => Some(chrono::Local::now().format("%m/%d/%Y").to_string()),
             "year" => Some(chrono::Local::now().format("%Y").to_string()),
+            "now" => Some(chrono::Local::now().format("%I:%M %p").to_string()),
             "time" => Some(clock::time_string(cx.st)),
             "restores" => Some(cx.meta.total_restores.to_string()),
             _ => {

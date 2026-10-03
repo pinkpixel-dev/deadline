@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.6.0 - October 3, 2026
+
+### 🪞 Act IV: IDENTITY
+
+- Act IV opens on the next login after Act III. `/var/janus/models` now has five models in it: `mara.q`, `eli.v`, `ghost17`, `parallax.partial` and `player_04`, which has your handle on it
+- `inspect player_04` shows the memory seed, the confidence and the session it's connected to. `whoami` and `trace me` change once you've seen it
+- ghost_17 asks you to look in the folder for them. You can tell them about `ghost17` or hide it, and how they take it depends on how much they trust you. Hiding it doesn't stick
+- Parallax, ROOT, null and ghost each have a different theory about what you are. ROOT remembers your Act I promise, and might slip if it trusts you
+- Parallax wants proof you're outside. `date --local` shows your machine's real clock next to the board's
+- `trace null` finally resolves all the way, and null has to answer for it
+- JANUS writes a snapshot you never made, `before_you`, and leaves a note in your journal. Restoring it plays the first night with your choice about ghost_17 flipped, then sends you back
+- If Eli knows what happened to him (or found the deletion log), he comes back on node 04 in the present
+- The act ends with JANUS asking what you are. You answer with `reply janus`, then the end card plays and ROOT hangs up five minutes later
+
+### 🧹 Maintenance
+
+- New `PlantSnapshot` effect writes a snapshot from the current timeline with some state changed. Restoring one remembers where you were, so the story can `Rewind` you back
+- New `Note` effect writes into the player's own journal notes
+- New `{now}` markup for the player's real local time
+- Eli's age in post 503 now matches his portrait (20)
+
 ## 0.5.0 - October 3, 2026
 
 ### 📼 Act III: 1998 (complete)

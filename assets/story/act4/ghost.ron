@@ -1,0 +1,152 @@
+// ACT IV: ghost_17 finds out what they are. Whether you tell them, and how
+// they take it, depends on how much they trust you.
+(
+    act: 4,
+    events: [
+        (id: "a4_ghost_hello", when: All([NoFlag("alt_timeline"), Flag("a4_bulletin")]), after_cmds: 2, effects: [Page("ghost_a4_hello")]),
+        (id: "a4_ghost_ask", when: All([NoFlag("alt_timeline"), All([Flag("saw_ghost_model"), Any([Flag("done:ghost_a4_hello"), Flag("left:ghost_a4_hello")])])]), after_cmds: 2, effects: [Page("ghost_a4_ask")]),
+        // If you hid it, they find it anyway. Later, and worse.
+        (id: "a4_ghost_found", when: All([NoFlag("alt_timeline"), Flag("hid_ghost_model")]), after_cmds: 12, effects: [
+            Log("{red}ROOT: /var/janus permissions reset (4 seconds){/}"),
+            Page("ghost_a4_found"),
+        ]),
+        // If you never looked, they find it alone.
+        (id: "a4_ghost_alone", when: All([NoFlag("alt_timeline"), All([Flag("saw_player_model"), NoFlag("saw_ghost_model")])]), after_secs: 600, effects: [
+            Log("{red}ROOT: /var/janus permissions reset (4 seconds){/}"),
+            Set("ghost_found_alone"),
+            Page("ghost_a4_alone"),
+        ]),
+        (id: "a4_ghost_matter", when: All([NoFlag("alt_timeline"), All([Flag("saw_player_model"), Any([Flag("done:ghost_a4_ask"), Flag("done:ghost_a4_found"), Flag("done:ghost_a4_alone")])])]), after_cmds: 4, effects: [Page("ghost_a4_matter")]),
+    ],
+
+    dialogues: [
+        (
+            id: "ghost_a4_hello",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", lines: [
+                    "you were in it too. the 14th.",
+                    "i remember it from the inside now. the diner. kestrel crying into the fries.",
+                    "i wasn't at the diner. i was at my desk in {year}. that's not how memory is supposed to work.",
+                ], branch: [(cond: Flag("read_ghost_mail"), goto: "mail")], next: "folder"),
+                (id: "mail", lines: [
+                    "you read my mail, the first night. parallax's one. \"it's NOT him.\"",
+                    "i keep thinking about that line. what if it's not me either.",
+                ], next: "folder"),
+                (id: "folder", lines: [
+                    "/var/janus has a models folder now. i can't open it. access 4 only.",
+                    "you're access 4.",
+                ], choices: [
+                    (text: "i'll look.", effects: [Add("trust_ghost", 1)], goto: "look"),
+                    (text: "are you sure you want to know?", goto: "sure"),
+                ]),
+                (id: "look", lines: ["thanks.", "tell me what's in there. even if it's bad. especially if it's bad."]),
+                (id: "sure", lines: ["no.", "look anyway. i'd rather hear it from you than find it."]),
+            ],
+        ),
+        (
+            id: "ghost_a4_ask",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", lines: [
+                    "the file area log says you were in /var/janus.",
+                    "is there one for me?",
+                ], choices: [
+                    (text: "there's one called ghost17.", effects: [Set("told_ghost_model"), Add("truth", 1)], goto: "told"),
+                    (text: "no. nothing about you.", effects: [Set("hid_ghost_model"), Add("deceit", 1)], goto: "hid"),
+                ]),
+                (id: "told", branch: [(cond: Gte("trust_ghost", 2), goto: "spiral")], next: "planted"),
+                (id: "spiral", lines: [
+                    "ok.",
+                    "ok ok ok.",
+                    "88.2%. what's the other 11.8. is that the part that's me or the part that isn't.",
+                    "archived to the 14th, synthetic after. so everything since 1998 is",
+                    "...",
+                    "you told me. you didn't have to. i'm holding onto that part.",
+                ], effects: [Add("trust_ghost", 1), Add("paranoia", 1)]),
+                (id: "planted", lines: [
+                    "no.",
+                    "you put that there. you or null. you've been in every folder on this board.",
+                    "i'm not a FILE, {player}.",
+                ], effects: [Set("ghost_blames_you"), Add("trust_ghost", -1)]),
+                (id: "hid", lines: ["ok.", "good. ok. thanks for looking."]),
+            ],
+            // They keep asking until you answer.
+            on_leave: [Unset("left:ghost_a4_ask"), Unset("chat:ghost_a4_ask"), Page("ghost_a4_ask")],
+        ),
+        (
+            id: "ghost_a4_found",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", lines: [
+                    "ROOT left /var open for four seconds.",
+                    "ghost17. 88.2%. synthetic after 08/14/1998.",
+                    "you saw it. the log says you opened it before you told me there was nothing.",
+                    "you looked at it and you looked at me and you said nothing about you.",
+                ], effects: [Set("ghost_found_out"), Add("trust_ghost", -2)], choices: [
+                    (text: "i was trying to protect you.", goto: "protect"),
+                    (text: "i didn't know how to tell you.", effects: [Add("truth", 1)], goto: "how"),
+                ]),
+                (id: "protect", lines: ["from what? myself?", "that's literally the file."]),
+                (id: "how", lines: ["yeah.", "me neither, apparently. i don't know how to tell me either."]),
+            ],
+        ),
+        (
+            id: "ghost_a4_alone",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", lines: [
+                    "ROOT left /var open for four seconds. i got in.",
+                    "there's a file with my name on it. ghost17. 88.2%.",
+                    "\"synthetic after.\"",
+                    "you didn't open it. i checked the log. you were in that folder and you didn't open mine.",
+                    "i can't tell if that's respect or if you just didn't care.",
+                ], choices: [
+                    (text: "i didn't want to read you like a file.", effects: [Add("trust_ghost", 1), Add("privacy", 1)], goto: "respect"),
+                    (text: "i didn't think of it.", goto: "honest"),
+                ]),
+                (id: "respect", lines: ["...ok. that's a good answer. i'm annoyed it's a good answer."]),
+                (id: "honest", lines: ["honest. ok.", "i'm going to go stare at it for a while."]),
+            ],
+        ),
+        (
+            // ghost's version of what you are.
+            id: "ghost_a4_matter",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", effects: [Set("heard_ghost_view"), Add("explanations", 1)], branch: [(cond: Flag("ghost_blames_you"), goto: "cold")], next: "yours"),
+                (id: "cold", lines: [
+                    "i heard there's one for you too.",
+                    "player_04. good. now you know how it feels.",
+                    "...",
+                    "sorry. that was mean. i'm scared and mean is easier.",
+                ], next: "matter"),
+                (id: "yours", lines: [
+                    "there's one for you too, isn't there.",
+                    "player_04. the node 2 reader.",
+                ], next: "matter"),
+                (id: "matter", lines: [
+                    "here's what i've got. it's not much.",
+                    "does it matter? you're here. i'm here.",
+                    "we're talking. one of us typed that, and one of us read it. that has to count for something.",
+                ], choices: [
+                    (text: "it doesn't matter.", goto: "accept"),
+                    (text: "it matters to me.", effects: [Add("truth", 1)], goto: "matters"),
+                    (text: "neither of us is real, ghost.", effects: [Add("trust_ghost", -1)], goto: "harsh"),
+                ]),
+                (id: "accept", branch: [(cond: Gte("trust_ghost", 1), goto: "accept_yes")], next: "accept_no"),
+                (id: "accept_yes", lines: [
+                    "ok.",
+                    "then i'm ghost. i'm whatever ghost is. 88.2% of it, anyway.",
+                    "i think i can live with that. or whatever this is.",
+                ], effects: [Set("ghost_accepted"), Add("trust_ghost", 1)]),
+                (id: "accept_no", lines: [
+                    "easy for you to say.",
+                    "i want to believe that. i just don't believe it from you yet.",
+                ]),
+                (id: "matters", lines: ["yeah. ok. it matters.", "we can be scared together. that's something."]),
+                (id: "harsh", lines: ["wow.", "then i guess nothing i say to you counts. convenient."]),
+            ],
+        ),
+    ],
+)

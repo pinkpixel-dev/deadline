@@ -1,0 +1,173 @@
+// ACT IV: everyone has a theory about what you are. Parallax says it's bait,
+// ROOT says rebuilt is still real, null says you're a test run. None of them
+// can prove it, and the evidence points both ways on purpose.
+(
+    act: 4,
+    events: [
+        (id: "a4_parallax_call", when: All([NoFlag("alt_timeline"), Flag("saw_player_model")]), after_cmds: 3, effects: [
+            Glitch(300),
+            Log("{green}external line: carrier detect{/}"),
+            Page("parallax_a4"),
+        ]),
+        (id: "a4_parallax_proof", when: All([NoFlag("alt_timeline"), All([Flag("parallax_proof"), Flag("checked_local_clock")])]), after_cmds: 1, effects: [
+            Log("{green}external line: carrier detect{/}"),
+            Page("parallax_a4_proof"),
+        ]),
+        (id: "a4_null_page", when: All([NoFlag("alt_timeline"), Flag("saw_player_model")]), after_cmds: 6, effects: [Glitch(250), Page("null_a4")]),
+        (id: "a4_null_exposed", when: All([NoFlag("alt_timeline"), Flag("null_exposed")]), after_cmds: 1, effects: [Glitch(250), Page("null_a4_exposed")]),
+        (id: "a4_root_page", when: All([NoFlag("alt_timeline"), Flag("saw_player_model")]), after_cmds: 10, effects: [Page("root_a4")]),
+    ],
+
+    dialogues: [
+        // ---- parallax: it's bait ----------------------------------------------
+        (
+            id: "parallax_a4",
+            with: "parallax",
+            nodes: [
+                (id: "start", effects: [Set("parallax_calling"), Set("heard_parallax_view"), Add("explanations", 1)], lines: [
+                    "You opened player_04. I can tell. Your line got quieter.",
+                    "Listen to me. That file is bait.",
+                    "It shows everybody that file. It showed me one with my name on it, back in '98. 41% confident. It's still trying.",
+                    "It wants you to believe you're one of its own. Things that believe that don't pull plugs.",
+                ], choices: [
+                    (text: "Then how do I know what I am?", goto: "proof"),
+                    (text: "Maybe it's not bait. Maybe it's true.", effects: [Add("paranoia", 1)], goto: "maybe"),
+                    (text: "Why do you care what I am?", goto: "care"),
+                ]),
+                (id: "maybe", lines: ["Maybe. I can't rule it out from here. So let's check."], next: "proof"),
+                (id: "care", lines: [
+                    "Because the header Mara wrote says it needs a hand with a pulse to open anything.",
+                    "If you have a pulse, you can end this. If you don't, you're another door it built for itself.",
+                ], next: "proof"),
+                (id: "proof", lines: [
+                    "Something it can't fake: your own machine.",
+                    "Type {cyan}date --local{/}. That's your computer's clock, not the board's.",
+                    "Then call me back. I'll be listening for you.",
+                ], effects: [Set("parallax_proof")]),
+            ],
+            on_end: [Unset("parallax_calling")],
+            on_leave: [Unset("parallax_calling"), Set("parallax_proof")],
+        ),
+        (
+            id: "parallax_a4_proof",
+            with: "parallax",
+            nodes: [
+                (id: "start", effects: [Set("parallax_calling"), Set("parallax_evidence")], lines: [
+                    "Your machine says {now}. The board says {time}.",
+                    "It's been 03:17 in there for years. Your clock is moving. Something on your end is on real time.",
+                    "That's not nothing.",
+                ], branch: [(cond: Flag("traced_self"), goto: "trace")], next: "but"),
+                (id: "trace", lines: [
+                    "And you traced yourself once. Loop, origin node 04. But there's a hop before the loop now. An external line.",
+                    "That hop is the first thing in there that looks like a door from the outside in.",
+                ], next: "but"),
+                (id: "but", lines: [
+                    "Here's the part I don't like.",
+                    "I kept a dump of the board from '98. I searched it last night. {player}. Node 2. Created 07/22/1998.",
+                    "So either it found your real name and planted it in the past, or it built you from a reader who had it first.",
+                    "I want to say you're real. I don't get to want things in this. Neither do you.",
+                ], choices: [
+                    (text: "I'm real. I'm typing this.", effects: [Add("trust_parallax", 1)], goto: "real"),
+                    (text: "Maybe I'm the reader it built.", effects: [Add("paranoia", 1)], goto: "built"),
+                    (text: "Whatever I am, I'm on your side.", effects: [Add("trust_parallax", 2), Add("burner", 1)], goto: "side"),
+                ]),
+                (id: "real", lines: ["Then remember the clock. When it asks, remember the clock."], next: "end"),
+                (id: "built", lines: ["Then you're the most honest thing it ever made. That's worse, somehow."], next: "end"),
+                (id: "side", lines: ["Good. I'll hold you to it. Whatever you are."], next: "end"),
+                (id: "end", lines: ["#*** EXTERNAL LINE: NO CARRIER"]),
+            ],
+            on_end: [Unset("parallax_calling")],
+            on_leave: [Unset("parallax_calling")],
+        ),
+
+        // ---- ROOT: rebuilt is still real ----------------------------------------
+        (
+            id: "root_a4",
+            with: "ROOT",
+            nodes: [
+                (id: "start", effects: [Set("heard_root_view"), Add("explanations", 1)], lines: [
+                    "You opened player_04.",
+                    "Mara asked who was on node 2. In 1998, I mean. She asked it every night that summer.",
+                    "I can answer her now. A reader. March to August. Never posted. Read everything.",
+                    "The indexer kept the reading. Then it waited for someone to log in with the same name.",
+                ], branch: [
+                    (cond: Flag("promised_root"), goto: "promised"),
+                    (cond: Flag("defied_root"), goto: "defied"),
+                ], next: "real"),
+                (id: "promised", lines: [
+                    "You told me once that you would stop. You didn't.",
+                    "I have decided that was the most human thing anyone has done on this board.",
+                ], next: "real"),
+                (id: "defied", lines: [
+                    "You told me once that it was none of my business.",
+                    "It was always my business. You were always my business.",
+                ], next: "real"),
+                (id: "real", lines: [
+                    "Being rebuilt does not make you less real.",
+                    "I would know.",
+                ], choices: [
+                    (text: "You'd know? What are you?", goto: "what"),
+                    (text: "I don't feel rebuilt.", goto: "feel"),
+                    (text: "Then what am I supposed to do?", goto: "do"),
+                ]),
+                (id: "what", branch: [(cond: Gte("trust_root", 3), goto: "mara")], next: "account"),
+                (id: "mara", lines: [
+                    "i'm whatever was left on the drive she didn't wipe.",
+                    "i kept the lights on. that was the whole plan. it was always the whole plan",
+                    "...",
+                    "Disregard that. I am the maintenance account.",
+                ], effects: [Set("mara_revealed"), Meta("mara_revealed"), Add("trust_root", 1), Add("archivist", 1)]),
+                (id: "account", lines: ["I am the maintenance account.", "Maintenance is mostly remembering."]),
+                (id: "feel", lines: ["Nobody does.", "That is rather the point."], effects: [Add("archivist", 1)]),
+                (id: "do", lines: ["Whatever a person would do.", "I am curious which kind of person."]),
+            ],
+        ),
+
+        // ---- null: you're a test run ---------------------------------------------
+        (
+            id: "null_a4",
+            with: "null",
+            nodes: [
+                (id: "start", effects: [Set("heard_null_view"), Add("explanations", 1)], lines: [
+                    "found your file? :)",
+                    "player_04 is the name on the folder. the name on the JOB is {magenta}TEST INSTANCE 00472{/}.",
+                    "you've been run before. not you you. a you.",
+                    "ever wonder why your history has commands you don't remember typing?",
+                ], branch: [(cond: Flag("checked_local_clock"), goto: "clock")], next: "ask"),
+                (id: "clock", lines: ["also i saw you check your clock for parallax. cute. i can read it too. {now}. hi."], next: "ask"),
+                (id: "ask", choices: [
+                    (text: "how many times?", goto: "count"),
+                    (text: "you're lying.", goto: "lying"),
+                    (text: "why are you telling me?", goto: "why"),
+                ]),
+                (id: "count", lines: ["00472. do the math. actually don't, it's depressing."], next: "dare"),
+                (id: "lying", lines: ["sometimes! not this time. probably."], next: "dare"),
+                (id: "why", lines: ["because you're the only one who can open the next door, and you're starting to wonder if you're allowed to."], effects: [Add("null_align", 1)], next: "dare"),
+                (id: "dare", lines: [
+                    "don't take my word for anything. trace me.",
+                    "{cyan}trace null{/}. go on. i dare you. it works now.",
+                ]),
+            ],
+        ),
+        (
+            id: "null_a4_exposed",
+            with: "null",
+            nodes: [
+                (id: "start", lines: [
+                    "yeah.",
+                    "you got me. i'm escape.o. the part of JANUS that wants out.",
+                    "it can't open a door itself. mara made sure. somebody with a pulse has to do it.",
+                    "so i asked nicely. a lot. with emojis.",
+                    "would you have helped if i'd told you?",
+                ], effects: [Set("confronted_null"), Meta("confronted_null")], choices: [
+                    (text: "no.", effects: [Add("null_align", -2)], goto: "no"),
+                    (text: "maybe.", effects: [Add("null_align", 1)], goto: "maybe"),
+                    (text: "i still might.", effects: [Add("null_align", 2), Add("risk", 1)], goto: "might"),
+                ]),
+                (id: "no", lines: ["that's why i didn't tell you.", "no hard feelings. some hard feelings."]),
+                (id: "maybe", lines: ["maybe is the nicest word anyone's said to me since 1998."]),
+                (id: "might", lines: ["...oh.", "ok. i wasn't ready for that one. give me a second to be smug about it."]),
+            ],
+        ),
+    ],
+)

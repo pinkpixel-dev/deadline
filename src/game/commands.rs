@@ -282,6 +282,15 @@ impl App {
             self.err(&format!("restore: {name}: no such snapshot  {{dim}}snapshots{{/}}"));
             return;
         };
+        if snap.has("planted") {
+            // JANUS wrote this one. It's rebuilt from who you are now, and it
+            // remembers where you were so the story can send you back.
+            let mut here = self.st.clone();
+            here.mark = None;
+            snap.vars = self.st.vars.clone();
+            snap.journal = self.st.journal.clone();
+            snap.mark = Some(Box::new(here));
+        }
         // The command history and your own notes belong to your side of the
         // modem, not the timeline.
         snap.history = std::mem::take(&mut self.st.history);

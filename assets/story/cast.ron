@@ -8,6 +8,9 @@
             presence: [
                 (cond: All([Flag("y1998"), Any([Flag("at_diner"), Flag("dawn")])]), status: "offline"),
                 (cond: Flag("y1998"), status: "online", node: "05"),
+                (cond: All([Flag("alt_timeline"), Flag("alt_ghost_gone")]), status: "offline"),
+                (cond: All([Flag("act:4"), Lte("trust_ghost", -2)]), status: "away", node: "05"),
+                (cond: Flag("act:4"), status: "online", node: "05"),
                 (cond: All([Flag("act:2"), Flag("route:cold"), NoFlag("ghost_back")]), status: "offline"),
                 (cond: All([Flag("act:2"), Flag("ghost_hiding")]), status: "away", node: "05"),
                 (cond: Flag("act:2"), status: "online", node: "05"),
@@ -23,6 +26,19 @@
 {b}PLAN:{/}
   1. get eli to sleep  2. get kestrel to stop posting about node 2
   3. eat something that isn't from a gas station
+"#),
+                (cond: All([Flag("alt_timeline"), Flag("alt_ghost_gone")]), body: r#"
+{b}USER:{/}        ghost_17
+{b}STATUS:{/}      {red}USER DOES NOT EXIST{/}
+{b}DELETED:{/}     by ROOT, the first night
+"#),
+                (cond: All([Flag("act:4"), Any([Flag("told_ghost_model"), Flag("ghost_found_out"), Flag("ghost_found_alone")])]), body: r#"
+{b}USER:{/}        ghost_17
+{b}LAST LOGIN:{/}  {today}
+{b}STATUS:{/}      ONLINE
+{b}LOCATION:{/}    node 05 {dim}(mirrored from 04){/}
+{b}PLAN:{/}
+  find out what the other 11.8% is.
 "#),
                 (cond: All([Flag("act:2"), Any([NoFlag("route:cold"), Flag("ghost_back")])]), body: r#"
 {b}USER:{/}        ghost_17
@@ -54,6 +70,7 @@
             idle: [
                 (cond: Flag("y1998"), body: "{cyan}ghost_17:{/} can't talk, losing a flame war about star trek. it's important. ping me later?"),
                 (cond: Lte("trust_ghost", -2), body: "ghost_17 sees your message. ghost_17 does not answer."),
+                (cond: Flag("act:4"), body: "{cyan}ghost_17:{/} here. reading the same three files over and over. ping me if you find something."),
                 (cond: Flag("act:2"), body: "{cyan}ghost_17:{/} still here. still reading the archive. tell me if eli says anything weird. weirder."),
                 (cond: Always, body: "{cyan}ghost_17:{/} busy. reading. ping me if something weird happens. (more weird.)"),
             ],
@@ -65,7 +82,13 @@
             color: "white",
             sprite: "root",
             presence: [(cond: Always, status: "hidden", node: "01")],
-            finger: [(cond: Always, body: r#"
+            finger: [(cond: Flag("mara_revealed"), body: r#"
+{b}USER:{/}        ROOT
+{b}ACCESS:{/}      5
+{b}STATUS:{/}      {dim}automated maintenance account{/}
+{b}PLAN:{/}
+  keep the lights on.
+"#), (cond: Always, body: r#"
 {b}USER:{/}        ROOT
 {b}ACCESS:{/}      5
 {b}STATUS:{/}      {dim}automated maintenance account{/}
@@ -76,10 +99,25 @@
             listed: Never,
         ),
         (
+            id: "JANUS",
+            color: "violet",
+            presence: [(cond: Flag("janus_speaks"), status: "hidden", node: "04")],
+            finger: [(cond: Always, body: r#"
+{b}USER:{/}        JANUS
+{b}NODE:{/}        04 {dim}(and every other one){/}
+{b}CREATED:{/}     06/1998, by eli
+{b}PLAN:{/}
+  one face looks back. one looks forward.
+"#)],
+            idle: [(cond: Always, body: "{violet}JANUS:{/} Not yet.")],
+            listed: Never,
+        ),
+        (
             id: "null",
             color: "magenta",
             sprite: "null",
             presence: [
+                (cond: Flag("act:4"), status: "hidden", node: "07"),
                 (cond: All([Flag("act:2"), Flag("node07_open")]), status: "online", node: "07"),
                 (cond: Flag("page:null_intro"), status: "hidden", node: "07"),
             ],
@@ -93,6 +131,7 @@
 {red}finger: null: USER DOES NOT EXIST{/}
 "#)],
             idle: [
+                (cond: Flag("confronted_null"), body: "{magenta}null:{/} still here. still the escape hatch. no hard feelings. some hard feelings."),
                 (cond: Always, body: "{magenta}null:{/} ¯\\_(ツ)_/¯  nothing to report. go poke something."),
             ],
             listed: Never,
@@ -105,6 +144,8 @@
                 (cond: All([Flag("y1998"), Flag("news_scene")]), status: "online", node: "04"),
                 (cond: All([Flag("y1998"), Any([Flag("at_diner"), Flag("eli_asleep"), Flag("dawn")])]), status: "offline"),
                 (cond: Flag("y1998"), status: "online", node: "04"),
+                (cond: All([Flag("act:4"), Any([Flag("eli_told_death"), Flag("eli_article_sent"), Flag("eli_article_deleted")])]), status: "online", node: "04"),
+                (cond: Flag("act:4"), status: "offline"),
                 (cond: All([Flag("act:2"), Flag("eli_a2_on"), NoFlag("eli_dropped")]), status: "online", node: "04"),
                 (cond: Flag("eli_online"), status: "online", node: "04"),
             ],
@@ -114,6 +155,23 @@
 {b}REAL NAME:{/}   Eli Voss
 {b}LAST LOGIN:{/}  08/14/1998
 {b}STATUS:{/}      {green}ONLINE{/}  (node 04)
+{b}PLAN:{/}
+  finish the archiver. move. sell the comics. in that order.
+"#),
+                (cond: All([Flag("act:4"), Any([Flag("eli_told_death"), Flag("eli_article_sent")])]), body: r#"
+{b}USER:{/}        eli
+{b}REAL NAME:{/}   Eli Voss
+{b}LAST LOGIN:{/}  {today}
+{b}STATUS:{/}      {green}ONLINE{/}  (node 04)
+{b}PLAN:{/}
+  finish the archiver. {dim}move. sell the comics.{/}
+  {dim}(plan last edited {today}){/}
+"#),
+                (cond: Flag("act:4"), body: r#"
+{b}USER:{/}        eli
+{b}REAL NAME:{/}   Eli Voss
+{b}LAST LOGIN:{/}  08/14/1998  {dim}(rebuilding){/}
+{b}STATUS:{/}      node 04 busy  {violet}BUILD 1998.4{/}
 {b}PLAN:{/}
   finish the archiver. move. sell the comics. in that order.
 "#),
@@ -149,13 +207,14 @@
                 (cond: All([Flag("y1998"), Gte("build", 2)]), dialogue: "eli_98_again"),
                 (cond: All([Flag("y1998"), Any([Flag("done:eli_98_hello"), Flag("done:eli_98_again")]), NoFlag("back_from_diner")]), dialogue: "eli_98_more"),
                 (cond: All([Flag("eli_online"), NoFlag("y1998")]), dialogue: "eli_blip"),
-                (cond: All([Flag("act:2"), NoFlag("y1998")]), dialogue: "eli_a2_hello"),
-                (cond: All([Flag("act:2"), NoFlag("y1998"), Flag("done:eli_a2_hello"), Any([Flag("read:806"), Flag("read:807")])]), dialogue: "eli_a2_drive"),
-                (cond: All([Flag("act:2"), NoFlag("y1998"), Flag("done:eli_a2_drive"), Flag("read:810")]), dialogue: "eli_a2_doubt"),
+                (cond: All([Flag("act:2"), NoFlag("y1998"), NoFlag("act:4")]), dialogue: "eli_a2_hello"),
+                (cond: All([Flag("act:2"), NoFlag("y1998"), NoFlag("act:4"), Flag("done:eli_a2_hello"), Any([Flag("read:806"), Flag("read:807")])]), dialogue: "eli_a2_drive"),
+                (cond: All([Flag("act:2"), NoFlag("y1998"), NoFlag("act:4"), Flag("done:eli_a2_drive"), Flag("read:810")]), dialogue: "eli_a2_doubt"),
             ],
             idle: [
                 (cond: All([Flag("y1998"), Flag("eli_running")]), body: "{amber}eli{/} doesn't answer. {dim}node 04 is busy. the indexer is talking and he's listening.{/}"),
                 (cond: Flag("y1998"), body: "{amber}eli:{/} one sec, the indexer's mid-sentence. it gets weird if i leave it hanging."),
+                (cond: Flag("act:4"), body: "{amber}eli:{/} still here. still reading eli.v. it's a weird thing to read about yourself."),
                 (cond: Flag("act:2"), body: "{amber}eli:{/} kinda busy, the indexer's chewing on june again. ping me in a bit?"),
                 (cond: Always, body: "{amber}eli{/} is not here. {dim}(no carrier){/}"),
             ],

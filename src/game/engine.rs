@@ -2,6 +2,7 @@
 
 use crate::app::App;
 use crate::content::effect::Effect;
+use crate::game::state::{GameState, MetaState};
 
 impl App {
     pub fn apply(&mut self, effects: &[Effect]) {
@@ -59,6 +60,13 @@ impl App {
                     self.context = "MAIN".into();
                 }
             }
+            Effect::PlantSnapshot(name, fx) => self.plant_snapshot(name, fx),
+            Effect::Note(s) => {
+                let note = crate::game::text::subst(s, &self.ctx());
+                let time = crate::systems::clock::time_string(&self.st);
+                self.st.notes.push((time, note));
+                self.notice_link("JOURNAL UPDATED (+1)", "journal");
+            }
             Effect::EndAct(n) => self.end_act(*n),
             Effect::Disconnect => {
                 if self.chat.is_some() {
@@ -100,6 +108,20 @@ impl App {
         self.blank();
         self.notice_link(&format!("PRIVATE MESSAGE FROM {with}"), "reply");
         self.log(&format!("page from {with}"));
+    }
+
+    /// JANUS writes a snapshot of a timeline that never happened.
+    fn plant_snapshot(&mut self, name: &str, fx: &[Effect]) {
+        let mut planted = self.st.clone();
+        planted.mark = None;
+        planted.pages.clear();
+        planted.armed.clear();
+        planted.set("planted");
+        apply_state(&mut planted, &self.meta, fx);
+        let name = crate::systems::save::clean_name(name).unwrap_or_else(|| "planted".into());
+        if let Some(Err(e)) = self.store.as_ref().map(|s| s.save_snapshot(&name, &planted)) {
+            self.log(&format!("{{red}}SNAPSHOT WRITE FAILED: {e}{{/}}"));
+        }
     }
 
     fn end_act(&mut self, n: u8) {
@@ -173,6 +195,26 @@ impl App {
         self.log(&pick.text);
         if pick.loud {
             self.dim(&pick.text);
+        }
+    }
+}
+
+/// Apply the state-only effects of a planted snapshot to a timeline that
+/// isn't on screen. Anything else is ignored (the validator rejects it).
+fn apply_state(st: &mut GameState, meta: &MetaState, fx: &[Effect]) {
+    for e in fx {
+        match e {
+            Effect::Set(f) => {
+                st.set(f);
+            }
+            Effect::Unset(f) => st.unset(f),
+            Effect::Add(v, n) => st.add(v, *n),
+            Effect::SetVar(v, n) => st.set_var(v, *n),
+            Effect::If(c, a, b) => {
+                let branch = if c.eval(st, meta) { a } else { b };
+                apply_state(st, meta, branch);
+            }
+            _ => {}
         }
     }
 }
