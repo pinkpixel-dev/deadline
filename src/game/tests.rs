@@ -357,3 +357,50 @@ fn a_wrong_archive_key_reminds_you_and_ghost_nudges() {
     run(&mut a, 0.3);
     assert!(a.st.has("archive_unlocked"));
 }
+
+#[test]
+fn journal_records_leads_keys_and_your_own_notes() {
+    let mut a = app();
+    boot(&mut a);
+    a.st.set("archive_revealed");
+    a.st.set("knows_lantern");
+    a.st.set("dl:/uploads/nodelist.txt");
+    a.st.set("knows_trace");
+    run(&mut a, 1.0);
+    assert!(a.st.journal.contains(&"k_lantern".to_string()));
+    assert!(screen(&a).contains("JOURNAL UPDATED"), "one tappable notice for new entries");
+    cmd(&mut a, "journal");
+    let s = screen(&a);
+    assert!(s.contains("LEADS") && s.contains("i have the key: lantern"), "the lead reflects what you know");
+    assert!(s.contains("KEYS & CODES") && s.contains("archive key (board 08): lantern"));
+    assert!(s.contains("nodelist.txt"), "downloads are listed");
+    assert!(s.contains("trace <user>"), "discovered commands are listed");
+    assert!(a.out.links.iter().flatten().any(|l| l.cmd == "open 08"), "leads are tappable");
+
+    // your own notes keep their casing
+    cmd(&mut a, "note ROOT said Mara liked lighthouses");
+    assert_eq!(a.st.notes[0].1, "ROOT said Mara liked lighthouses");
+
+    // resolving a lead crosses it off
+    a.st.set("archive_unlocked");
+    cmd(&mut a, "clear");
+    cmd(&mut a, "journal");
+    assert!(screen(&a).contains("✓ board 08 [ARCHIVE] is locked"));
+    cmd(&mut a, "note rm 1");
+    assert!(a.st.notes.is_empty());
+}
+
+#[test]
+fn notes_survive_a_restore() {
+    let dir = std::env::temp_dir().join(format!("deadline-notes-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&dir);
+    let store = Store::at(dir).unwrap();
+    let content = Content::load().unwrap();
+    let mut a = App::new(content, GameState::new("tester"), MetaState::default(), Some(store));
+    a.speed = Speed::Instant;
+    boot(&mut a);
+    cmd(&mut a, "snapshot early");
+    cmd(&mut a, "note the key might be lantern");
+    cmd(&mut a, "restore early");
+    assert_eq!(a.st.notes.len(), 1, "notes live on your side of the modem");
+}

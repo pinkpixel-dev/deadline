@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3.0 - October 3, 2026
+
+### 📓 Journal
+
+- New `journal` command (also `notes`): a notes file on your side of the modem that keeps what you've learned between sessions
+- Leads show what's still open and get crossed off when you resolve them, so you can pick up where you left off days later
+- Keys and codes, people, downloaded files and discovered commands are collected automatically
+- `note <text>` adds your own notes, and `note rm <#>` removes one. Your notes survive `restore`
+- Journal rows are tappable, and a single `*** JOURNAL UPDATED` notice appears when something new is added
+- Existing saves get their journal filled in from what you've already discovered
+
+
 ## 0.2.1 - October 3, 2026
 
 ### 🐛 Fixes

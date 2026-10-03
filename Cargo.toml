@@ -1,6 +1,6 @@
 [package]
 name = "deadline"
-version = "0.2.1"
+version = "0.3.0"
 edition = "2024"
 description = "A haunted late-90s BBS text adventure for your terminal"
 license = "Apache-2.0"

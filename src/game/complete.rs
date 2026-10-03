@@ -6,7 +6,7 @@ use crate::game::files::{basename, parent};
 const VERBS: &[&str] = &[
     "boards", "open", "read", "next", "mail", "users", "finger", "whoami", "chat", "reply",
     "leave", "files", "cd", "view", "inspect", "download", "delete", "history", "clear",
-    "snapshot", "restore", "snapshots", "speed", "status", "help", "logout",
+    "snapshot", "restore", "snapshots", "speed", "status", "help", "logout", "journal", "note",
 ];
 
 impl App {

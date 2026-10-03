@@ -23,6 +23,7 @@ pub struct ContentFile {
     pub sequences: Vec<Sequence>,
     pub ambient: Vec<Ambient>,
     pub help: Vec<HelpEntry>,
+    pub journal: Vec<JournalRule>,
 }
 
 /// A body that changes based on state. The first matching alt wins,
@@ -268,4 +269,20 @@ pub struct HelpEntry {
     pub cmd: String,
     pub desc: String,
     pub cond: Cond,
+}
+
+/// A journal entry the story writes for the player. It appears once `when`
+/// holds and stays (in discovery order). Leads are crossed off when `done` holds.
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(default)]
+pub struct JournalRule {
+    pub id: String,
+    /// `leads`, `keys` or `people`.
+    pub section: String,
+    pub when: Cond,
+    pub done: Cond,
+    pub text: String,
+    pub alt: Vec<Alt>,
+    /// Command to run when the entry is tapped.
+    pub cmd: Option<String>,
 }

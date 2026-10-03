@@ -1,0 +1,50 @@
+// Act II journal entries.
+(
+    journal: [
+        // ---- leads ---------------------------------------------------------
+        (id: "l2_archive", section: "leads", when: Flag("a2_bulletin"), done: Flag("janus_named"), cmd: "open 08",
+            text: "board 08 grew overnight. new logs from june to august 1998."),
+        (id: "l2_eli", section: "leads", when: Flag("eli_a2_on"), done: Any([Flag("done:eli_a2_hello"), Flag("left:eli_a2_hello")]), cmd: "chat eli",
+            text: "eli is online on node 04. he wants to talk."),
+        (id: "l2_eli_help", section: "leads", when: Flag("eli_investigating"), done: Flag("done:eli_a2_found"),
+            text: "i told eli i'd help him figure out why he has no messages after august."),
+        (id: "l2_consent", section: "leads", when: Flag("quest_consent"), done: Any([Flag("gave_parallax_log"), Flag("gave_root_log"), Flag("act2_complete")]), cmd: "view /archive/consent.log",
+            text: "parallax wants /archive/consent.log. download it, then {cyan}send parallax consent.log{/}. or don't.", alt: [
+                (cond: Flag("has_consent_log"), body: "i have consent.log. parallax wants it ({cyan}send parallax consent.log{/}). ROOT knows i have it."),
+            ]),
+        (id: "l2_seal", section: "leads", when: Flag("janus_src_visible"), done: Flag("recovered:/janus/src/seal.dat"), cmd: "recover /janus/src/seal.dat",
+            text: "null left /janus/src open. seal.dat is broken."),
+        (id: "l2_node07", section: "leads", when: Flag("recovered:/janus/src/seal.dat"), done: Any([Flag("node07_open"), Flag("act2_complete")]), cmd: "open 07 --node",
+            text: "seal.dat says node 07 opens with {cyan}open 07 --node{/}. null wants it open."),
+        (id: "l2_shadow", section: "leads", when: Flag("knows_shadow"), done: Any([Flag("shadowed_eli"), Flag("act2_complete")]),
+            text: "null wants me to {cyan}shadow eli{/} and read his screen. he wouldn't know."),
+        (id: "l2_board10", section: "leads", when: Flag("board10_open"), done: Flag("board10_gone"), cmd: "open 10",
+            text: "a board called [10] YOU showed up. nobody's mentioned it.", alt: [
+                (cond: Flag("board10_gone"), body: "a board called [10] YOU showed up, full of posts in my voice. then it was gone."),
+            ]),
+        (id: "l2_fragment", section: "leads", when: Flag("janus_named"), done: Flag("read_fragment"), cmd: "open 08",
+            text: "the archive is still recovering things from node 04. something from the night of 08/14/1998 is coming back."),
+        (id: "l2_over", section: "leads", when: Flag("act2_complete"), done: Flag("act:3"),
+            text: "for a second the board said 08/14/1998 and everyone was online. ROOT will end the night soon."),
+
+        // ---- keys & codes --------------------------------------------------
+        (id: "k2_seal", section: "keys", when: Flag("recovered:/janus/src/seal.dat"),
+            text: "node 07 seal key: 0x07. {cyan}open 07 --node{/}."),
+        (id: "k2_send", section: "keys", when: Flag("quest_consent"),
+            text: "the shell can send files off the board: {cyan}send <user> <file>{/}."),
+        (id: "k2_secret", section: "keys", when: Flag("root_asked_secrecy"),
+            text: "i promised ROOT i wouldn't tell eli what year it is.", alt: [
+                (cond: Flag("broke_root_promise"), body: "i promised ROOT i wouldn't tell eli what year it is. i told him anyway."),
+            ]),
+
+        // ---- people ----------------------------------------------------------
+        (id: "p2_janus", section: "people", when: Flag("janus_named"),
+            text: "JANUS: eli's name for the archiver. two faces. one looks back at everything we wrote, one looks forward."),
+        (id: "p2_node2", section: "people", when: Flag("node2_model_known"),
+            text: "node 2: in 1998 the indexer modeled someone lurking on node 2. no handle. it named the model {player}."),
+        (id: "p2_eli_draft", section: "people", when: Flag("eli_found_draft"),
+            text: "eli's last message is an unsent draft, 08/14 11:58pm: he was driving to mara's to stop the wipe."),
+        (id: "p2_photo", section: "people", when: Flag("counted_photo"), cmd: "view /archive/meetup_0712.gif",
+            text: "the july meetup photo has eight people in it and seven names."),
+    ],
+)

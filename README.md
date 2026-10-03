@@ -54,6 +54,7 @@ If you'd rather type everything, the commands are all still there. Type `help` o
 | `files`, `cd <dir>`, `view <file>` | the file area |
 | `inspect <file>`, `download <file>` | file details, ZMODEM |
 | `send <user> <file>` | send a file from local storage (once someone asks for one) |
+| `journal`, `note <text>` | what you've learned, your own notes |
 | `history` | your command history |
 | `snapshot [name]`, `restore [name]` | save and load |
 | `speed <slow\|normal\|fast\|instant>` | how fast text arrives |
@@ -69,6 +70,12 @@ A few controls worth knowing:
 - **Enter** or a click skips a cinematic
 - In a conversation, press **1-9**, use the arrows, or click a reply. You can still type commands mid-conversation if you want to check something first.
 - **Ctrl+C** twice logs you off
+
+### Your journal
+
+Type `journal` any time to see what you've found out so far. It lists open leads (crossed off once you've dealt with them), keys and passwords, the people you've met, files you've downloaded and commands you've discovered. If you come back after a few days and can't remember where you were, start there.
+
+You can add your own notes with `note <text>`, like `note ghost seems scared of ROOT`. Remove one with `note rm 2`. The journal is a file on your computer, not on the BBS, so your notes stick around even when you restore a snapshot.
 
 ### Saving
 

@@ -1,0 +1,65 @@
+// Act I journal entries. Written like the player's own notes. Entries only
+// record things the player has actually seen or been told.
+(
+    journal: [
+        // ---- leads ---------------------------------------------------------
+        (id: "l_whoami", section: "leads", when: Flag("ghost_asked_whoami"), done: Flag("ran:whoami"), cmd: "whoami",
+            text: "ghost_17 asked me to run whoami and tell them what it says."),
+        (id: "l_ghost_whoami", section: "leads", when: All([Flag("ran:whoami"), Flag("ghost_asked_whoami")]), done: Any([Flag("done:ghost_whoami"), Flag("left:ghost_whoami")]), cmd: "reply",
+            text: "my account says LAST LOGIN 08/14/1998. ghost_17 will want to hear that."),
+        (id: "l_nodelist", section: "leads", when: Flag("quest_nodelist"), done: Flag("got_nodelist"), cmd: "view /uploads/nodelist.txt",
+            text: "ghost_17 wants me to download nodelist.txt from /uploads before ROOT notices."),
+        (id: "l_board9", section: "leads", when: Flag("null_hint_09"), done: Any([Flag("board:09"), Flag("board09_gone")]), cmd: "open 09",
+            text: "null said to try {cyan}open 09{/}. there is no board 9."),
+        (id: "l_manual", section: "leads", when: Flag("file:/uploads/manual.txt"), done: Flag("recovered:/uploads/manual.txt"),
+            text: "/uploads/manual.txt is damaged. it looked like a list of sysop commands.", alt: [
+                (cond: Flag("cmd:recover"), body: "/uploads/manual.txt is damaged. eli left a {cyan}recover{/} command that might fix it."),
+            ]),
+        (id: "l_lastcall", section: "leads", when: Flag("file:/uploads/lastcall.txt"), done: Flag("recovered:/uploads/lastcall.txt"),
+            text: "/uploads/lastcall.txt is damaged too. a caller log from the last night."),
+        (id: "l_archive_key", section: "leads", when: Flag("archive_revealed"), done: Flag("archive_unlocked"), cmd: "open 08",
+            text: "board 08 [ARCHIVE] is locked. it wants a key.", alt: [
+                (cond: Flag("knows_lantern"), body: "board 08 [ARCHIVE] is locked. i have the key: {b}lantern{/}."),
+                (cond: Flag("null_hint_force"), body: "board 08 [ARCHIVE] is locked. null says the lock has a bug: {cyan}open 08 --force{/}."),
+            ]),
+        (id: "l_archive_read", section: "leads", when: Flag("archive_unlocked"), done: Flag("read_reveal"), cmd: "open 08",
+            text: "the archive is open. i should read through board 08.", alt: [
+                (cond: Flag("ghost_warned_804"), body: "the archive is open. ghost_17 said to read 804 last."),
+            ]),
+        (id: "l_act1_over", section: "leads", when: Flag("act1_complete"), done: Flag("act:2"),
+            text: "the line dropped after 804. ROOT will end the night soon. i'll have to dial in again tomorrow."),
+
+        // ---- keys & codes --------------------------------------------------
+        (id: "k_lantern", section: "keys", when: Flag("knows_lantern"),
+            text: "archive key (board 08): {b}lantern{/}. mara liked lighthouses."),
+        (id: "k_mailflag", section: "keys", when: Flag("null_hint_mail"),
+            text: "null says mailbox flags are broken: {cyan}mail -u ghost_17{/} opens ghost's private mail."),
+        (id: "k_force", section: "keys", when: Flag("null_hint_force"),
+            text: "null says board 08's lock has a bug: {cyan}open 08 --force{/}. ROOT will notice."),
+        (id: "k_level4", section: "keys", when: Flag("done:null_intro"),
+            text: "access levels go 0, 1, 2, 3, 5. there is no level 4. mine says 4."),
+
+        // ---- people ----------------------------------------------------------
+        (id: "p_ghost", section: "people", when: Any([Flag("chat:ghost_intro"), Flag("chat:ghost_ignored")]), cmd: "finger ghost_17",
+            text: "ghost_17: was on this board before it died. says they made every account here. not mine."),
+        (id: "p_root", section: "people", when: Any([Flag("overlay:root_first"), Flag("chat:root_intro")]), cmd: "finger root",
+            text: "ROOT: the administrator. talks like a locked door. knows what i'm doing."),
+        (id: "p_null", section: "people", when: Flag("chat:null_intro"), cmd: "finger null",
+            text: "null: not on the user list. leaks things. wants me to dig.", alt: [
+                (cond: Flag("traced_null"), body: "null: not on the user list. leaks things. trace says it comes from inside this system."),
+            ]),
+        (id: "p_eli", section: "people", when: Any([Flag("heard_eli"), Flag("eli_seen"), Flag("file:/uploads/eli_portrait.ans")]), cmd: "finger eli",
+            text: "eli: Eli Voss. built the archiver on node 4. account deleted 08/16/1998.", alt: [
+                (cond: Flag("act:2"), body: "eli: Eli Voss. built the archiver. online on node 04 every night, and sure it's still 1998."),
+                (cond: Flag("talked_eli"), body: "eli: Eli Voss. built the archiver. his account was deleted in 1998, and he messaged me anyway."),
+            ]),
+        (id: "p_mara", section: "people", when: Any([Flag("read:101"), Flag("finger:mara"), Flag("read:108")]), cmd: "finger mara",
+            text: "mara: Mara Quinn, the original sysop. posted DON'T SHUT IT DOWN at 03:17 on 08/14/1998."),
+        (id: "p_parallax", section: "people", when: Flag("mail:m_parallax"), cmd: "finger parallax",
+            text: "parallax: one of the original hackers. calling from outside. wants me to hang up."),
+        (id: "p_me", section: "people", when: Flag("ran:whoami"), cmd: "whoami",
+            text: "me: the board already had an account for me. last login 08/14/1998.", alt: [
+                (cond: Flag("read_reveal"), body: "me: in a 1998 log, ghost_17 said someone named {player} was coming. there was no user by that name. \"there will be.\""),
+            ]),
+    ],
+)

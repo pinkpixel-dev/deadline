@@ -5,6 +5,8 @@
         (cmd: "open <#>", desc: "enter a board"),
         (cmd: "read <#>  /  n", desc: "read a message / next unread"),
         (cmd: "mail [#]", desc: "your mailbox"),
+        (cmd: "journal", desc: "everything you've found out"),
+        (cmd: "note <text>", desc: "write in your journal"),
         (cmd: "users", desc: "who's online"),
         (cmd: "finger <user>", desc: "look someone up"),
         (cmd: "whoami", desc: "your account"),

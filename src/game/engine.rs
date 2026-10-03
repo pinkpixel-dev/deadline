@@ -101,6 +101,7 @@ impl App {
         if self.modal() {
             return;
         }
+        self.check_journal();
         let content = self.content.clone();
         for ev in &content.events {
             if !ev.repeat && self.st.fired.contains(&ev.id) {

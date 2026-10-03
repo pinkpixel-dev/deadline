@@ -31,6 +31,7 @@ pub struct Content {
     pub sequences: HashMap<String, Sequence>,
     pub ambient: Vec<Ambient>,
     pub help: Vec<HelpEntry>,
+    pub journal: Vec<JournalRule>,
     pub sprites: HashMap<String, Sprite>,
     pub art: HashMap<String, String>,
 }
@@ -97,6 +98,7 @@ impl Content {
         self.hooks.extend(p.hooks);
         self.ambient.extend(p.ambient);
         self.help.extend(p.help);
+        self.journal.extend(p.journal);
         self.mail.extend(p.mail.into_iter().map(|m| (m.id.clone(), m)));
         self.dialogues
             .extend(p.dialogues.into_iter().map(|d| (d.id.clone(), d)));

@@ -71,7 +71,11 @@ impl App {
         self.st.commands += 1;
         let input = normalize(trimmed);
         let verb = input.split(' ').next().unwrap_or("").to_string();
-        if !self.run_hooks(&input) {
+        if verb == "note" {
+            // Notes keep the player's own casing.
+            let raw = trimmed.split_once(char::is_whitespace).map(|(_, r)| r).unwrap_or("");
+            self.cmd_note(raw);
+        } else if !self.run_hooks(&input) {
             let args = input[verb.len()..].trim().to_string();
             self.builtin(&verb, &args);
         }
@@ -127,6 +131,7 @@ impl App {
             }
             "n" | "next" => self.cmd_read(""),
             "mail" | "m" => self.cmd_mail(args),
+            "journal" | "notes" | "jo" => self.cmd_journal(),
             "users" | "who" | "w" | "online" => self.cmd_users(),
             "finger" | "f" => self.cmd_finger(args),
             "whoami" => self.cmd_whoami(),
@@ -265,8 +270,10 @@ impl App {
             self.err(&format!("restore: {name}: no such snapshot  {{dim}}snapshots{{/}}"));
             return;
         };
-        // The command history belongs to the terminal, not the timeline.
+        // The command history and your own notes belong to your side of the
+        // modem, not the timeline.
         snap.history = std::mem::take(&mut self.st.history);
+        snap.notes = std::mem::take(&mut self.st.notes);
         snap.player = self.st.player.clone();
         self.st = snap;
         self.st.set("restored");

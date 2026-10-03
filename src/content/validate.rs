@@ -122,6 +122,12 @@ fn gather(c: &Content) -> Refs {
         r.steps(&s.steps);
     }
     c.ambient.iter().for_each(|a| r.conds.push(a.cond.clone()));
+    for j in &c.journal {
+        r.conds.push(j.when.clone());
+        r.conds.push(j.done.clone());
+        r.alts(&j.alt);
+        r.texts.push(j.text.clone());
+    }
     c.help.iter().for_each(|h| r.conds.push(h.cond.clone()));
 
     // Expand nested effects and the conditions/texts they carry.
@@ -261,6 +267,15 @@ pub fn check(c: &Content) -> Vec<String> {
                     errs.push(format!("unknown art in text: {name}"));
                 }
             }
+        }
+    }
+    let mut journal_ids = HashSet::new();
+    for j in &c.journal {
+        if !journal_ids.insert(j.id.as_str()) {
+            errs.push(format!("duplicate journal id {}", j.id));
+        }
+        if !matches!(j.section.as_str(), "leads" | "keys" | "people") {
+            errs.push(format!("journal {} has unknown section {}", j.id, j.section));
         }
     }
     for id in ["boot", "reconnect", "logout"] {

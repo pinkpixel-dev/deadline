@@ -28,6 +28,10 @@ pub struct GameState {
     pub board: Option<String>,
     /// Current directory in the file area.
     pub cwd: String,
+    /// Journal entry ids, in the order they were discovered.
+    pub journal: Vec<String>,
+    /// The player's own notes: (BBS clock time, text).
+    pub notes: Vec<(String, String)>,
 }
 
 impl Default for GameState {
@@ -53,6 +57,8 @@ impl GameState {
             act_started: 1,
             board: None,
             cwd: "/".to_string(),
+            journal: Vec::new(),
+            notes: Vec::new(),
         }
     }
 
