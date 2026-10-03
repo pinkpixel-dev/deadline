@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.3 - October 3, 2026
+
+### 🐛 Fixes
+
+- Logging in after the last finished act used to drop you on a quiet board with nothing left to happen. The game now says you've reached the end of the current build, and your save picks up from there once the next act is written
+
 ## 0.6.2 - October 3, 2026
 
 ### 🐛 Fixes

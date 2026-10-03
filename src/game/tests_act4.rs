@@ -242,3 +242,14 @@ fn act_two_ambient_lines_stay_in_act_two() {
         assert!(!log.iter().any(|l| l.contains(stale)), "act two line leaked into act four: {stale}");
     }
 }
+
+#[test]
+fn an_unwritten_act_says_so_instead_of_going_quiet() {
+    let mut a = act4("unwritten");
+    assert!(!screen(&a).contains("END OF CURRENT BUILD"), "a written act opens normally");
+    let next = a.content.last_act + 1;
+    a.st.act = next;
+    next_login(&mut a);
+    assert_eq!(a.st.act_started, next);
+    assert!(screen(&a).contains("END OF CURRENT BUILD"), "{}", screen(&a));
+}

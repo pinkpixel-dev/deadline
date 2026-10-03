@@ -62,6 +62,8 @@ pub struct App {
     /// Clickable terminal rows from the last frame: (row, menu, item, command).
     pub link_hits: Vec<(Rect, u32, usize, String)>,
     next_event_check: f64,
+    /// Whether this launch has said the open act isn't written yet.
+    pub(crate) build_end_shown: bool,
 }
 
 impl App {
@@ -94,6 +96,7 @@ impl App {
             next_menu: 1,
             link_hits: Vec::new(),
             next_event_check: 0.0,
+            build_end_shown: false,
         }
     }
 

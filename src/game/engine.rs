@@ -147,6 +147,13 @@ impl App {
             return;
         }
         self.check_journal();
+        if self.st.act_started > self.content.last_act && !self.build_end_shown {
+            self.build_end_shown = true;
+            self.print(&format!(
+                "{{amber}}END OF CURRENT BUILD.{{/}} {{dim}}act {} isn't written yet. your save is kept and picks up here when it is.{{/}}",
+                self.st.act_started
+            ));
+        }
         let content = self.content.clone();
         for ev in &content.events {
             if !ev.repeat && self.st.fired.contains(&ev.id) {
