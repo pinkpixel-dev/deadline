@@ -123,6 +123,17 @@ fn janus_plants_before_you_and_restoring_it_sends_you_back() {
 }
 
 #[test]
+fn act_four_autosaves_without_a_logout() {
+    let mut a = act4("autosave");
+    for _ in 0..10 {
+        cmd(&mut a, "users");
+    }
+    let saved = a.store.as_ref().and_then(|s| s.session()).expect("autosaved session");
+    assert_eq!(saved.act_started, 4, "closing the window mid-act keeps the act");
+    assert_eq!(saved.commands % 10, 0);
+}
+
+#[test]
 fn the_local_clock_is_parallax_s_proof_and_null_gets_traced() {
     let mut a = act4("proof");
     see_my_model(&mut a);

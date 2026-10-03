@@ -8,6 +8,9 @@ use crate::output::Speed;
 use crate::systems::save;
 use crate::ui::theme;
 
+/// Commands between session autosaves.
+const AUTOSAVE_EVERY: u32 = 10;
+
 /// Lowercase and collapse whitespace.
 pub fn normalize(raw: &str) -> String {
     raw.split_whitespace().collect::<Vec<_>>().join(" ").to_lowercase()
@@ -81,6 +84,10 @@ impl App {
         }
         self.st.set(&format!("ran:{verb}"));
         self.check_events();
+        // Closing the window skips logout, so don't wait for it.
+        if self.st.commands % AUTOSAVE_EVERY == 0 {
+            self.save_session();
+        }
     }
 
     fn echo(&mut self, s: &str) {
@@ -309,6 +316,7 @@ impl App {
         ));
         self.log(&format!("restore {name}"));
         self.check_events();
+        self.save_session();
     }
 
     fn cmd_snapshots(&mut self) {

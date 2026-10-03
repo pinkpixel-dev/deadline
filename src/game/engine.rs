@@ -58,6 +58,7 @@ impl App {
                     self.queue.clear();
                     self.out.clear();
                     self.context = "MAIN".into();
+                    self.save_session();
                 }
             }
             Effect::PlantSnapshot(name, fx) => self.plant_snapshot(name, fx),
@@ -133,6 +134,7 @@ impl App {
         }
         self.meta.discoveries.insert(format!("actend:{n}"));
         self.save_meta();
+        self.save_session();
         let seq = format!("act{n}_end");
         if self.content.sequences.contains_key(&seq) {
             self.start_or_queue(Effect::Sequence(seq));

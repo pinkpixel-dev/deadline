@@ -72,7 +72,11 @@ fn main() -> Result<()> {
         None => (GameState::new(&player), "boot"),
     };
     st.player = player;
-    st.begin_act();
+    if st.begin_act()
+        && let Some(Err(e)) = store.as_ref().map(|s| s.clear_planted())
+    {
+        eprintln!("could not clear planted snapshots: {e}");
+    }
 
     let mut app = App::new(content, st, meta, store);
     app.save_meta();
