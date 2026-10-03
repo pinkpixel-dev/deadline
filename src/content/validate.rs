@@ -11,7 +11,7 @@ use super::model::*;
 const ENGINE_PREFIXES: &[&str] = &[
     "ran:", "board:", "read:", "file:", "dl:", "deleted:", "inspected:", "recovered:", "changed:",
     "mail:", "mailread:", "page:", "chat:", "done:", "left:", "finger:", "overlay:", "seq:",
-    "actend:", "sum:",
+    "actend:", "sum:", "act:",
 ];
 const ENGINE_FLAGS: &[&str] = &["restored"];
 

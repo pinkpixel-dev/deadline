@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.2.0 - October 3, 2026
+
+### 🎮 Act II: ARCHIVES
+
+- Act II starts on your first login after Act I ends, with a title card and a different opening for each of Act I's four endings
+- Board 08 grows by ten archive logs, and `/archive` opens with the consent log, a meetup photo and more
+- Eli is online all night and slowly works out that it isn't 1998
+- null leaks JANUS source and asks for three favors: recover a seal, unseal node 07, shadow Eli
+- Parallax calls from outside for the consent log, with a new `send <user> <file>` command
+- ROOT asks you to keep Eli in the dark, and lowers your access level if you push too hard
+- `[10] YOU` and `[11] DON'T GO IN HERE` appear and disappear
+- Four Act II finales, one per route, ending on the 1998 cliffhanger
+- New `shadow <user>` command and Act II versions of `listen` and `trace`
+
+### 🌙 Act breaks
+
+- Once an act is finished you get about five minutes of free roam, then ROOT warns you and hangs up
+- The next act begins on your next login
+
+### 🐛 Fixes
+
+- Story events now belong to an act, so Act I scenes can't fire during Act II
+
+
 ## 0.1.0 - October 3, 2026
 
 ### 🎮 Game

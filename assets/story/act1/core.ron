@@ -1,186 +1,5 @@
-// DEADLINE: core cast, help, overlays and cinematics for Act I.
+// DEADLINE: help, overlays and cinematics for Act I. The cast is in cast.ron.
 (
-    users: [
-        (
-            id: "ghost_17",
-            color: "cyan",
-            sprite: "ghost_17",
-            presence: [
-                (cond: Any([Flag("ghost_away"), Flag("actend:1")]), status: "offline"),
-                (cond: Always, status: "online", node: "05"),
-            ],
-            finger: [
-                (cond: Flag("actend:1"), body: r#"
-{b}USER:{/}        ghost_17
-{b}STATUS:{/}      {red}USER DOES NOT EXIST{/}
-"#),
-                (cond: Always, body: r#"
-{b}USER:{/}        ghost_17
-{b}LAST LOGIN:{/}  08/14/1998
-{b}STATUS:{/}      ONLINE
-{b}LOCATION:{/}    UNKNOWN
-{b}PLAN:{/}
-  Nothing deleted stays gone.
-"#),
-            ],
-            chats: [],
-            idle: [
-                (cond: Lte("trust_ghost", -2), body: "ghost_17 sees your message. ghost_17 does not answer."),
-                (cond: Always, body: "{cyan}ghost_17:{/} busy. reading. ping me if something weird happens. (more weird.)"),
-            ],
-            listed: Always,
-            last_login: "08/14/1998",
-        ),
-        (
-            id: "ROOT",
-            color: "white",
-            sprite: "root",
-            presence: [(cond: Always, status: "hidden", node: "01")],
-            finger: [(cond: Always, body: r#"
-{b}USER:{/}        ROOT
-{b}ACCESS:{/}      5
-{b}STATUS:{/}      {dim}automated maintenance account{/}
-{b}PLAN:{/}
-  This system has survived because certain boundaries were respected.
-"#)],
-            idle: [(cond: Always, body: "{white}ROOT:{/} {b}No.{/}")],
-            listed: Never,
-        ),
-        (
-            id: "null",
-            color: "magenta",
-            sprite: "null",
-            presence: [
-                (cond: Flag("page:null_intro"), status: "hidden", node: "07"),
-            ],
-            finger: [(cond: Always, body: r#"
-{magenta}N U L L{/}
-
-{magenta}▓▒░░▒▓▒░▒▓{/}
-{magenta}ERR::0x0000{/}
-{magenta}▒▓██▒░░▓▒{/}
-
-{red}finger: null: USER DOES NOT EXIST{/}
-"#)],
-            idle: [
-                (cond: Always, body: "{magenta}null:{/} ¯\\_(ツ)_/¯  nothing to report. go poke something."),
-            ],
-            listed: Never,
-        ),
-        (
-            id: "eli",
-            color: "amber",
-            sprite: "eli",
-            presence: [(cond: Flag("eli_online"), status: "online", node: "04")],
-            finger: [
-                (cond: Flag("eli_online"), body: r#"
-{b}USER:{/}        eli
-{b}REAL NAME:{/}   Eli Voss
-{b}LAST LOGIN:{/}  08/14/1998
-{b}STATUS:{/}      {green}ONLINE{/}  (node 04)
-{b}PLAN:{/}
-  finish the archiver. move. sell the comics. in that order.
-"#),
-                (cond: Always, body: r#"
-{b}USER:{/}        eli
-{b}REAL NAME:{/}   Eli Voss
-{b}LAST LOGIN:{/}  08/14/1998
-{b}STATUS:{/}      {red}ACCOUNT DELETED 08/16/1998{/}
-{b}PLAN:{/}
-  finish the archiver. move. sell the comics. in that order.
-"#),
-            ],
-            chats: [(cond: Flag("eli_online"), dialogue: "eli_blip")],
-            idle: [(cond: Always, body: "{amber}eli{/} is not here. {dim}(no carrier){/}")],
-            listed: Always,
-        ),
-        (
-            id: "mara",
-            color: "violet",
-            sprite: "mara",
-            finger: [(cond: Always, body: r#"
-{b}USER:{/}        mara
-{b}REAL NAME:{/}   Mara Quinn
-{b}ACCESS:{/}      5 (sysop)
-{b}LAST LOGIN:{/}  08/14/1998 03:16 AM
-{b}STATUS:{/}      offline
-{b}PLAN:{/}
-  keep the lights on.
-"#)],
-            listed: Always,
-        ),
-        (
-            id: "parallax",
-            color: "green",
-            sprite: "parallax",
-            finger: [
-                (cond: Flag("mail:m_parallax"), body: r#"
-{b}USER:{/}        parallax
-{b}LAST LOGIN:{/}  {today}
-{b}FROM:{/}        {dim}external line, no node assigned{/}
-{b}STATUS:{/}      offline
-{b}PLAN:{/}
-  burn it down properly this time.
-"#),
-                (cond: Always, body: r#"
-{b}USER:{/}        parallax
-{b}LAST LOGIN:{/}  08/16/1998
-{b}STATUS:{/}      offline
-{b}PLAN:{/}
-  rm -rf the past.
-"#),
-            ],
-            listed: Always,
-        ),
-        (id: "kestrel", color: "blue", listed: Always, finger: [(cond: Always, body: r#"
-{b}USER:{/}        kestrel
-{b}LAST LOGIN:{/}  08/13/1998
-{b}PLAN:{/}
-  convince everyone pineapple belongs on pizza. find out who is on node 2.
-"#)]),
-        (id: "dialtone", color: "yellow", listed: Always, finger: [(cond: Always, body: r#"
-{b}USER:{/}        dialtone
-{b}LAST LOGIN:{/}  08/12/1998
-{b}PLAN:{/}
-  get my doom ii disks back from {player}.
-"#)]),
-        (id: "byte_witch", color: "red", listed: Always, finger: [(cond: Always, body: r#"
-{b}USER:{/}        byte_witch
-{b}LAST LOGIN:{/}  08/13/1998
-{b}PLAN:{/}
-  1. learn perl  2. regret it  3. teach the cat perl
-"#)]),
-        (id: "crankshaft", color: "text", listed: Always, finger: [(cond: Always, body: r#"
-{b}USER:{/}        crankshaft
-{b}LAST LOGIN:{/}  08/11/1998
-{b}PLAN:{/}
-  Y2K bunker: 74% complete. beans: 100% complete.
-"#)]),
-        (
-            id: "$player",
-            color: "white",
-            sprite: "player",
-            finger: [
-                (cond: Flag("actend:1"), body: r#"
-{b}USER:{/}        {player}
-{b}ACCESS:{/}      4
-{b}CREATED:{/}     {amber}07/22/1998{/}
-{b}LAST LOGIN:{/}  {today}
-{b}PLAN:{/}
-  don't let them shut it down.
-"#),
-                (cond: Always, body: r#"
-{b}USER:{/}        {player}
-{b}ACCESS:{/}      4
-{b}LAST LOGIN:{/}  08/14/1998
-{b}PLAN:{/}
-  don't let them shut it down.
-"#),
-            ],
-            listed: Never,
-        ),
-    ],
-
     help: [
         (cmd: "boards", desc: "list message boards"),
         (cmd: "open <#>", desc: "enter a board"),
@@ -365,6 +184,27 @@
             ],
         ),
         (
+            id: "kick_1",
+            steps: [
+                Glitch(600),
+                Pause(600),
+                Clear,
+                Sprite("root"),
+                Line(""),
+                Type("{white}ROOT:{/} That is enough for one night."),
+                Pause(1400),
+                Type("{white}ROOT:{/} Go to sleep, {player}."),
+                Pause(1600),
+                Type("{white}ROOT:{/} We will keep your seat warm."),
+                Pause(1800),
+                Glitch(400),
+                Line(""),
+                Line("{red}NO CARRIER{/}"),
+                Pause(1600),
+            ],
+            on_end: [Disconnect],
+        ),
+        (
             id: "act1_end",
             steps: [
                 Glitch(900),
@@ -395,8 +235,7 @@
                 When(All([Lte("trust_ghost", 1), NoFlag("forced_archive"), NoFlag("told_root_ghost"), NoFlag("talked_eli")]), [Line("{dim}nobody is holding the line open.{/}")]),
                 Pause(2600),
                 Line(""),
-                Line("{dim}the line will ring again in Act II: ARCHIVES.{/}"),
-                Line("{dim}until then, DEADLINE stays up. it always does.{/}"),
+                Line("{dim}the board is still up. it always is.{/}"),
                 Pause(3500),
             ],
             on_end: [Set("act1_complete"), Print("{dim}...{/}"), Print("{amber}CARRIER RESTORED.{/} {dim}the board is quieter now.{/}")],

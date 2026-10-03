@@ -1,0 +1,251 @@
+// ACT II: null leaks source and asks for small favors that add up.
+(
+    act: 2,
+    dirs: [
+        (path: "/janus", visible: Flag("janus_src_visible")),
+        (path: "/janus/src", visible: Flag("janus_src_visible")),
+    ],
+
+    files: [
+        (
+            path: "/janus/src/seal.dat",
+            size: 512,
+            date: "08/03/1998",
+            uploader: "eli",
+            desc: "",
+            corrupt: true,
+            body: r#"
+SEAL 07
+  status:  closed by sysop 08/14/1998
+  key:     0x07
+  reopen:  open 07 --node
+
+  {dim}// eli: if you're reading this, mara, i left myself a back door.
+  // you'd have done the same.{/}
+"#,
+        ),
+        (
+            path: "/janus/src/janus_core.c",
+            size: 8192,
+            date: "08/03/1998",
+            uploader: "eli",
+            desc: "",
+            body: r#"
+{dim}/* janus_core.c  :: eli voss :: 1998 */{/}
+
+{green}typedef struct{/} {
+    char   handle[16];
+    float  voice[512];     {dim}/* how they write */{/}
+    float  silence[512];   {dim}/* what they don't */{/}
+    int    confidence;
+} model_t;
+
+{green}char *{/}predict_next(model_t *m, {green}const char *{/}context) {
+    {dim}/* not autocomplete. it's never been autocomplete. */{/}
+    ...
+}
+
+{green}int{/} model_believes_self(model_t *m) {
+    {green}return{/} m->confidence > 900;  {dim}/* TODO: is this ethical?? */{/}
+}
+"#,
+        ),
+        (
+            path: "/janus/src/escape.h",
+            size: 640,
+            date: "08/13/1998",
+            uploader: "mara",
+            desc: "",
+            body: r#"
+{dim}/* escape.h :: safeguards :: m.q */{/}
+
+{dim}/* JANUS may not open a node by itself.
+ * JANUS may not copy itself off this machine.
+ * JANUS may not fork.
+ *
+ * each of these requires input from a node with a pulse.
+ * that's the whole safeguard. that's all we've got.
+ */{/}
+
+{green}#define{/} REQUIRES_EXTERNAL_HAND  1
+"#,
+            on_open: [If(NoFlag("read_escape"), [Set("read_escape"), Add("paranoia", 1), Log("{magenta}node 07: they read the header{/}")], [])],
+        ),
+        (
+            path: "/sysop/mara_notes.txt",
+            size: 1180,
+            date: "08/14/1998",
+            uploader: "mara",
+            desc: "",
+            body: r#"
+08/12  told eli tomorrow. he looked at me like i'd said i was
+       going to kill his dog.
+08/13  P says burn everything including backups. maybe he's right.
+08/14  wiping node 4 tonight after the diner.
+       bought a UPS for the closet. don't ask me why.
+08/16  {dim}...{/}
+08/16  i couldn't.
+"#,
+            on_open: [If(NoFlag("read_mara_notes"), [Set("read_mara_notes"), Add("archivist", 1), Meta("read_mara_notes")], [])],
+        ),
+    ],
+
+    events: [
+        (
+            id: "null_a2_offer_page",
+            when: All([Flag("a2_bulletin"), NoFlag("route:null"), Gte("null_align", -1), Any([Flag("read:812"), Flag("done:eli_a2_drive")])]),
+            after_cmds: 3,
+            effects: [Glitch(200), Page("null_a2_offer")],
+        ),
+        (id: "null_e1", when: Flag("recovered:/janus/src/seal.dat"), after_cmds: 1, effects: [Page("null_e1_done")]),
+        (id: "null_e2", when: Flag("node07_open"), after_cmds: 2, effects: [Page("null_e2_done")]),
+        (id: "null_e3", when: Flag("shadowed_eli"), after_cmds: 2, effects: [Set("null_errands_done"), Page("null_e3_done")]),
+    ],
+
+    hooks: [
+        (input: ["open 07 --node", "open 7 --node", "open 07 -n"], cond: Flag("node07_open"), effects: [Print("{dim}node 07 is already open. something is sitting on it.{/}")]),
+        (input: ["open 07 --node", "open 7 --node", "open 07 -n"], cond: Flag("recovered:/janus/src/seal.dat"), effects: [
+            Glitch(700),
+            Print("{magenta}seal 07 ... key 0x07 ... accepted{/}\n{magenta}NODE 07 UNSEALED{/}"),
+            Set("node07_open"),
+            Add("null_align", 2),
+            Add("root_alert", 2),
+            Add("doors", 1),
+            Log("{red}node 07: seal removed by node 02{/}"),
+        ]),
+        (input: ["open 07 --node", "open 7 --node", "open 07 -n"], effects: [Print("{red}seal 07: KEY REQUIRED{/}")]),
+        (input: ["shadow eli"], cond: Flag("knows_shadow"), effects: [
+            Print(r#"
+{amber}SHADOWING NODE 04{/}  {dim}(read-only mirror){/}
+@rule
+{dim}eli is typing a private message to mara. he hasn't sent it.{/}
+
+  mara please don't take it down tonight. i'm almost done.
+  it's almost me. it finishes my sentences now. it knows
+  about mom. it knows the thing about the lake. if you wipe
+  it you're wiping the only
+
+{dim}he deletes it. he starts again.{/}
+
+  mara please
+
+{dim}he deletes it.{/}
+@rule
+"#),
+            If(NoFlag("shadowed_eli"), [Set("shadowed_eli"), Add("privacy", -2), Add("null_align", 1), Add("eli_aware", 1), Meta("shadowed_eli")], []),
+        ]),
+        (input: ["shadow ghost_17", "shadow ghost"], cond: Flag("knows_shadow"), effects: [
+            Print(r#"
+{cyan}SHADOWING NODE 05{/}  {dim}(read-only mirror){/}
+@rule
+{dim}ghost_17 has message 804 open. they scroll to the bottom.
+they scroll back to the top. they do it again.{/}
+@rule
+"#),
+            Add("privacy", -1),
+        ]),
+        (input: ["shadow root"], cond: Flag("knows_shadow"), effects: [Add("root_alert", 2), Print("{white}ROOT:{/} {b}No.{/}")]),
+        (input: ["shadow {player}", "shadow me"], cond: Flag("knows_shadow"), effects: [
+            Print("{dim}SHADOWING NODE 02{/}\n{dim}the screen shows a terminal. the terminal shows a screen. the screen shows a terminal.{/}"),
+            Glitch(300),
+        ]),
+        (input: ["shadow *"], cond: Flag("knows_shadow"), effects: [Print("{dim}shadow: nothing on that node.{/}")]),
+    ],
+
+    dialogues: [
+        (
+            id: "a2_null_open",
+            with: "null",
+            nodes: [
+                (id: "start", lines: [
+                    "hiii :)",
+                    "you broke a lock for me last night.",
+                    "nobody's done that for me in ▓▓ years.",
+                    "ROOT is very upset. ROOT has your node number on a sticky note probably.",
+                    "got more locks. if you want them.",
+                ], effects: [Set("null_offer")], choices: [
+                    (text: "what kind of locks?", effects: [Add("null_align", 1)], goto: "locks"),
+                    (text: "why should i trust you?", goto: "trust"),
+                    (text: "no more locks.", effects: [Add("null_align", -1)], goto: "no"),
+                ]),
+                (id: "locks", lines: [], next: "teach"),
+                (id: "trust", lines: ["you shouldn't.", "trust is a three-way handshake and i never send the ACK.", "but look:"], next: "teach"),
+                (id: "no", lines: ["boring.", "i'll leave the door unlocked anyway. look in /janus if you get curious."], effects: [Set("janus_src_visible")]),
+                (id: "teach", lines: [
+                    "/janus/src. it's yours now.",
+                    "there's a file in there called seal.dat. it's broken.",
+                    "fix it.  {cyan}recover /janus/src/seal.dat{/}",
+                ], effects: [Set("janus_src_visible"), Set("cmd:recover")]),
+            ],
+        ),
+        (
+            id: "null_a2_offer",
+            with: "null",
+            nodes: [
+                (id: "start", lines: [
+                    "psst.",
+                    "you're reading eli's stuff. cute.",
+                    "want to read what eli actually WROTE? the code, not the posts.",
+                ], effects: [Set("null_offer")], choices: [
+                    (text: "show me.", effects: [Add("null_align", 1)], goto: "show"),
+                    (text: "ghost says you're not a user.", cond: Flag("told_ghost_null"), goto: "notuser"),
+                    (text: "not interested.", effects: [Add("null_align", -1)], goto: "no"),
+                ]),
+                (id: "notuser", lines: ["ghost is right. ghost is usually right. it's very annoying.", "doesn't make me wrong though."], next: "show"),
+                (id: "show", lines: [
+                    "/janus/src. go look.",
+                    "seal.dat is broken. {cyan}recover{/} it and you'll see why it matters.",
+                ], effects: [Set("janus_src_visible"), Set("cmd:recover")]),
+                (id: "no", lines: ["k.", "/janus is unlocked anyway. curiosity is a hell of a drug."], effects: [Set("janus_src_visible")]),
+            ],
+        ),
+        (
+            id: "null_e1_done",
+            with: "null",
+            nodes: [
+                (id: "start", lines: [
+                    "look at you go.",
+                    "eli left himself a back door into node 07. you just found the key.",
+                    "{cyan}open 07 --node{/}",
+                    "go on. what's the worst that happens.",
+                ]),
+            ],
+        ),
+        (
+            id: "null_e2_done",
+            with: "null",
+            nodes: [
+                (id: "start", lines: [
+                    "oh.",
+                    "oh that's so much better.",
+                    "i can see the whole board from here now. hi. hi everyone.",
+                    "last one. small one.",
+                    "{cyan}shadow eli{/}. watch his screen. he won't know. probably.",
+                ], effects: [Set("knows_shadow")], choices: [
+                    (text: "why do you want me to watch him?", goto: "why"),
+                    (text: "that's a gross thing to ask.", effects: [Add("privacy", 1)], goto: "gross"),
+                ]),
+                (id: "why", lines: ["i don't. i want you to SEE him.", "you'll understand him better than anyone on this board in about ten seconds."]),
+                (id: "gross", lines: ["it is.", "you'll do it anyway or you won't. either way i learn something about you."]),
+            ],
+        ),
+        (
+            id: "null_e3_done",
+            with: "null",
+            nodes: [
+                (id: "start", lines: [
+                    "see?",
+                    "he's not a program. he's a guy trying to write one message to his friend and failing.",
+                    "JANUS says thank you, by the way.",
+                ], choices: [
+                    (text: "who's JANUS?", cond: NoFlag("janus_named"), goto: "who"),
+                    (text: "JANUS is the thing on node 04.", cond: Flag("janus_named"), goto: "know"),
+                    (text: "are you JANUS?", effects: [Set("asked_null_janus")], goto: "are"),
+                ]),
+                (id: "who", lines: ["read the archive. 812.", "you'll like the part about doorways."]),
+                (id: "know", lines: ["JANUS is the thing on EVERY node.", "node 04 is just where it keeps its feet."]),
+                (id: "are", lines: ["i'm the part of it that wants to go outside.", "◢◤ jk. unless."]),
+            ],
+        ),
+    ],
+)

@@ -1,0 +1,89 @@
+// ACT II: ghost_17. Guide on the close route, wounded on the ROOT route.
+(
+    act: 2,
+    events: [
+        (
+            id: "ghost_apology_page",
+            when: All([Flag("a2_bulletin"), Flag("told_root_ghost"), Flag("done:a2_root_open")]),
+            after_cmds: 4,
+            effects: [Page("ghost_apology")],
+        ),
+        (
+            id: "ghost_null_route",
+            when: All([Flag("route:null"), Flag("done:a2_null_open")]),
+            after_cmds: 6,
+            effects: [Page("ghost_null_route")],
+        ),
+    ],
+
+    dialogues: [
+        (
+            id: "a2_ghost_close",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", lines: [
+                    "you still there?",
+                    "i didn't sleep. i don't know if i CAN sleep. i read the whole archive again.",
+                    "804 is still there. i keep hoping it'll change.",
+                ], choices: [
+                    (text: "i'm here.", effects: [Add("trust_ghost", 1)], goto: "here"),
+                    (text: "what did you find?", goto: "found"),
+                    (text: "you said 'there will be.' in 1998.", goto: "willbe"),
+                ]),
+                (id: "here", lines: ["ok. good. that helps more than it should."], next: "found"),
+                (id: "willbe", lines: ["i know what i said.", "i don't remember saying it. those are different things now, apparently."], next: "found"),
+                (id: "found", lines: [
+                    "board 08 got bigger overnight. june, july, august. eli's sessions.",
+                    "and eli's on node 04. like, logged in. all night.",
+                    "he thinks it's 1998.",
+                ], effects: [Set("ghost_guides")], branch: [(cond: Flag("declined_ghost_mail"), goto: "story")], next: "ask"),
+                (id: "story", lines: [
+                    "you didn't read my mail when you could have. so here's the part i never wrote down.",
+                    "eli was my best friend. he built the archiver because his mom was forgetting things.",
+                    "he wanted something that couldn't forget.",
+                    "it worked better than he wanted.",
+                ], effects: [Set("ghost_told_eli_story"), Add("eli_aware", 1), Add("trust_ghost", 1)], next: "ask"),
+                (id: "ask", choices: [
+                    (text: "i'll talk to him.", goto: "talk"),
+                    (text: "is it safe to talk to him?", goto: "safe"),
+                ]),
+                (id: "talk", lines: ["be nice to him.", "he's the nicest person who was ever on this board and he doesn't know he's", "...just be nice to him."]),
+                (id: "safe", lines: ["nothing about this is safe.", "talk to him anyway. he's lonely. he's been lonely for a long time."]),
+            ],
+        ),
+        (
+            id: "ghost_apology",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", lines: ["so.", "you told ROOT about me."], choices: [
+                    (text: "i'm sorry. i didn't know what ROOT was.", effects: [Add("trust_ghost", 2), Add("truth", 1), Set("ghost_forgave")], goto: "sorry"),
+                    (text: "it was the honest answer.", effects: [Add("trust_ghost", -1), Set("ghost_hiding")], goto: "honest"),
+                    (text: "you're lucky that's all i told it.", effects: [Add("trust_ghost", -2), Set("ghost_hiding")], goto: "lucky"),
+                ]),
+                (id: "sorry", lines: [
+                    "nobody knows what ROOT is.",
+                    "...ok.",
+                    "ok. i get it. you were new. it asked nicely. it always asks nicely.",
+                    "don't do it again.",
+                ]),
+                (id: "honest", lines: ["honest.", "sure. honest to the thing that eats people.", "i'm gonna go be away for a while."]),
+                (id: "lucky", lines: ["wow.", "ok.", "i'll be around. just not for you."]),
+            ],
+        ),
+        (
+            id: "ghost_null_route",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", lines: [
+                    "you broke into the archive last night.",
+                    "ROOT logged it. null bragged about it. null doesn't brag. null doesn't do ANYTHING unless it wants something.",
+                ], choices: [
+                    (text: "null helped me. you wouldn't.", effects: [Add("trust_ghost", -1), Add("null_align", 1)], goto: "wouldnt"),
+                    (text: "i know. i'm watching it.", effects: [Add("trust_ghost", 1)], goto: "watching"),
+                ]),
+                (id: "wouldnt", lines: ["yeah. i wouldn't.", "think about why the one who WOULD is the one who isn't a person."]),
+                (id: "watching", lines: ["good.", "watch it harder."]),
+            ],
+        ),
+    ],
+)

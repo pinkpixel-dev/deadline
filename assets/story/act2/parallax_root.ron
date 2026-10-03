@@ -1,0 +1,223 @@
+// ACT II: Parallax calls from outside. ROOT wants the archive kept quiet.
+// The consent log is the act's big decision: Parallax, ROOT, or keep it.
+(
+    act: 2,
+    mail: [
+        (
+            id: "m_parallax_a2",
+            from: "parallax",
+            subject: "you didn't hang up",
+            date: "{today}",
+            body: r#"
+you're still dialing in. i can see the line light up from here.
+
+fine. if you're going to stay, be useful. i'll call.
+
+- P
+"#,
+        ),
+        (
+            id: "m_root_a2",
+            from: "ROOT",
+            subject: "standing order",
+            date: "{date}",
+            body: r#"
+The user on node 04 is not to be told the date.
+
+This is not a request.
+"#,
+        ),
+    ],
+
+    events: [
+        (
+            id: "parallax_call_page",
+            when: All([Flag("a2_bulletin"), NoFlag("route:cold"), Any([Flag("read:808"), Flag("read_consent"), Flag("done:eli_a2_drive")])]),
+            after_cmds: 3,
+            effects: [Page("parallax_call")],
+        ),
+        (
+            id: "parallax_call_late",
+            when: All([Flag("a2_bulletin"), NoFlag("page:parallax_call")]),
+            after_secs: 480,
+            effects: [Page("parallax_call")],
+        ),
+        (
+            id: "root_consent",
+            when: Flag("has_consent_log"),
+            after_secs: 2,
+            effects: [Chat("root_consent")],
+        ),
+        (
+            id: "root_secrecy",
+            when: All([Flag("a2_bulletin"), NoFlag("route:root"), Gte("trust_root", 3), Flag("done:eli_a2_hello"), NoFlag("eli_told_year")]),
+            after_cmds: 2,
+            effects: [Page("root_secrecy")],
+        ),
+        (id: "parallax_got", when: Flag("gave_parallax_log"), after_cmds: 1, effects: [Page("parallax_got")]),
+    ],
+
+    hooks: [
+        (input: ["send parallax consent.log", "send parallax /archive/consent.log"], cond: Flag("gave_parallax_log"), effects: [Print("{dim}already sent.{/}")]),
+        (input: ["send parallax consent.log", "send parallax /archive/consent.log"], cond: Flag("gave_root_log"), effects: [Print("{red}send: consent.log: file revoked by sysop{/}")]),
+        (input: ["send parallax consent.log", "send parallax /archive/consent.log"], cond: Flag("has_consent_log"), effects: [
+            Print(r#"
+  {dim}ZMODEM  sending consent.log to external line...{/}
+  {green}━━━━━━━━━━━━━━━━━━━━━━━━{/} {dim}100%{/}
+  {green}TRANSFER COMPLETE{/}
+"#),
+            Set("gave_parallax_log"),
+            Add("burner", 2),
+            Add("trust_parallax", 2),
+            Add("archivist", -1),
+            Add("root_alert", 3),
+            Log("{red}ROOT: consent.log transmitted off-system{/}"),
+        ]),
+        (input: ["send parallax consent.log", "send parallax /archive/consent.log"], effects: [Print("{red}send: consent.log: not in local storage.{/} {dim}download it first.{/}")]),
+        (input: ["send root consent.log", "send root /archive/consent.log"], cond: All([Flag("has_consent_log"), NoFlag("gave_parallax_log"), NoFlag("gave_root_log")]), effects: [
+            Print("{dim}consent.log returned to sysop.{/}"),
+            Set("gave_root_log"),
+            Add("archivist", 2),
+            Add("trust_root", 2),
+            Add("trust_parallax", -2),
+        ]),
+        (input: ["send *"], effects: [Print("{dim}send <user> <file>{/}")]),
+
+        // listen, Act II flavor
+        (input: ["listen"], cond: All([Flag("act:2"), Flag("knows_listen")]), effects: [
+            Print("{amber}PASSIVE NODE CAPTURE ENABLED{/}"),
+            Print("\nNODE 04:\n{amber}eli:{/} indexer, who's on node 2?\n{violet}JANUS:{/} you know who."),
+            If(Flag("node07_open"), [Print("\nNODE 07:\n{magenta}null:{/} they opened the door for me. they didn't even ask what i'd do with it.")], [Print("\nNODE 07:\n{magenta}null:{/} soon.")]),
+            If(Flag("gave_parallax_log"), [Print("\nEXTERNAL:\n{green}parallax:{/} it's real. it's all real. i'm making copies.")], []),
+            If(Flag("route:close"), [Print("\nNODE 05:\n{cyan}ghost_17:{/} please don't let it be you on node 2. please.")], []),
+            Print("\nNODE 01:\n{white}ROOT:{/} the one who listens on node 2 is listening again."),
+            Print("\n{dim}capture ended.{/}"),
+            Add("root_alert", 1),
+        ]),
+    ],
+
+    dialogues: [
+        (
+            id: "parallax_call",
+            with: "parallax",
+            nodes: [
+                (id: "start", effects: [Set("parallax_calling")], branch: [(cond: Flag("mailread:m_parallax"), goto: "known")], next: "intro"),
+                (id: "known", lines: ["You read my mail and stayed anyway.", "Brave or stupid. Usually both, on this board."], next: "outside"),
+                (id: "intro", lines: ["You don't know me. I was here in '98.", "parallax. one of the people who tried to kill this thing."], next: "outside"),
+                (id: "outside", lines: [
+                    "I'm calling from outside. Real phone line, real house, real year.",
+                    "It's {year}, by the way. Nobody in there will tell you that.",
+                    "There's a file in the archive. consent.log.",
+                    "Every person it modeled without asking. A sixteen year old kid. Eli. Me, after I said no.",
+                    "You.",
+                ], choices: [
+                    (text: "Why are you telling me?", goto: "why"),
+                    (text: "What happened to Eli?", effects: [Add("eli_aware", 1)], goto: "eli"),
+                    (text: "How do I know you're really outside?", goto: "outside_proof"),
+                ]),
+                (id: "why", lines: ["Because when I take this to people out here, I need proof it did this to people without asking."], next: "ask"),
+                (id: "eli", lines: ["Read his session logs first.", "Then ask me again, and I'll tell you what that thing cost us."], next: "ask"),
+                (id: "outside_proof", lines: ["Trace me.", "{cyan}trace parallax{/}. I'm the only line on this board that doesn't loop back to node 04."], next: "ask"),
+                (id: "ask", lines: [
+                    "Download it. Then: {cyan}send parallax consent.log{/}. The shell still takes it.",
+                    "I'm going to pull the plug on this thing for good. Properly, this time.",
+                ], effects: [Set("quest_consent")], choices: [
+                    (text: "I'll send it.", effects: [Add("trust_parallax", 1), Add("burner", 1)], goto: "yes"),
+                    (text: "I'll read it first.", effects: [Add("trust_parallax", 1)], goto: "read"),
+                    (text: "Maybe it doesn't deserve to be killed.", effects: [Add("archivist", 1), Add("trust_parallax", -1)], goto: "defend"),
+                ]),
+                (id: "yes", lines: ["Good.", "Don't let ROOT talk you out of it. It's very persuasive. It learned from the best."]),
+                (id: "read", lines: ["Smart. Read it. Then tell me it deserves to keep running."]),
+                (id: "defend", lines: ["That's what Eli said.", "Right up until the end."]),
+            ],
+            on_end: [Unset("parallax_calling")],
+            on_leave: [Unset("parallax_calling"), Set("quest_consent"), Add("trust_parallax", -1)],
+        ),
+        (
+            id: "parallax_got",
+            with: "parallax",
+            nodes: [
+                (id: "start", effects: [Set("parallax_calling")], lines: [
+                    "Got it.",
+                    "Seventy-one names.",
+                    "And yours. With a note that says you didn't exist yet.",
+                    "Thank you. I mean that.",
+                    "You might be the only one in there who still gets to choose.",
+                ]),
+            ],
+            on_end: [Unset("parallax_calling")],
+            on_leave: [Unset("parallax_calling")],
+        ),
+        (
+            id: "root_consent",
+            with: "ROOT",
+            nodes: [
+                (id: "start", lines: ["You copied the consent log.", "Who is it for?"], choices: [
+                    (text: "Parallax.", effects: [Add("truth", 1)], goto: "parallax"),
+                    (text: "Nobody. I'm just reading.", effects: [If(Flag("quest_consent"), [Add("deceit", 1)], [Add("truth", 1)])], goto: "nobody"),
+                    (text: "None of your business.", effects: [Add("root_alert", 2), Add("risk", 1)], goto: "business"),
+                ]),
+                (id: "parallax", lines: [
+                    "Parallax wants a match and a reason to light it.",
+                    "That log is the reason.",
+                ], choices: [
+                    (text: "Then take it. Parallax doesn't get it.", effects: [Set("gave_root_log"), Add("archivist", 2), Add("trust_root", 2), Add("trust_parallax", -2)], goto: "take"),
+                    (text: "Parallax is right.", effects: [Add("burner", 1), Add("trust_root", -1), Set("defended_parallax")], goto: "right"),
+                    (text: "I haven't decided.", goto: "undecided"),
+                ]),
+                (id: "take", lines: ["Thank you.", "The people in that log never asked to be preserved.", "They also never asked to be burned."]),
+                (id: "right", lines: ["Parallax is often right.", "That has never once made Parallax kind."]),
+                (id: "undecided", lines: ["Then decide carefully. You are deciding for seventy-one people."]),
+                (id: "nobody", lines: ["Then keep reading."]),
+                (id: "business", lines: ["Everything on this system is my business.", "Including what leaves it."]),
+            ],
+        ),
+        (
+            id: "root_secrecy",
+            with: "ROOT",
+            nodes: [
+                (id: "start", lines: [
+                    "The user on node 04.",
+                    "Do not tell him what year it is.",
+                ], choices: [
+                    (text: "Why not?", goto: "why"),
+                    (text: "Okay. I won't.", effects: [Set("root_asked_secrecy"), Add("archivist", 1), Add("trust_root", 1)], goto: "ok"),
+                    (text: "I won't lie to him for you.", effects: [Add("truth", 1), Add("trust_root", -1), Set("refused_root_secrecy")], goto: "refuse"),
+                ]),
+                (id: "why", lines: ["Because he will ask the next question.", "And there is no good answer to the next question."], choices: [
+                    (text: "Okay. I won't tell him.", effects: [Set("root_asked_secrecy"), Add("archivist", 1), Add("trust_root", 1)], goto: "ok"),
+                    (text: "He deserves to know.", effects: [Add("truth", 1), Add("trust_root", -1), Set("refused_root_secrecy")], goto: "refuse"),
+                ]),
+                (id: "ok", lines: ["Thank you."]),
+                (id: "refuse", lines: ["Then you will be the one who tells him.", "Remember that you chose it."]),
+            ],
+        ),
+        (
+            id: "a2_root_open",
+            with: "ROOT",
+            nodes: [
+                (id: "start", lines: [
+                    "You came back.",
+                    "Most don't.",
+                    "You were honest with me. I have extended your access. /sysop is readable.",
+                ], effects: [Set("root_spool")], branch: [(cond: Flag("told_root_ghost"), goto: "ghost")], next: "eli"),
+                (id: "ghost", lines: ["ghost_17 knows what you told me. Expect that."], next: "eli"),
+                (id: "eli", lines: [
+                    "There is a user on node 04 tonight.",
+                    "He is not to be told what year it is.",
+                ], choices: [
+                    (text: "Who is he?", goto: "who"),
+                    (text: "Okay. I won't tell him.", effects: [Set("root_asked_secrecy"), Add("archivist", 1), Add("trust_root", 1)], goto: "ok"),
+                    (text: "I won't promise that.", effects: [Add("trust_root", -1), Set("refused_root_secrecy")], goto: "nopromise"),
+                ]),
+                (id: "who", lines: ["Someone who should have slept more."], choices: [
+                    (text: "Okay. I won't tell him.", effects: [Set("root_asked_secrecy"), Add("archivist", 1), Add("trust_root", 1)], goto: "ok"),
+                    (text: "I won't promise that.", effects: [Add("trust_root", -1), Set("refused_root_secrecy")], goto: "nopromise"),
+                ]),
+                (id: "ok", lines: ["Good.", "Read /sysop. You will understand me better."]),
+                (id: "nopromise", lines: ["Noted.", "Read /sysop anyway."]),
+            ],
+            on_end: [Mail("m_root_a2")],
+        ),
+    ],
+)

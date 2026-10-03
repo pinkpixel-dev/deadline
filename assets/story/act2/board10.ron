@@ -1,0 +1,130 @@
+// ACT II: boards that shouldn't exist. [10] YOU and [11] DON'T GO IN HERE.
+// Nobody announces them. They appear in the board list and then they don't.
+(
+    act: 2,
+    boards: [
+        (
+            id: "10",
+            name: "YOU",
+            count_label: "3 msgs",
+            visible: All([Flag("board10_open"), NoFlag("board10_gone")]),
+            header: r#"
+@banner white YOU
+{dim}posts by {player}. 1998.{/}
+"#,
+            on_open: [If(NoFlag("opened_board10"), [Set("opened_board10"), Meta("saw_board10"), Glitch(300)], [])],
+        ),
+        (
+            id: "11",
+            name: "DON'T GO IN HERE",
+            count_label: "",
+            visible: All([Flag("board11_up"), NoFlag("board11_gone")]),
+            header: r#"
+{red}it's empty.{/}
+
+{dim}it was always empty.{/}
+"#,
+            on_open: [Glitch(700), Set("board11_gone"), Meta("saw_board11"), Add("paranoia", 1)],
+        ),
+    ],
+
+    posts: [
+        (id: 1001, board: "10", subject: "reading", date: "07/23/1998", author: "{player}", body: r#"
+{player}:
+i don't post. i just read.
+
+every night around 3 i dial in and read everything new.
+i like knowing everyone's still here. kestrel's pizza
+opinions. eli's 4am code. ghost being mean to people they
+like.
+
+nobody knows i'm here. i like that too.
+"#, on_read: [Add("paranoia", 1)]),
+        (id: 1002, board: "10", subject: "if anyone sees this", date: "08/01/1998", author: "{player}", body: r#"
+{player}:
+i think the archiver knows i'm here. there's a name on
+node 2 now. i never made an account.
+
+if you're reading this, you're me, or you're it.
+
+either way. hi.
+"#, on_read: [Add("paranoia", 1)]),
+        (id: 1003, board: "10", subject: "don't", date: "08/14/1998 03:17 AM", author: "{player}", body: r#"
+{player}:
+don't shut it down.
+"#, alt: [(cond: Flag("read:815"), body: r#"
+{player}:
+don't shut it down.
+
+{dim}(you've read this sentence before. you've said it before.){/}
+"#)], on_read: [Add("paranoia", 1), Glitch(250)]),
+    ],
+
+    events: [
+        (
+            id: "board10_appear",
+            when: All([Flag("act:2"), Any([Flag("read:814"), Flag("read:812")])]),
+            after_cmds: 2,
+            effects: [Set("board10_open"), Log("message base: board 10 mounted (owner: node 02)")],
+        ),
+        (
+            id: "board10_appear_late",
+            when: All([Flag("act:2"), NoFlag("board10_open")]),
+            after_secs: 600,
+            effects: [Set("board10_open"), Log("message base: board 10 mounted (owner: node 02)")],
+        ),
+        (
+            id: "board10_vanish",
+            when: All([Flag("board10_open"), Any([Flag("read:1002"), Flag("read:1003")])]),
+            after_cmds: 3,
+            effects: [Set("board10_gone"), Glitch(300), Log("message base: board 10 removed by ROOT")],
+        ),
+        (
+            id: "board10_vanish_unread",
+            when: Flag("board10_open"),
+            after_cmds: 25,
+            effects: [Set("board10_gone"), Log("message base: board 10 removed by ROOT")],
+        ),
+        (id: "board11_appear", when: Flag("board10_gone"), after_cmds: 5, effects: [Set("board11_up")]),
+        (id: "board11_vanish", when: Flag("board11_up"), after_cmds: 5, effects: [Set("board11_gone")]),
+        (id: "ghost_board10", when: All([Flag("tried_10"), NoFlag("route:cold")]), after_cmds: 1, effects: [Page("ghost_board10")]),
+    ],
+
+    hooks: [
+        (input: ["open 10", "board 10", "join 10", "open you", "read 1001", "read 1002", "read 1003"], cond: Flag("board10_gone"), effects: [
+            Print("{red}ERROR: BOARD DOES NOT EXIST{/}"),
+            Set("tried_10"),
+        ]),
+        (input: ["open 11", "board 11", "open don't go in here"], cond: Flag("board11_gone"), effects: [
+            Print("{red}ERROR: BOARD DOES NOT EXIST{/}"),
+        ]),
+    ],
+
+    dialogues: [
+        (
+            id: "ghost_board10",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", branch: [(cond: Gte("trust_ghost", 3), goto: "saw")], next: "deny"),
+                (id: "saw", lines: [
+                    "board 10.",
+                    "i saw it too.",
+                    "i read one of the posts before it went away.",
+                    "it sounded like you. like, exactly like you.",
+                ], choices: [
+                    (text: "it was me. or something wearing my name.", effects: [Add("truth", 1), Add("trust_ghost", 1), Set("told_ghost_board10")], goto: "me"),
+                    (text: "i didn't write those.", goto: "notme"),
+                ]),
+                (id: "me", lines: ["yeah.", "you were reading this board in 1998, {player}.", "you were on node 2 the whole time and none of us knew."], next: "nine"),
+                (id: "notme", lines: ["i believe you.", "i don't think it matters whether you wrote them."], next: "nine"),
+                (id: "deny", lines: [
+                    "board 10?",
+                    "there's no board 10.",
+                    "there was never a board 10.",
+                ], next: "nine"),
+                (id: "nine", branch: [(cond: Flag("tried_09_again"), goto: "nine2")]),
+                (id: "nine2", lines: ["first board 9. now this.", "what ARE you."], effects: [Add("paranoia", 1)]),
+            ],
+        ),
+    ],
+)

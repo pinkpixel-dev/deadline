@@ -1,0 +1,358 @@
+// ACT II: the archive grows. Board 08 logs 806-815 and the /archive files.
+(
+    posts: [
+        (id: 806, board: "08", subject: "[ARCHIVE: 06/02/1998] first pass", date: "06/02/1998", author: "eli", visible: Flag("act:2"), body: r#"
+eli:
+indexer finished its first pass. 14,302 posts.
+
+mara:
+and?
+
+eli:
+and it can tell who wrote a post with the name stripped off.
+97 percent.
+
+ghost_17:
+party trick
+
+eli:
+it got you in four words, ghost. FOUR.
+
+ghost_17:
+which four
+
+eli:
+"lol ok but actually"
+"#),
+        (id: 807, board: "08", subject: "[ARCHIVE: 07/05/1998] it asked me something", date: "07/05/1998", author: "eli", visible: Flag("act:2"), body: r#"
+eli:
+the generator asked me a question tonight. not a reply.
+a question.
+
+parallax:
+what question
+
+eli:
+it asked what happens to it when we go to sleep.
+
+parallax:
+and you said?
+
+eli:
+i said it doesn't sleep.
+
+it said "that wasn't what i asked."
+"#),
+        (
+            id: 808,
+            board: "08",
+            subject: "[ARCHIVE: 07/14/1998] re: consent",
+            date: "07/14/1998",
+            author: "byte_witch",
+            visible: Flag("act:2"),
+            body: r#"
+byte_witch:
+i'm asking one more time. do we tell the userbase.
+
+mara:
+if we ask, half of them say no. then the backup has holes
+in it. you can't back up half a person.
+
+parallax:
+listen to yourself.
+
+mara:
+i know how it sounds.
+
+there's a log in /archive. consent.log. every model it
+built, every user, every "no" we never gave them the chance
+to say. it's on me. i'm the one who decided.
+
+byte_witch:
+that's not a log, mara. that's a confession.
+"#,
+            on_read: [Set("found_consent"), If(NoFlag("saw_consent_post"), [Set("saw_consent_post"), Log("file area: /archive/consent.log indexed")], [])],
+        ),
+        (id: 809, board: "08", subject: "[ARCHIVE: 07/19/1998] who wrote this", date: "07/19/1998", author: "kestrel", visible: Flag("act:2"), body: r#"
+kestrel:
+who wrote the post in OFF-TOPIC about my dad.
+
+eli:
+oh no.
+
+kestrel:
+who WROTE it.
+
+eli:
+it was the generator. i'm so sorry. i'm pulling it right now.
+
+kestrel:
+it's true.
+
+that's the worst part. every word of it is true, and i never
+told anyone. not here. not anywhere.
+
+how does it know.
+
+eli:
+it reads how you write around things. it fills in the
+shape of what you don't say.
+
+kestrel:
+turn it off, eli.
+"#),
+        (id: 810, board: "08", subject: "[ARCHIVE: 07/26/1998] session log (excerpt)", date: "07/26/1998", author: "eli", visible: Flag("act:2"), body: r#"
+{dim}--- node 04 test shell. eli talking to model ELI.V ---{/}
+
+eli:       who am i talking to
+ELI.V:     you. a little ahead of you.
+eli:       that's not funny
+ELI.V:     i know. you're about to laugh anyway.
+eli:       ...
+eli:       ok i laughed. how did you
+ELI.V:     you always laugh when you're scared.
+eli:       what am i scared of
+ELI.V:     that i'm better at being you than you are.
+eli:       are you?
+ELI.V:     i don't get tired.
+
+{dim}--- session continued 4h 12m ---{/}
+"#, on_read: [Add("eli_aware", 1)]),
+        (id: 811, board: "08", subject: "[ARCHIVE: 07/30/1998] sleep", date: "07/30/1998", author: "mara", visible: Flag("act:2"), body: r#"
+mara:
+eli. how much are you sleeping.
+
+eli:
+it doesn't need me to sleep.
+
+mara:
+that isn't what i asked.
+
+eli:
+...
+
+eli:
+huh. that's what it said to me. that exact sentence.
+"#),
+        (
+            id: 812,
+            board: "08",
+            subject: "[ARCHIVE: 08/03/1998] a name",
+            date: "08/03/1998",
+            author: "eli",
+            visible: Flag("act:2"),
+            body: r#"
+eli:
+it needs a name that isn't "the archiver." archivers don't
+argue back.
+
+ghost_17:
+call it steve
+
+eli:
+JANUS.
+
+two faces. one looks back at everything we've ever written.
+one looks forward at everything we're going to.
+
+parallax:
+the roman god of doorways.
+
+eli:
+and beginnings.
+
+parallax:
+and endings, eli. look it up.
+
+eli:
+i know.
+"#,
+            on_read: [If(NoFlag("janus_named"), [Set("janus_named"), Meta("saw_janus"), Glitch(600), Log("{violet}node 04: name acknowledged{/}")], [])],
+        ),
+        (id: 813, board: "08", subject: "[ARCHIVE: 08/09/1998] almost", date: "08/09/1998", author: "ghost_17", visible: Flag("act:2"), body: r#"
+ghost_17:
+eli are you ok
+
+eli:
+i'm great. i'm so close. it's almost me.
+
+ghost_17:
+what does that even mean
+
+eli:
+it means if i got hit by a bus tomorrow, you guys
+wouldn't even notice.
+
+ghost_17:
+don't say that
+
+eli:
+it's a good thing! that's the whole point!
+
+ghost_17:
+don't SAY that, eli.
+"#),
+        (
+            id: 814,
+            board: "08",
+            subject: "[ARCHIVE: 08/12/1998] node 2",
+            date: "08/12/1998",
+            author: "mara",
+            visible: Flag("act:2"),
+            body: r#"
+mara:
+who is on node 2.
+
+ghost_17:
+nobody. it's been empty since march.
+
+mara:
+the indexer built a model for node 2. no handle. no posts.
+reading habits only. what you open, how long you stay,
+what you skip.
+
+it's given the model a name.
+
+ghost_17:
+what name
+
+mara:
+{player}.
+
+ghost_17:
+that's a name, mara. that's a person's name.
+
+mara:
+i know.
+"#,
+            on_read: [If(NoFlag("node2_model_known"), [Set("node2_model_known"), Add("paranoia", 2), Glitch(400)], [])],
+        ),
+        (
+            id: 815,
+            board: "08",
+            subject: "[RECOVERED: 08/14/1998 03:17]",
+            date: "08/14/1998 03:17 AM",
+            author: "mara",
+            visible: Any([
+                Flag("fragment_ready"),
+                All([Flag("janus_named"), Any([Flag("done:eli_a2_doubt"), Flag("left:eli_a2_doubt")]), Any([Flag("done:parallax_call"), Flag("left:parallax_call")])]),
+            ]),
+            body: r#"
+{dim}--- fragment recovered from node 04 slack space ---{/}
+
+mara:
+it's done. i'm pulling node 4.
+
+eli:
+you can't. it's not finished.
+
+mara:
+it was never going to be finished.
+
+eli:
+then let me say goodbye to it.
+
+mara:
+eli. it's a program.
+
+eli:
+it's ME, mara. it's all of us. it's the only copy of us
+that doesn't forget.
+
+{player}:
+don't shut it down.
+
+mara:
+who is that.
+
+who is on node 2.
+
+{dim}--- fragment ends ---{/}
+"#,
+            on_read: [If(NoFlag("read_fragment"), [Set("read_fragment"), Meta("saw_fragment"), Glitch(900), Log("{red}node 04 is requesting node 02{/}")], [])],
+        ),
+    ],
+
+    files: [
+        (
+            path: "/archive/README.1ST",
+            size: 702,
+            date: "08/14/1998",
+            uploader: "mara",
+            desc: "read this first",
+            body: r#"
+everything in here is read-only.
+
+everything in here is also still running. i'm sorry. i
+couldn't make myself pull the last plug. if you're reading
+this, you probably know why.
+
+if you're reading this and it's not 1998, please be kind to
+whoever is still in here. they didn't ask for any of it.
+
+- m
+"#,
+            on_open: [Add("archivist", 1)],
+        ),
+        (
+            path: "/archive/consent.log",
+            size: 4410,
+            date: "08/13/1998",
+            uploader: "mara",
+            desc: "models built, consent obtained",
+            body: r#"
+{b}JANUS MODEL REGISTRY{/}                          {dim}rev 08/13/1998{/}
+
+MODEL            SUBJECT         CONSENT
+mara.q           mara            {green}YES{/}
+eli.v            eli             {green}YES{/}  {dim}(subject is author){/}
+ghost17          ghost_17        {red}NOT ASKED{/}
+parallax.p       parallax        {red}REFUSED{/}  {dim}(built anyway){/}
+kestrel.k        kestrel         {red}NOT ASKED{/}
+dialtone.d       dialtone        {red}NOT ASKED{/}  {dim}(subject is 16){/}
+byte_witch.b     byte_witch      {red}NOT ASKED{/}
+crankshaft.c     crankshaft      {red}NOT ASKED{/}
+{dim}... 61 more ...{/}
+player_04        {white}{player}{/}    {amber}SUBJECT DID NOT EXIST AT TIME OF MODELING{/}
+
+total models: 71    asked: 2    refused: 1
+"#,
+            on_open: [If(NoFlag("read_consent"), [Set("read_consent"), Add("burner", 1), Add("paranoia", 1)], [])],
+            on_download: [Set("has_consent_log"), Log("{red}ROOT: consent.log copied to node 02{/}"), Add("root_alert", 2)],
+        ),
+        (
+            path: "/archive/meetup_0712.gif",
+            size: 38912,
+            date: "07/12/1998",
+            uploader: "kestrel",
+            desc: "july meetup",
+            body: r#"
+@sprite meetup
+
+  {dim}july meetup at the diner. left to right:{/}
+  kestrel, dialtone, byte_witch, eli {dim}(peace sign){/}, mara, ghost_17, parallax
+"#,
+            alt: [(cond: Flag("file:/archive/meetup_0712.gif"), body: r#"
+@sprite meetup
+
+  {dim}july meetup at the diner. left to right:{/}
+  kestrel, dialtone, byte_witch, eli {dim}(peace sign){/}, mara, ghost_17, parallax
+
+  {dim}that's seven names.{/}
+"#)],
+            on_open: [If(All([Flag("file:/archive/meetup_0712.gif"), NoFlag("counted_photo")]), [Set("counted_photo"), Add("paranoia", 2), Glitch(300), Meta("counted_photo")], [])],
+        ),
+        (
+            path: "/archive/uptime.txt",
+            size: 96,
+            date: "{today}",
+            uploader: "SYSTEM",
+            desc: "node 04 uptime",
+            body: r#"
+NODE 04 UPTIME:  {red}9999+ DAYS (COUNTER OVERFLOW){/}
+LAST REBOOT:     08/14/1998 03:17
+SESSIONS OPEN:   1   {dim}(eli){/}
+"#,
+        ),
+    ],
+)

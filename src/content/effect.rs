@@ -45,6 +45,8 @@ pub enum Effect {
     If(Cond, Vec<Effect>, Vec<Effect>),
     /// Finish an act.
     EndAct(u8),
+    /// Save the session and hang up.
+    Disconnect,
 }
 
 /// A choice offered to the player, inline or inside a conversation.

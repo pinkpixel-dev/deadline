@@ -39,6 +39,14 @@ impl App {
                 self.apply(&branch);
             }
             Effect::EndAct(n) => self.end_act(*n),
+            Effect::Disconnect => {
+                if self.chat.is_some() {
+                    self.end_chat(false);
+                }
+                self.st.pages.clear();
+                self.save_session();
+                self.quit = true;
+            }
             Effect::Chat(_)
             | Effect::Overlay(_)
             | Effect::Sequence(_)
@@ -96,6 +104,9 @@ impl App {
         let content = self.content.clone();
         for ev in &content.events {
             if !ev.repeat && self.st.fired.contains(&ev.id) {
+                continue;
+            }
+            if ev.act != 0 && ev.act != self.st.act_started {
                 continue;
             }
             if !ev.when.eval(&self.st, &self.meta) {

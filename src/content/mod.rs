@@ -84,7 +84,10 @@ impl Content {
         Ok(c)
     }
 
-    fn merge(&mut self, p: ContentFile) {
+    fn merge(&mut self, mut p: ContentFile) {
+        for e in p.events.iter_mut().filter(|e| e.act == 0) {
+            e.act = p.act;
+        }
         self.boards.extend(p.boards);
         self.posts.extend(p.posts);
         self.files.extend(p.files);

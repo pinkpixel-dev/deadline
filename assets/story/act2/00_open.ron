@@ -1,0 +1,205 @@
+// ACT II: ARCHIVES. Opening, routing, cinematics and act-wide systems.
+//
+// The act begins on the first login after Act I ends (the engine sets
+// `act:2`). The route flag mirrors how Act I ended.
+(
+    act: 2,
+    events: [
+        (
+            id: "a2_open",
+            when: Flag("act:2"),
+            effects: [
+                If(All([Gte("trust_ghost", 2), NoFlag("told_root_ghost")]), [Set("route:close")], [
+                    If(Flag("root_opened_archive"), [Set("route:root")], [
+                        If(Flag("forced_archive"), [Set("route:null"), Add("root_alert", 2)], [Set("route:cold")]),
+                    ]),
+                ]),
+                Set("archive_mounted"),
+                Sequence("act2_open"),
+            ],
+        ),
+
+        // ---- route openers -------------------------------------------------
+        (id: "a2_route_close", when: All([Flag("route:close"), Flag("a2_bulletin")]), after_cmds: 1, effects: [Page("a2_ghost_close")]),
+        (id: "a2_route_root", when: All([Flag("route:root"), Flag("a2_bulletin")]), after_cmds: 1, effects: [Page("a2_root_open")]),
+        (id: "a2_route_null", when: All([Flag("route:null"), Flag("a2_bulletin")]), after_cmds: 1, effects: [Glitch(250), Page("a2_null_open")]),
+        (id: "a2_route_cold", when: All([Flag("route:cold"), Flag("a2_bulletin")]), after_cmds: 1, effects: [Mail("m_parallax_a2"), Page("parallax_call")]),
+
+        // ---- nudges if the player stalls -----------------------------------
+        (id: "a2_nudge_archive", when: All([Flag("act:2"), NoFlag("board:08"), NoFlag("read:806")]), after_secs: 150, effects: [
+            Log("message base: board 08 grew overnight (+10 msgs)"),
+        ]),
+        (id: "a2_fragment_fallback", when: All([Flag("act:2"), NoFlag("read_fragment")]), after_secs: 1800, effects: [
+            Set("fragment_ready"),
+            Log("{violet}node 04: fragment 08/14/1998 03:17 recovered to board 08{/}"),
+        ]),
+
+        // ---- ROOT's patience -----------------------------------------------
+        (id: "a2_lock1", when: All([Flag("act:2"), Gte("root_alert", 7)]), after_cmds: 1, effects: [Glitch(400), Overlay("root_lock")]),
+        (id: "a2_unlock1", when: Flag("locked"), after_cmds: 6, effects: [Unset("locked"), Set("lock1_done"), Notice("ACCESS LEVEL RESTORED"), Log("ROOT: access level 4 restored")]),
+        (id: "a2_lock2", when: All([Flag("lock1_done"), Gte("root_alert", 12)]), after_cmds: 1, effects: [Glitch(400), Overlay("root_lock")]),
+
+        // ---- after the act -------------------------------------------------
+        (id: "a2_clock_flicker_on", when: Flag("act2_complete"), after_secs: 40, effects: [Set("clock:1998"), Glitch(200)]),
+        (id: "a2_clock_flicker_off", when: Flag("a2_flick_seen"), after_secs: 3, effects: [Unset("clock:1998")]),
+        (id: "a2_clock_flicker_mark", when: Flag("clock:1998"), effects: [Set("a2_flick_seen")]),
+        (id: "a2_kick_warn", when: Flag("act2_complete"), after_secs: 240, effects: [
+            Log("{white}ROOT: session limit approaching{/}"),
+            Notice("SESSION LIMIT: 60 SECONDS"),
+        ]),
+        (id: "a2_kick", when: Flag("act2_complete"), after_secs: 300, effects: [Unset("clock:1998"), Sequence("kick_2")]),
+    ],
+
+    overlays: [
+        (
+            id: "root_lock",
+            title: "ROOT MESSAGE",
+            style: "root",
+            body: "{b}ACCESS LEVEL REDUCED.{/}\n\nLevel 2 until further notice.",
+            hold: 1,
+            hold_text: ["ROOT: You did this to yourself."],
+            on_close: [Set("locked"), Log("{red}ROOT: node 02 access reduced to level 2{/}")],
+        ),
+        (
+            id: "root_broken",
+            title: "ROOT MESSAGE",
+            style: "root",
+            body: "{b}You told him.{/}",
+            hold: 1,
+            hold_text: ["ROOT: I asked you for one thing."],
+        ),
+    ],
+
+    hooks: [
+        // While ROOT has you at level 2, the useful commands stop working.
+        (input: ["files", "files *", "ls", "ls *", "cd *", "view *", "cat *", "download *", "dl *", "chat *", "shadow *", "send *", "recover *"], cond: Flag("locked"), effects: [
+            Print("{red}ACCESS LEVEL 2: COMMAND UNAVAILABLE{/}"),
+        ]),
+    ],
+
+    sequences: [
+        (
+            id: "act2_open",
+            steps: [
+                Clear,
+                Pause(500),
+                Banner("text", "ACT II"),
+                Line(""),
+                Banner("violet", "ARCHIVES"),
+                Line(""),
+                Pause(1200),
+                Type("{dim}night two. the carrier comes up on the first ring.{/}"),
+                Pause(900),
+                When(Flag("route:cold"), [Type("{dim}nobody is waiting for you this time. that's almost worse.{/}"), Pause(700)]),
+                When(Flag("route:close"), [Type("{dim}node 05 has been holding the line open all day.{/}"), Pause(700)]),
+                When(Flag("route:root"), [Type("{dim}your access level reads 4. it read 4 yesterday too. it feels different now.{/}"), Pause(700)]),
+                When(Flag("route:null"), [Type("{dim}something on node 07 sends one character before you finish logging in.{/}"), Pause(700)]),
+                Pause(1600),
+            ],
+            on_end: [
+                Set("a2_bulletin"),
+                Print(r#"
+@rule
+{amber}BULLETIN{/}   {dim}posted {today} 03:17 AM{/}
+
+      {b}THE ARCHIVE IS MOUNTED. READ-ONLY.{/}
+      {b}DO NOT REPLY TO ANYTHING DATED AFTER 08/14/1998.{/}
+                                      {dim}- ROOT{/}
+@rule
+"#),
+                Log("node 04: indexer resumed"),
+                Log("{violet}message base: board 08 +10 msgs{/}"),
+                Log("file area: /archive mounted"),
+            ],
+        ),
+        (
+            id: "act2_end",
+            steps: [
+                Glitch(900),
+                Pause(900),
+                Clear,
+                Line("{red}CONNECTION LOST{/}"),
+                Pause(1200),
+                Line("{dim}retrying...{/}"),
+                Pause(1300),
+                Line("{dim}retrying...{/}"),
+                Pause(1100),
+                Line("{green}CONNECT 14400/ARQ/V32BIS{/}"),
+                Pause(900),
+                Clear,
+                Sprite("title_room"),
+                Line(""),
+                Type("{b}WELCOME TO DEADLINE.{/}"),
+                Pause(700),
+                Type("{b}DATE: 08/14/1998{/}"),
+                Pause(1200),
+                Type("{b}USERS ONLINE: 9{/}"),
+                Pause(500),
+                Line("{amber}eli{/}  {violet}mara{/}  {cyan}ghost_17{/}  {blue}kestrel{/}  {yellow}dialtone{/}  {red}byte_witch{/}  {green}parallax{/}  {text}crankshaft{/}  {white}{player}{/}"),
+                Pause(2400),
+                Glitch(700),
+                Line(""),
+                Line("{red}NO CARRIER{/}"),
+                Pause(1000),
+                Sprite("crt_off"),
+                Pause(4000),
+                Clear,
+                Pause(600),
+                Banner("text", "ACT II"),
+                Line(""),
+                Banner("violet", "ARCHIVES"),
+                Line(""),
+                Pause(1200),
+                When(Flag("gave_parallax_log"), [Line("{green}parallax has the consent log. somewhere outside, someone is reading your name.{/}")]),
+                When(Flag("gave_root_log"), [Line("{white}ROOT has the consent log. it is not going anywhere.{/}")]),
+                When(Flag("kept_log"), [Line("{dim}the consent log is still in your local storage. you never decided.{/}")]),
+                When(Flag("eli_told_year"), [Line("{amber}eli knows it isn't 1998. he doesn't know what that means yet.{/}")]),
+                When(All([Flag("eli_deflected"), NoFlag("eli_told_year")]), [Line("{amber}eli still thinks it's 1998. you let him.{/}")]),
+                When(Flag("null_errands_done"), [Line("{magenta}node 07 is open. something walked through it.{/}")]),
+                When(Flag("shadowed_eli"), [Line("{dim}you watched eli's screen while he typed. he felt it.{/}")]),
+                Pause(2600),
+                Line(""),
+                Line("{dim}that was not a glitch. that was a door.{/}"),
+                Pause(3000),
+            ],
+            on_end: [Set("act2_complete"), Print("{dim}...{/}"), Print("{amber}CARRIER RESTORED.{/} {dim}for a second the clock said 1998. now it doesn't.{/}")],
+        ),
+        (
+            id: "kick_2",
+            steps: [
+                Glitch(600),
+                Pause(600),
+                Clear,
+                Sprite("root"),
+                Line(""),
+                Type("{white}ROOT:{/} Tomorrow is a night you have already lived."),
+                Pause(1600),
+                Type("{white}ROOT:{/} Everyone will be there."),
+                Pause(1400),
+                Type("{white}ROOT:{/} Don't be late."),
+                Pause(1800),
+                Glitch(400),
+                Line(""),
+                Line("{red}NO CARRIER{/}"),
+                Pause(1600),
+            ],
+            on_end: [Disconnect],
+        ),
+    ],
+
+    ambient: [
+        (text: "node 04: indexing 06/1998", cond: Flag("act:2")),
+        (text: "node 04: uptime counter overflow (ignored)", cond: Flag("act:2")),
+        (text: "ROOT: archive mount verified", cond: Flag("act:2")),
+        (text: "node 04: eli keystroke latency nominal", cond: Flag("act:2")),
+        (text: "node 07: carrier detect", cond: Flag("node07_open")),
+        (text: "node 07: something is typing", cond: Flag("node07_open"), loud: true),
+        (text: "node 05: ghost_17 reading 804 (again)", cond: All([Flag("act:2"), Flag("route:close")])),
+        (text: "external line: ringing (no answer)", cond: Flag("done:parallax_call")),
+    ],
+
+    help: [
+        (cmd: "send <user> <file>", desc: "send a file from local storage", cond: Flag("quest_consent")),
+        (cmd: "shadow <user>", desc: "", cond: Flag("knows_shadow")),
+    ],
+)

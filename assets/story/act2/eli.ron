@@ -1,0 +1,155 @@
+// ACT II: Eli. Casual, cheerful, certain it's 1998. Starts to notice.
+(
+    act: 2,
+    events: [
+        (id: "eli_a2_page_hello", when: All([Flag("a2_bulletin"), NoFlag("chat:eli_a2_hello")]), after_cmds: 5, effects: [
+            Set("eli_a2_on"),
+            Notice("eli has logged on"),
+            Log("{amber}node 04: login eli{/}"),
+            Page("eli_a2_hello"),
+        ]),
+        (id: "eli_a2_page_drive", when: All([Flag("done:eli_a2_hello"), Any([Flag("read:806"), Flag("read:807")]), NoFlag("chat:eli_a2_drive")]), after_cmds: 2, effects: [Page("eli_a2_drive")]),
+        (id: "eli_a2_page_doubt", when: All([Flag("done:eli_a2_drive"), Flag("read:810"), NoFlag("chat:eli_a2_doubt")]), after_cmds: 2, effects: [Page("eli_a2_doubt")]),
+        // If the player never reads 810, Eli gets there on his own eventually.
+        (id: "eli_a2_doubt_late", when: All([Flag("done:eli_a2_drive"), NoFlag("chat:eli_a2_doubt")]), after_secs: 420, effects: [Page("eli_a2_doubt")]),
+        (id: "eli_back", when: Flag("eli_dropped"), after_secs: 45, effects: [Unset("eli_dropped"), Set("eli_returned"), Notice("eli has logged on"), Page("eli_a2_after_year")]),
+        (id: "eli_a2_page_found", when: Flag("eli_investigating"), after_cmds: 6, effects: [Page("eli_a2_found")]),
+        (id: "eli_root_broken", when: All([Flag("eli_told_year"), Flag("root_asked_secrecy")]), after_cmds: 2, effects: [Set("broke_root_promise"), Add("trust_root", -2), Overlay("root_broken")]),
+        (id: "ghost_eli_spiral", when: All([Flag("eli_told_year"), NoFlag("route:cold")]), after_cmds: 4, effects: [Page("ghost_eli_spiral")]),
+    ],
+
+    dialogues: [
+        (
+            id: "eli_a2_hello",
+            with: "eli",
+            nodes: [
+                (id: "start", branch: [(cond: Flag("talked_eli"), goto: "again")], next: "new"),
+                (id: "again", lines: ["hey!! it's you. from last night. right?", "you just kinda vanished. carrier lost or whatever."], effects: [Add("eli_trust", 1)], next: "chat"),
+                (id: "new", lines: ["oh hey, a new person!", "eli. code board, archiver guy. the sunglasses are canon."], next: "chat"),
+                (id: "chat", lines: [
+                    "mara's being super weird about node 4. she keeps saying \"tomorrow.\"",
+                    "anyway. what are you up to?",
+                ], choices: [
+                    (text: "reading the archive.", goto: "archive"),
+                    (text: "who are you talking to on node 4?", goto: "node4"),
+                    (text: "eli, what's the date?", effects: [Add("eli_aware", 1), Set("asked_eli_date")], goto: "date"),
+                ]),
+                (id: "archive", lines: ["ha. the archive is like 60 percent me arguing with parallax.", "the other 40 is crankshaft and beans."], effects: [Add("eli_trust", 1)], next: "bye"),
+                (id: "node4", lines: ["the indexer. it's a really good listener.", "better than most people on here, honestly. no offense."], next: "bye"),
+                (id: "date", lines: [
+                    "08/14? why, did i miss something?",
+                    "oh crap is it the meetup. it's tonight right? at the diner?",
+                    "...it's tonight. i'm pretty sure it's tonight.",
+                ], next: "bye"),
+                (id: "bye", lines: ["ok i gotta babysit the indexer. ping me whenever!"]),
+            ],
+        ),
+        (
+            id: "eli_a2_drive",
+            with: "eli",
+            nodes: [
+                (id: "start", lines: [
+                    "ok weird thing.",
+                    "the uptime counter on node 4 overflowed.",
+                    "it only overflows after 9999 days. that's like 27 years.",
+                    "probably a bug in my counter right? i wrote it at 4am.",
+                ], choices: [
+                    (text: "probably a bug.", effects: [Set("eli_deflected"), Add("deceit", 1)], goto: "bug"),
+                    (text: "maybe it's not a bug.", effects: [Add("truth", 1), Add("eli_aware", 1), Add("eli_trust", 1)], goto: "notbug"),
+                    (text: "you wrote code at 4am and you're surprised it's wrong?", effects: [Add("eli_trust", 1)], goto: "joke"),
+                ]),
+                (id: "bug", lines: ["yeah. yeah. definitely."], next: "shadow"),
+                (id: "notbug", lines: ["ok you're being spooky on purpose.", "...you're being spooky on purpose, right?"], next: "shadow"),
+                (id: "joke", lines: ["lol ok rude. accurate. but rude."], next: "shadow"),
+                (id: "shadow", branch: [(cond: Flag("shadowed_eli"), goto: "felt")], next: "end"),
+                (id: "felt", lines: [
+                    "also this is gonna sound dumb",
+                    "but did you ever get the feeling somebody's reading your screen? over your shoulder?",
+                    "i had that like ten minutes ago. really strong.",
+                ], choices: [
+                    (text: "that was me. i'm sorry.", effects: [Add("truth", 2), Add("eli_trust", 1), Set("confessed_shadow")], goto: "confess"),
+                    (text: "probably just tired.", effects: [Add("deceit", 1)], goto: "end"),
+                ]),
+                (id: "confess", lines: ["...", "huh.", "ok. thanks for telling me. most people wouldn't have.", "don't do it again though?"], next: "end"),
+                (id: "end", lines: ["anyway. back to the grind."]),
+            ],
+        ),
+        (
+            id: "eli_a2_doubt",
+            with: "eli",
+            nodes: [
+                (id: "start", lines: [
+                    "there's something wrong with the archive.",
+                    "everyone else has messages after august.",
+                    "i don't.",
+                    "why don't i?",
+                ], choices: [
+                    (text: "let's find out together.", effects: [Set("eli_investigating"), Add("eli_trust", 2), Add("curiosity", 1)], goto: "together"),
+                    (text: "probably a gap in the backup.", effects: [Set("eli_deflected"), Add("deceit", 1), If(Flag("root_asked_secrecy"), [Add("archivist", 1), Add("trust_root", 1)], [])], goto: "gap"),
+                    (text: "eli, it isn't 1998 anymore.", effects: [Set("eli_told_year"), Add("truth", 2), Add("eli_aware", 2)], goto: "told"),
+                    (text: "i don't know.", goto: "dunno"),
+                ]),
+                (id: "together", lines: ["ok. ok cool.", "i'll grep my own posts. you poke around the file area?", "this is fine. this is just a bug hunt. i love bug hunts."]),
+                (id: "gap", lines: ["yeah.", "yeah, that makes sense.", "...right?"]),
+                (id: "dunno", lines: ["yeah me neither.", "cool cool cool."], effects: [Add("eli_trust", -1)]),
+                (id: "told", lines: ["lol ok", "...", "you're not kidding.", "what year is it."], choices: [
+                    (text: "it's {year}.", effects: [Add("truth", 1)], goto: "year"),
+                    (text: "never mind. forget i said it.", effects: [Add("deceit", 1), Add("eli_trust", -1)], goto: "never"),
+                ]),
+                (id: "year", lines: [
+                    "that's not a real number. that's a sci-fi number.",
+                    "if it's {year} then where is everybody.",
+                    "where's mara. where's ghost.",
+                    "#*** eli has logged off",
+                ], effects: [Set("eli_dropped")]),
+                (id: "never", lines: ["ok.", "i'm gonna pretend you didn't say that.", "i'm really good at pretending, it turns out."]),
+            ],
+            on_leave: [Add("eli_trust", -1)],
+        ),
+        (
+            id: "eli_a2_after_year",
+            with: "eli",
+            nodes: [
+                (id: "start", lines: [
+                    "sorry. i needed a minute.",
+                    "i asked the indexer what year it is.",
+                    "it said \"which one.\"",
+                ], choices: [
+                    (text: "are you ok?", effects: [Add("eli_trust", 1)], goto: "ok"),
+                    (text: "what do you think it meant?", goto: "meant"),
+                ]),
+                (id: "ok", lines: ["no.", "but thanks for asking. nobody here asks.", "i think i'd rather know. i think. ask me again later."]),
+                (id: "meant", lines: ["i think it meant it's been running a lot of years.", "and i've been running a lot of them with it."]),
+            ],
+        ),
+        (
+            id: "eli_a2_found",
+            with: "eli",
+            nodes: [
+                (id: "start", lines: [
+                    "found something.",
+                    "my last post isn't a post. it's a draft. 08/14, 11:58pm. never sent.",
+                    "it says: \"mara if you're reading this i'm on my way over. don't wipe it. please.\"",
+                    "why would i drive to mara's at midnight",
+                ], effects: [Set("eli_found_draft"), Add("eli_aware", 1)], choices: [
+                    (text: "maybe you were scared she'd do it that night.", effects: [Add("truth", 1)], goto: "scared"),
+                    (text: "don't think about it too hard.", effects: [Add("deceit", 1)], goto: "dont"),
+                ]),
+                (id: "scared", lines: ["yeah.", "i was, wasn't i.", "i just don't remember leaving."]),
+                (id: "dont", lines: ["too late. i think about everything too hard. it's kind of my thing."]),
+            ],
+        ),
+        (
+            id: "ghost_eli_spiral",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", lines: ["what did you say to eli.", "he's spiraling on node 04. he keeps asking the indexer what year it is."], choices: [
+                    (text: "i told him the truth. it isn't 1998.", effects: [Add("truth", 1)], goto: "truth"),
+                    (text: "nothing. he figured it out.", effects: [Add("deceit", 1), Add("trust_ghost", -1)], goto: "lie"),
+                ]),
+                (id: "truth", lines: ["...", "yeah.", "somebody had to. i never could.", "i've been letting him think it's 1998 for a really long time, {player}."], effects: [Add("trust_ghost", 1), Set("ghost_admits_eli")]),
+                (id: "lie", lines: ["the log says node 02.", "you really gotta stop lying to people who can read logs."]),
+            ],
+        ),
+    ],
+)

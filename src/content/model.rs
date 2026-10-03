@@ -8,6 +8,8 @@ use super::effect::{ChoiceOpt, Effect};
 #[derive(Debug, Default, Deserialize)]
 #[serde(default)]
 pub struct ContentFile {
+    /// Events in this file only fire during this act's sessions (0 = any).
+    pub act: u8,
     pub boards: Vec<Board>,
     pub posts: Vec<Post>,
     pub mail: Vec<Mail>,
@@ -187,6 +189,8 @@ pub struct Branch {
 #[serde(default)]
 pub struct Event {
     pub id: String,
+    /// Only fire while this act is the one in play (0 = any). Defaults to the file's `act`.
+    pub act: u8,
     pub when: Cond,
     pub after_cmds: u32,
     pub after_secs: u32,

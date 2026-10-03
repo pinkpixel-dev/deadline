@@ -72,6 +72,7 @@ fn main() -> Result<()> {
         None => (GameState::new(&player), "boot"),
     };
     st.player = player;
+    st.begin_act();
 
     let mut app = App::new(content, st, meta, store);
     app.save_meta();

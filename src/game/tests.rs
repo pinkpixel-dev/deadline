@@ -7,14 +7,14 @@ use crate::game::text::plain;
 use crate::output::Speed;
 use crate::systems::save::Store;
 
-fn app() -> App {
+pub(super) fn app() -> App {
     let content = Content::load().expect("story content loads");
     let mut a = App::new(content, GameState::new("tester"), MetaState::default(), None);
     a.speed = Speed::Instant;
     a
 }
 
-fn run(a: &mut App, secs: f64) {
+pub(super) fn run(a: &mut App, secs: f64) {
     let mut t = 0.0;
     while t < secs {
         a.tick(0.05);
@@ -22,7 +22,7 @@ fn run(a: &mut App, secs: f64) {
     }
 }
 
-fn boot(a: &mut App) {
+pub(super) fn boot(a: &mut App) {
     a.start_sequence("boot");
     if let Some(s) = a.seq.as_mut() {
         s.fast = true;
@@ -32,17 +32,17 @@ fn boot(a: &mut App) {
     run(a, 0.5);
 }
 
-fn cmd(a: &mut App, s: &str) {
+pub(super) fn cmd(a: &mut App, s: &str) {
     a.submit(s);
     run(a, 0.3);
 }
 
-fn screen(a: &App) -> String {
+pub(super) fn screen(a: &App) -> String {
     a.out.lines.iter().map(plain).collect::<Vec<_>>().join("\n")
 }
 
 /// Wait for a choice to appear and pick the option whose text contains `needle`.
-fn pick(a: &mut App, needle: &str) {
+pub(super) fn pick(a: &mut App, needle: &str) {
     for _ in 0..400 {
         if a.choice.is_some() {
             break;
@@ -60,7 +60,7 @@ fn pick(a: &mut App, needle: &str) {
 }
 
 /// Let a conversation play out until it closes.
-fn finish_chat(a: &mut App) {
+pub(super) fn finish_chat(a: &mut App) {
     for _ in 0..600 {
         if a.chat.is_none() {
             return;
@@ -71,7 +71,7 @@ fn finish_chat(a: &mut App) {
 }
 
 /// Press Esc on overlays until they close.
-fn dismiss(a: &mut App) {
+pub(super) fn dismiss(a: &mut App) {
     for _ in 0..10 {
         if a.overlay.is_none() {
             return;
@@ -82,7 +82,7 @@ fn dismiss(a: &mut App) {
     assert!(a.overlay.is_none(), "overlay should close");
 }
 
-fn opening(a: &mut App) {
+pub(super) fn opening(a: &mut App) {
     boot(a);
     cmd(a, "boards");
     cmd(a, "whoami");
@@ -99,6 +99,33 @@ fn opening(a: &mut App) {
     pick(a, "ok.");
     finish_chat(a);
     assert!(a.st.has("quest_nodelist"));
+}
+
+/// Play Act I on the close route (ghost_17 stays) through the end card.
+pub(super) fn act1_close(a: &mut App) {
+    opening(a);
+    a.st.set("null_hint_mail");
+    cmd(a, "mail -u ghost_17");
+    a.submit("y");
+    run(a, 0.5);
+    cmd(a, "open 08");
+    a.submit("LANTERN");
+    run(a, 0.3);
+    cmd(a, "open 08");
+    cmd(a, "read 804");
+    while a.chat.is_some() {
+        a.end_chat(false);
+        run(a, 0.2);
+    }
+    run(a, 8.0);
+    pick(a, "i'm still here");
+    finish_chat(a);
+    run(a, 1.0);
+    if let Some(s) = a.seq.as_mut() {
+        s.fast = true;
+    }
+    run(a, 2.0);
+    assert!(a.st.has("act1_complete"));
 }
 
 #[test]

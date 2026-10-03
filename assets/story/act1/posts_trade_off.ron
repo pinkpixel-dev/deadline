@@ -200,7 +200,28 @@ i'll be there.
 
 eli:
 everyone's going to be so weird about it. don't be weird about it.
-"#),
+"#, alt: [(cond: Flag("act:2"), body: r#"
+mara:
+eli's moving at the end of the month. meetup at the diner on
+the 14th, after the board's nightly maintenance. eli's paying.
+(eli doesn't know yet.)
+
+eli:
+eli does know now.
+
+ghost_17:
+i'll be there
+
+parallax:
+i'll be there.
+
+eli:
+everyone's going to be so weird about it. don't be weird about it.
+
+{dim}--- reply posted {today} 03:17 AM ---{/}
+eli:
+did anybody save me a seat?
+"#)]),
         (id: 608, board: "06", subject: "worst error message you've ever seen", date: "07/27/1998", author: "byte_witch", body: r#"
 byte_witch:
 "Keyboard not found. Press F1 to continue."

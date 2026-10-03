@@ -68,7 +68,30 @@ the board will be fine.
 
 eli:
 the board will outlive all of us. that's kind of the plan.
-"#),
+"#, alt: [(cond: Flag("act:2"), body: r#"
+crankshaft:
+i'm serious. 00 rolls over and every clock thinks it's 1900.
+planes. banks. VCRs. i'm stockpiling canned beans.
+
+byte_witch:
+the VCRs have been blinking 12:00 since 1985. they're fine.
+
+crankshaft:
+you'll see. you'll all see. and i'll have beans.
+
+ghost_17:
+what happens to the board in 2000
+
+mara:
+the board will be fine.
+
+eli:
+the board will outlive all of us. that's kind of the plan.
+
+{dim}--- reply posted {today} 03:17 AM ---{/}
+crankshaft:
+told you the clocks would break. somebody tell eli what year it is.
+"#)]),
         (id: 105, board: "01", subject: "post your setup", date: "06/14/1998", author: "byte_witch", body: r#"
 byte_witch:
 486DX2/66, 8 megs, USR 14.4, and a chair that hates me.

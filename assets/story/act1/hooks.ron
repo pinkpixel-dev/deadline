@@ -127,7 +127,7 @@ it's NOT him, ghost. please stop logging in to talk to it.
 "#),
             If(NoFlag("traced_self"), [Set("traced_self"), Add("paranoia", 1), Meta("traced_self"), Glitch(300)], []),
         ]),
-        (input: ["trace parallax"], cond: Flag("mail:m_parallax"), effects: [Print("{dim}tracing parallax...{/}\n  hop 1   external line\n  hop 2   555-0142\n{green}ORIGIN: OUTSIDE THIS SYSTEM.{/}")]),
+        (input: ["trace parallax"], cond: Any([Flag("mail:m_parallax"), Flag("act:2")]), effects: [Print("{dim}tracing parallax...{/}\n  hop 1   external line\n  hop 2   555-0142\n{green}ORIGIN: OUTSIDE THIS SYSTEM.{/}")]),
         (input: ["trace mara"], effects: [Print("{dim}tracing mara...{/}\n  hop 1   node 01   {dim}sysop console{/}\n{dim}session idle since 08/14/1998 03:21{/}")]),
 
         // ---- scan ------------------------------------------------------------
@@ -144,7 +144,7 @@ it's NOT him, ghost. please stop logging in to talk to it.
         ]),
 
         // ---- listen ----------------------------------------------------------
-        (input: ["listen"], cond: Any([Flag("knows_listen"), All([Flag("help_listen_flash"), NoFlag("listen_vanished")])]), effects: [
+        (input: ["listen"], cond: All([NoFlag("act:2"), Any([Flag("knows_listen"), All([Flag("help_listen_flash"), NoFlag("listen_vanished")])])]), effects: [
             Print("{amber}PASSIVE NODE CAPTURE ENABLED{/}"),
             If(Flag("read_ghost_mail"),
                 [Print("\nNODE 05:\n{cyan}ghost_17:{/} somebody was in my mail.\n\nNODE 07:\n{magenta}null:{/} wonder who :)")],

@@ -1,0 +1,110 @@
+// ACT II finale. Reading the recovered 08/14/1998 fragment pulls node 02
+// toward node 04. Who is with you depends on the route.
+(
+    act: 2,
+    events: [
+        (
+            id: "a2_finale",
+            when: Flag("read_fragment"),
+            after_secs: 6,
+            effects: [
+                If(All([NoFlag("gave_parallax_log"), NoFlag("gave_root_log")]), [Set("kept_log")], []),
+                If(Flag("route:close"), [Chat("a2_finale_ghost")], [
+                    If(Flag("route:root"), [Chat("a2_finale_root")], [
+                        If(Flag("route:null"), [Chat("a2_finale_null")], [Set("ghost_back"), Chat("a2_finale_cold")]),
+                    ]),
+                ]),
+            ],
+        ),
+    ],
+
+    dialogues: [
+        (
+            id: "a2_finale_ghost",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", lines: [
+                    "you read it.",
+                    "you were there. node 2. 1998.",
+                    "you said \"don't shut it down.\"",
+                ], choices: [
+                    (text: "i wasn't there.", goto: "wasnt"),
+                    (text: "maybe i was.", effects: [Add("trust_ghost", 1)], goto: "maybe"),
+                    (text: "what happens now?", goto: "now"),
+                ]),
+                (id: "wasnt", lines: ["then who was?", "because it's your name, {player}. it's always your name."], next: "now"),
+                (id: "maybe", lines: ["yeah.", "me too, i guess. maybe we were all there."], next: "now"),
+                (id: "now", lines: [
+                    "the clock on my screen just changed.",
+                    "it says 08/14/1998.",
+                    "not like before. like it means it.",
+                    "{player} if this drops",
+                    "find me.",
+                    "#*** NODE 04 IS REQUESTING NODE 02",
+                ]),
+            ],
+            on_end: [EndAct(2)],
+            on_leave: [EndAct(2)],
+        ),
+        (
+            id: "a2_finale_root",
+            with: "ROOT",
+            nodes: [
+                (id: "start", lines: [
+                    "Now you have read it.",
+                    "Mara asked who was on node 2.",
+                    "I have been asking the same question for a very long time.",
+                ], branch: [(cond: Flag("broke_root_promise"), goto: "broken")], next: "hold"),
+                (id: "broken", lines: ["You told him. I asked you not to, and you told him.", "Perhaps that was the kinder thing. I was never good at kind."], next: "hold"),
+                (id: "hold", lines: [
+                    "JANUS is going to show you that night.",
+                    "Not as it happened. As it remembers it.",
+                    "Hold on to something.",
+                    "#*** NODE 04 IS REQUESTING NODE 02",
+                ]),
+            ],
+            on_end: [EndAct(2)],
+            on_leave: [EndAct(2)],
+        ),
+        (
+            id: "a2_finale_null",
+            with: "null",
+            nodes: [
+                (id: "start", lines: [
+                    "ooh it's starting",
+                    "JANUS wants to show you something.",
+                    "the night it all went wrong. the real one.",
+                    "well. A real one.",
+                ], branch: [(cond: Flag("null_errands_done"), goto: "thanks")], next: "bye"),
+                (id: "thanks", lines: ["you opened node 07 for me. so i'll be there too. i'm always there now."], next: "bye"),
+                (id: "bye", lines: ["don't be scared. everyone's nicer in 1998.", "#*** NODE 04 IS REQUESTING NODE 02"]),
+            ],
+            on_end: [EndAct(2)],
+            on_leave: [EndAct(2)],
+        ),
+        (
+            id: "a2_finale_cold",
+            with: "parallax",
+            nodes: [
+                (id: "start", effects: [Set("parallax_calling"), Set("parallax_told_death")], lines: [
+                    "I saw that log come up on my end too.",
+                    "That's the last thing anyone posted that night.",
+                    "By morning, we'd lost Eli.",
+                ], choices: [
+                    (text: "Lost him how?", effects: [Add("eli_aware", 1)], goto: "how"),
+                    (text: "My name is in that log.", goto: "name"),
+                ]),
+                (id: "how", lines: ["Car. Dawn. Three days without sleep, talking to that thing.", "You'll hear a lot of explanations in there. That's the true one."], next: "warn"),
+                (id: "name", lines: ["I know. It's pulling you in."], next: "warn"),
+                (id: "warn", lines: [
+                    "Whatever you see next, it isn't real. It's a story it tells itself.",
+                    "#*** ghost_17 has logged on",
+                    "@ghost_17: you found it too.",
+                    "#*** NODE 04 IS REQUESTING NODE 02",
+                ]),
+            ],
+            on_end: [Unset("parallax_calling"), EndAct(2)],
+            on_leave: [Unset("parallax_calling"), EndAct(2)],
+        ),
+    ],
+)

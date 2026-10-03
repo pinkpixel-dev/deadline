@@ -21,6 +21,9 @@ pub struct GameState {
     /// Conversations waiting for a `reply`.
     pub pages: Vec<String>,
     pub act: u8,
+    /// The act whose opening has already run. Acts open on the next login
+    /// after the previous one ends.
+    pub act_started: u8,
     /// Board the player is currently in, for `n` and bare `read`.
     pub board: Option<String>,
     /// Current directory in the file area.
@@ -47,6 +50,7 @@ impl GameState {
             armed: BTreeMap::new(),
             pages: Vec::new(),
             act: 1,
+            act_started: 1,
             board: None,
             cwd: "/".to_string(),
         }
@@ -75,6 +79,17 @@ impl GameState {
     pub fn set_var(&mut self, name: &str, value: i32) {
         self.vars.insert(name.to_string(), value);
     }
+
+    /// Called on login. If an act ended last session, open the next one by
+    /// setting `act:<n>`. Returns true when a new act begins.
+    pub fn begin_act(&mut self) -> bool {
+        if self.act <= self.act_started {
+            return false;
+        }
+        self.act_started = self.act;
+        self.set(&format!("act:{}", self.act));
+        true
+    }
 }
 
 /// State that lives outside every timeline. Restores never touch it.
@@ -100,6 +115,16 @@ mod tests {
         assert_eq!(st.var("trust_ghost"), -1);
         assert!(st.set("a"));
         assert!(!st.set("a"));
+    }
+
+    #[test]
+    fn acts_open_on_the_next_login() {
+        let mut st = GameState::new("x");
+        assert!(!st.begin_act());
+        st.act = 2;
+        assert!(st.begin_act());
+        assert!(st.has("act:2"));
+        assert!(!st.begin_act());
     }
 
     #[test]

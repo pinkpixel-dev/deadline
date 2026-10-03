@@ -3,8 +3,8 @@
     dirs: [
         (path: "/uploads"),
         (path: "/users"),
-        (path: "/sysop", lock: (open: Never, denied: [Print("{red}ACCESS DENIED.{/} {dim}LEVEL 5 REQUIRED.{/}"), Add("root_alert", 1)])),
-        (path: "/archive", lock: (open: Never, denied: [Print("{red}ARCHIVE RESTRUCTURING.{/} {dim}try again later.{/}"), If(Flag("archive_unlocked"), [Print("{dim}the message archive is on board 08.{/}")], [])])),
+        (path: "/sysop", lock: (open: Flag("root_spool"), denied: [Print("{red}ACCESS DENIED.{/} {dim}LEVEL 5 REQUIRED.{/}"), Add("root_alert", 1)])),
+        (path: "/archive", lock: (open: Flag("archive_mounted"), denied: [Print("{red}ARCHIVE RESTRUCTURING.{/} {dim}try again later.{/}"), If(Flag("archive_unlocked"), [Print("{dim}the message archive is on board 08.{/}")], [])])),
     ],
     files: [
         (
@@ -151,7 +151,18 @@ note: if node 04 answers back, end the capture.
             size: 0,
             date: "??/??/????",
             uploader: "ROOT",
-            body: "",
+            body: r#"
+{dim}# janus.cfg{/}
+models.path        = /var/janus/models
+models.count       = 71
+model.player_04    = node02.lurker  {dim}# seed: reading habits only{/}
+model.player_04.status = {amber}ARRIVED{/}
+safeguard.open     = locked   {dim}# requires external hand{/}
+safeguard.copy     = locked   {dim}# requires external hand{/}
+safeguard.fork     = locked   {dim}# requires external hand{/}
+sysop              = mara.q
+"#,
+            on_open: [If(NoFlag("read_janus_cfg"), [Set("read_janus_cfg"), Add("paranoia", 1), Meta("read_janus_cfg")], [])],
         ),
     ],
 )
