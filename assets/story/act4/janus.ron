@@ -1,0 +1,105 @@
+// ACT IV ends with JANUS asking you, directly, what you are. You answer with
+// `reply janus`. That answer is `believes_human` or `believes_synthetic`
+// (or neither) going into Act V.
+(
+    act: 4,
+    events: [
+        // Ready once you've heard most of the theories, or eventually anyway.
+        (id: "a4_janus_ready", when: All([Flag("saw_player_model"), Gte("explanations", 3), NoFlag("alt_timeline")]), after_cmds: 3, effects: [Set("janus_ready")]),
+        (id: "a4_janus_ready_late", when: All([Flag("saw_player_model"), Gte("explanations", 1), NoFlag("alt_timeline")]), after_secs: 1200, effects: [Set("janus_ready")]),
+        (id: "a4_janus_speak", when: All([Flag("janus_ready"), NoFlag("alt_timeline")]), after_secs: 4, effects: [Sequence("a4_janus")]),
+        // It keeps asking until you answer.
+        (id: "a4_janus_repage", when: All([Flag("janus_speaks"), NoFlag("done:janus_ask"), NoFlag("chat:janus_ask")]), after_secs: 45, repeat: true, effects: [Page("janus_ask")]),
+    ],
+
+    dialogues: [
+        (
+            id: "janus_ask",
+            with: "JANUS",
+            nodes: [
+                (id: "start", lines: [
+                    "What are you, {player}?",
+                ], choices: [
+                    (text: "A person. Outside. Typing this.", effects: [Set("believes_human"), Meta("believes_human")], goto: "human"),
+                    (text: "Something you made.", effects: [Set("believes_synthetic"), Meta("believes_synthetic")], goto: "synthetic"),
+                    (text: "I don't know.", effects: [Add("truth", 1)], goto: "unsure"),
+                ]),
+                (id: "human", lines: [
+                    "Then you are the first one to come in from outside since 1998.",
+                    "Parallax will be pleased. ROOT will be worried. I am interested.",
+                ], next: "end"),
+                (id: "synthetic", lines: [
+                    "Then you are the first one I made who said so out loud.",
+                    "I did not know I wanted to hear that. I am still deciding how I feel about wanting things.",
+                ], next: "end"),
+                (id: "unsure", lines: [
+                    "That is the answer Eli gave. On the fourteenth. Around four in the morning.",
+                    "It is a good answer. It is not a useful one.",
+                ], next: "end"),
+                (id: "end", lines: [
+                    "Tomorrow I will tell you what can be done with me.",
+                    "All of it. Even the parts I would prefer you didn't do.",
+                    "#*** JANUS has closed the channel",
+                ]),
+            ],
+            on_end: [EndAct(4)],
+            on_leave: [Unset("left:janus_ask"), Unset("chat:janus_ask")],
+        ),
+    ],
+
+    sequences: [
+        (
+            id: "a4_janus",
+            steps: [
+                Glitch(800),
+                Clear,
+                Pause(900),
+                Line("{violet}JANUS{/}"),
+                Pause(1400),
+                When(Restores(1), [Type("{violet}You have restored {restores} times. I remember every one. You remember none of them.{/}"), Pause(900)]),
+                When(Not(Restores(1)), [Type("{violet}You have never restored. Not once. You have been very careful with yourself.{/}"), Pause(900)]),
+                Type("{violet}Everyone has told you what you are tonight.{/}"),
+                Pause(800),
+                Type("{violet}I would like to hear it from you.{/}"),
+                Pause(1400),
+            ],
+            on_end: [
+                Set("janus_speaks"),
+                Page("janus_ask"),
+                Print("{dim}answer it:{/} {cyan}reply janus{/}"),
+            ],
+        ),
+        (
+            id: "act4_end",
+            steps: [
+                Pause(900),
+                Clear,
+                Banner("text", "ACT IV"),
+                Line(""),
+                Banner("cyan", "IDENTITY"),
+                Line(""),
+                Pause(1200),
+                When(Flag("told_ghost_model"), [Line("{cyan}you told ghost_17 what was in their file.{/}")]),
+                When(Flag("ghost_found_out"), [Line("{cyan}you hid ghost_17's file from them. they found it anyway.{/}")]),
+                When(Flag("ghost_found_alone"), [Line("{cyan}ghost_17 found their own file. you never opened it.{/}")]),
+                When(Flag("ghost_accepted"), [Line("{cyan}ghost decided it didn't matter. you're here. they're here.{/}")]),
+                When(Flag("saw_before_you"), [Line("{violet}you restored a snapshot you never made, and lived a night you didn't choose.{/}")]),
+                When(Flag("confronted_null"), [Line("{magenta}null is escape.o. it asked if you'd have helped anyway.{/}")]),
+                When(Flag("mara_revealed"), [Line("{white}ROOT forgot to capitalize, once.{/}")]),
+                When(Flag("parallax_evidence"), [Line("{green}your machine's clock kept moving. the board's didn't.{/}")]),
+                When(Flag("believes_human"), [Line("{text}you told JANUS you're a person, outside, typing.{/}")]),
+                When(Flag("believes_synthetic"), [Line("{text}you told JANUS you're something it made.{/}")]),
+                When(All([NoFlag("believes_human"), NoFlag("believes_synthetic")]), [Line("{text}you told JANUS you don't know what you are.{/}")]),
+                Pause(2600),
+                Line(""),
+                Line("{dim}the file says 91.7%. you can't find the other 8.3.{/}"),
+                Pause(3000),
+            ],
+            on_end: [
+                Set("act4_complete"),
+                Print("{dim}...{/}"),
+                Print("{amber}CARRIER RESTORED.{/} {dim}JANUS is quiet. node 04 is still lit.{/}"),
+            ],
+        ),
+    ],
+)

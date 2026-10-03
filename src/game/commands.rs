@@ -8,6 +8,9 @@ use crate::output::Speed;
 use crate::systems::save;
 use crate::ui::theme;
 
+/// Commands between session autosaves.
+const AUTOSAVE_EVERY: u32 = 10;
+
 /// Lowercase and collapse whitespace.
 pub fn normalize(raw: &str) -> String {
     raw.split_whitespace().collect::<Vec<_>>().join(" ").to_lowercase()
@@ -81,6 +84,10 @@ impl App {
         }
         self.st.set(&format!("ran:{verb}"));
         self.check_events();
+        // Closing the window skips logout, so don't wait for it.
+        if self.st.commands % AUTOSAVE_EVERY == 0 {
+            self.save_session();
+        }
     }
 
     fn echo(&mut self, s: &str) {
@@ -282,6 +289,23 @@ impl App {
             self.err(&format!("restore: {name}: no such snapshot  {{dim}}snapshots{{/}}"));
             return;
         };
+        if snap.has("planted") {
+            // JANUS wrote this one. It's rebuilt from who you are now, and it
+            // remembers where you were so the story can send you back.
+            // Restoring it again from inside keeps the original way back,
+            // or the replay would become its own return point.
+            let here = match &self.st.mark {
+                Some(mark) if self.st.has("planted") => mark.clone(),
+                _ => {
+                    let mut here = self.st.clone();
+                    here.mark = None;
+                    Box::new(here)
+                }
+            };
+            snap.vars = self.st.vars.clone();
+            snap.journal = self.st.journal.clone();
+            snap.mark = Some(here);
+        }
         // The command history and your own notes belong to your side of the
         // modem, not the timeline.
         snap.history = std::mem::take(&mut self.st.history);
@@ -300,6 +324,7 @@ impl App {
         ));
         self.log(&format!("restore {name}"));
         self.check_events();
+        self.save_session();
     }
 
     fn cmd_snapshots(&mut self) {

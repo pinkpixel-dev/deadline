@@ -20,7 +20,7 @@ There are no dialogue menus floating over the game. You type commands like you w
 
 The story keeps track of what you do without showing you a single number. Who you trust, what you read, who you lied to, and which doors you opened all change what people will tell you later. Some choices look tiny. A few of them really aren't.
 
-Right now the game contains **Act I: CONNECTION**, **Act II: ARCHIVES** and **Act III: 1998**. Acts I and II each have several routes and four ways to end, depending on who you've trusted and who you've been honest with, and how Act I ends changes how Act II begins. Act III drops you into the night of 08/14/1998 with everyone still alive, and the night keeps rebuilding itself every time you try to change it. Acts IV and V are planned and build on the same engine.
+Right now the game contains **Act I: CONNECTION**, **Act II: ARCHIVES**, **Act III: 1998** and **Act IV: IDENTITY**. Acts I and II each have several routes and four ways to end, depending on who you've trusted and who you've been honest with, and how Act I ends changes how Act II begins. Act III drops you into the night of 08/14/1998 with everyone still alive, and the night keeps rebuilding itself every time you try to change it. Act IV brings you back to the present and turns the mystery toward you. Act V is planned and builds on the same engine.
 
 Acts happen on different nights. When you finish one, the board lets you poke around for a few more minutes, then ROOT hangs up on you. Log in again to start the next act.
 

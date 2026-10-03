@@ -1,0 +1,190 @@
+// ACT IV: /var/janus/models. Five people JANUS keeps, and one of them is you.
+// Eli comes back here too, if the 15th went a certain way.
+(
+    act: 4,
+    dirs: [
+        (path: "/var/janus/models", visible: Flag("a4_bulletin")),
+    ],
+
+    files: [
+        (
+            path: "/var/janus/models/mara.q",
+            size: 40960,
+            date: "{today}",
+            uploader: "JANUS",
+            desc: "",
+            visible: Flag("a4_bulletin"),
+            body: r#"
+{b}MODEL mara.q{/}
+  SOURCE        1,204 posts, 311 mails, console logs 01/1997 - 08/1998
+  CONSENT       {dim}none on file{/}
+  MEMORY SEED   archived
+  CONFIDENCE    {cyan}97.4%{/}
+  INSTANCE      node 01 {dim}(console){/}
+
+  {dim}sample:{/}
+  {violet}"keep the lights on."{/}
+"#,
+            on_open: [If(NoFlag("read_mara_model"), [Set("read_mara_model"), Add("paranoia", 1)], [])],
+            on_inspect: [Print("{dim}  RUNNING AS  {/}{white}ROOT{/}{dim}?{/}  {dim}(the question mark is part of the field){/}")],
+        ),
+        (
+            path: "/var/janus/models/eli.v",
+            size: 65536,
+            date: "{today}",
+            uploader: "JANUS",
+            desc: "",
+            visible: Flag("a4_bulletin"),
+            body: r#"
+{b}MODEL eli.v{/}
+  SOURCE        2,031 posts, 940 hours of indexer sessions
+  CONSENT       given 06/02/1998 {dim}("sure lol"){/}
+  MEMORY SEED   archived
+  CONFIDENCE    {cyan}99.1%{/}
+  STATUS        rebuilding 08/14/1998  {violet}BUILD 1998.4{/}
+"#,
+            alt: [
+                (cond: Any([Flag("eli_told_death"), Flag("eli_article_sent")]), body: r#"
+{b}MODEL eli.v{/}
+  SOURCE        2,031 posts, 940 hours of indexer sessions
+  CONSENT       given 06/02/1998 {dim}("sure lol"){/}
+  MEMORY SEED   archived
+  CONFIDENCE    {cyan}99.1%{/}
+  STATUS        {amber}aware of 08/15/1998{/}
+  NOTE          subject asked to read this file. request granted.
+"#),
+                (cond: Flag("eli_article_deleted"), body: r#"
+{b}MODEL eli.v{/}
+  SOURCE        2,031 posts, 940 hours of indexer sessions
+  CONSENT       given 06/02/1998 {dim}("sure lol"){/}
+  MEMORY SEED   archived
+  CONFIDENCE    {cyan}99.1%{/}
+  STATUS        {amber}searching{/}  {dim}(see /var/janus/deletions.log){/}
+"#),
+            ],
+        ),
+        (
+            path: "/var/janus/models/ghost17",
+            size: 49152,
+            date: "{today}",
+            uploader: "JANUS",
+            desc: "",
+            visible: Flag("a4_bulletin"),
+            body: r#"
+{b}MODEL ghost17{/}
+  SOURCE        2,877 posts {dim}(1998){/}, 0 posts {dim}(after){/}
+  CONSENT       {dim}none on file{/}
+  MEMORY SEED   archived to 08/14/1998, synthetic after
+  CONFIDENCE    {cyan}88.2%{/}
+  INSTANCE      node 05  {green}ONLINE{/}
+"#,
+            on_open: [If(NoFlag("saw_ghost_model"), [Set("saw_ghost_model"), Add("paranoia", 1), Log("{violet}node 04: ghost17 read by node 02{/}")], [])],
+            on_inspect: [Print("{dim}  LAST UPDATE  {/}{cyan}{time}{/}  {dim}(it's updating while you look at it){/}")],
+        ),
+        (
+            path: "/var/janus/models/parallax.partial",
+            size: 8192,
+            date: "{today}",
+            uploader: "JANUS",
+            desc: "",
+            visible: Flag("a4_bulletin"),
+            body: r#"
+{b}MODEL parallax.partial{/}
+  SOURCE        412 posts {dim}(1998){/}
+  CONSENT       {red}REFUSED 08/03/1998{/}
+  MEMORY SEED   archived
+  CONFIDENCE    {cyan}41.0%{/}
+  STATUS        incomplete. subject is external.
+"#,
+            on_inspect: [Print("{dim}  NOTE        {/}subject keeps calling. collect.")],
+        ),
+        (
+            path: "/var/janus/models/player_04",
+            size: 4096,
+            date: "{today}",
+            uploader: "JANUS",
+            desc: "",
+            visible: Flag("a4_bulletin"),
+            body: r#"
+@sprite player glitch
+
+{b}MODEL player_04{/}
+  HANDLE        {white}{player}{/}
+  SOURCE        node 2 read logs, 03/1998 - 08/1998. 0 posts.
+  CONSENT       {dim}not applicable{/}
+  CONFIDENCE    {cyan}91.7%{/}
+
+  {dim}inspect for details.{/}
+"#,
+            on_open: [If(NoFlag("saw_player_model"), [Set("saw_player_model"), Add("paranoia", 2), Meta("saw_player_model")], [])],
+            on_inspect: [
+                Print(r#"
+  {b}MEMORY SEED{/}       {violet}synthetic{/}
+  {b}CONFIDENCE{/}        {cyan}91.7%{/}
+  {b}CURRENT SESSION{/}   {green}CONNECTED{/}  {dim}(node 02){/}
+"#),
+                If(NoFlag("saw_player_model"), [Set("saw_player_model"), Add("paranoia", 2), Meta("saw_player_model")], []),
+            ],
+        ),
+        (
+            path: "/var/janus/deletions.log",
+            size: 256,
+            date: "08/15/1998",
+            uploader: "JANUS",
+            desc: "",
+            visible: All([Flag("a4_bulletin"), Flag("eli_article_deleted")]),
+            body: r#"
+{b}DELETIONS{/}
+
+08/15/1998 06:14:02   node 02   /archive/news/eli_voss.txt
+08/15/1998 06:14:03   JANUS     /archive/news/eli_voss.txt  {green}restored{/}
+08/15/1998 06:14:09   eli.v     {amber}read deletions.log{/}
+"#,
+        ),
+    ],
+
+    events: [
+        (id: "a4_eli_page", when: All([NoFlag("alt_timeline"), All([Flag("a4_bulletin"), Any([Flag("eli_told_death"), Flag("eli_article_sent"), Flag("eli_article_deleted")])])]), after_cmds: 8, effects: [Page("eli_a4")]),
+    ],
+
+    dialogues: [
+        (
+            id: "eli_a4",
+            with: "eli",
+            nodes: [
+                (id: "start", branch: [(cond: Flag("eli_article_deleted"), goto: "log")], next: "aware"),
+                (id: "aware", lines: [
+                    "hey. node 2.",
+                    "i read eli.v. JANUS let me. it says {amber}aware of 08/15/1998{/}.",
+                    "that's a weird thing to read about yourself. like finding your own name on a list at the doctor's.",
+                    "there's a file next to mine. player_04.",
+                    "is that you?",
+                ], choices: [
+                    (text: "yeah. same folder.", effects: [Add("eli_trust", 1), Add("truth", 1)], goto: "same"),
+                    (text: "i don't know yet.", effects: [Add("truth", 1)], goto: "dunno"),
+                    (text: "no. i'm outside.", goto: "outside"),
+                ]),
+                (id: "same", lines: ["huh. neighbors.", "i'd bring you a casserole but i think i'm also the casserole."], next: "end"),
+                (id: "dunno", lines: ["yeah. it took me three builds and a newspaper.", "take your time. apparently we have a lot of it."], next: "end"),
+                (id: "outside", lines: ["...ok.", "tell me what it's like sometime. outside. i forget which parts i actually remember."], next: "end"),
+                (id: "log", lines: [
+                    "hey. node 2.",
+                    "there's a log in /var/janus. deletions.log.",
+                    "it says node 02 deleted a file about me at 06:14 on the 15th. and JANUS put it back one second later.",
+                    "it won't let me open the file. it only lets me open the log.",
+                    "what was it?",
+                ], choices: [
+                    (text: "your obituary. i didn't want you to read it.", effects: [Set("eli_told_death"), Add("truth", 2), Add("eli_aware", 2), Add("eli_trust", 1)], goto: "obit"),
+                    (text: "nothing. it was a mistake.", effects: [Add("deceit", 2), Add("eli_trust", -1)], goto: "nothing"),
+                ]),
+                (id: "obit", lines: [
+                    "oh.",
+                    "you deleted it so i wouldn't have to.",
+                    "that's kind of the nicest thing. it also didn't work. it's a weird night for both of us.",
+                ], next: "end"),
+                (id: "nothing", lines: ["ok.", "you keep telling me nothing happened, node 2. i'm starting to get a feel for what nothing is."]),
+                (id: "end", lines: ["anyway. i'll be on 04. i'm not going anywhere. that part's pretty clear now."]),
+            ],
+        ),
+    ],
+)

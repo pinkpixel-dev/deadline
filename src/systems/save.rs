@@ -1,6 +1,6 @@
 //! Session, snapshot and meta persistence.
 //!
-//! - `session.json`: the live timeline, written on logout.
+//! - `session.json`: the live timeline, written on logout and autosaved.
 //! - `snapshots/<name>.json`: player snapshots (`snapshot` / `restore`).
 //! - `meta.json`: what JANUS remembers across every timeline.
 
@@ -78,6 +78,17 @@ impl Store {
         self.read(&format!("snapshots/{name}.json"))
     }
 
+    /// Delete the snapshots JANUS planted, so a new act can't restore one
+    /// from an earlier run before the story writes it again.
+    pub fn clear_planted(&self) -> Result<()> {
+        for name in self.snapshots() {
+            if self.snapshot(&name).is_some_and(|s| s.has("planted")) {
+                fs::remove_file(self.root.join(format!("snapshots/{name}.json")))?;
+            }
+        }
+        Ok(())
+    }
+
     /// Snapshot names, newest first.
     pub fn snapshots(&self) -> Vec<String> {
         let Ok(rd) = fs::read_dir(self.root.join("snapshots")) else {
@@ -139,6 +150,17 @@ mod tests {
         assert!(store.session().is_some());
         store.clear_session().unwrap();
         assert!(store.session().is_none());
+    }
+
+    #[test]
+    fn a_new_act_clears_only_planted_snapshots() {
+        let store = temp_store("planted");
+        let mut st = GameState::new("p");
+        store.save_snapshot("mine", &st).unwrap();
+        st.set("planted");
+        store.save_snapshot("before_you", &st).unwrap();
+        store.clear_planted().unwrap();
+        assert_eq!(store.snapshots(), vec!["mine".to_string()]);
     }
 
     #[test]

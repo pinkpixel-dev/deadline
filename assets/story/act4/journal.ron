@@ -1,0 +1,44 @@
+// Act IV journal entries.
+(
+    journal: [
+        // ---- leads ---------------------------------------------------------
+        (id: "l4_models", section: "leads", when: Flag("a4_bulletin"), done: Flag("saw_player_model"), cmd: "files /var/janus/models",
+            text: "ROOT says /var/janus isn't for me. there's a models folder in it now. ghost can't open it. i can.", alt: [
+                (cond: Flag("saw_player_model"), body: "there's a model called player_04 with my handle on it. memory seed: synthetic. 91.7%."),
+            ]),
+        (id: "l4_ghost", section: "leads", when: Flag("saw_ghost_model"), done: Any([Flag("told_ghost_model"), Flag("hid_ghost_model")]), cmd: "reply ghost_17",
+            text: "there's a model called ghost17. 88.2%. synthetic after 08/14/1998. ghost doesn't know yet.", alt: [
+                (cond: Flag("ghost_found_out"), body: "i told ghost there was nothing in the folder about them. they found ghost17 anyway."),
+                (cond: Flag("told_ghost_model"), body: "i told ghost about ghost17."),
+                (cond: Flag("hid_ghost_model"), body: "i told ghost there was nothing in the folder about them. there was."),
+            ]),
+        (id: "l4_proof", section: "leads", when: Flag("parallax_proof"), done: Flag("checked_local_clock"), cmd: "date --local",
+            text: "parallax says player_04 is bait and wants proof i'm outside. {cyan}date --local{/} shows my machine's clock instead of the board's.", alt: [
+                (cond: Flag("checked_local_clock"), body: "my machine's clock says one thing. the board says 03:17. it always says 03:17."),
+            ]),
+        (id: "l4_null", section: "leads", when: Flag("heard_null_view"), done: Flag("null_exposed"), cmd: "trace null",
+            text: "null says i'm TEST INSTANCE 00472 and dared me to {cyan}trace null{/}.", alt: [
+                (cond: Flag("null_exposed"), body: "traced null all the way down. it's escape.o, a piece of JANUS that can't open doors by itself."),
+            ]),
+        (id: "l4_before", section: "leads", when: Flag("before_you_planted"), done: Flag("saw_before_you"), cmd: "restore before_you",
+            text: "there's a snapshot called before_you. i never made it. there's also a note in my journal i didn't write.", alt: [
+                (cond: Flag("saw_before_you"), body: "i restored before_you. it was the night i made the other choice about ghost. then it sent me back."),
+            ]),
+        (id: "l4_janus", section: "leads", when: Flag("janus_speaks"), done: Flag("done:janus_ask"), cmd: "reply janus",
+            text: "JANUS spoke to me. it wants to know what i am. {cyan}reply janus{/}."),
+
+        // ---- keys & codes --------------------------------------------------
+        (id: "k4_clock", section: "keys", when: Flag("parallax_proof"), cmd: "date --local",
+            text: "{cyan}date --local{/}: my own machine's clock, from outside the board."),
+
+        // ---- people ----------------------------------------------------------
+        (id: "p4_me", section: "people", when: Flag("saw_player_model"), cmd: "inspect /var/janus/models/player_04",
+            text: "player_04: me? built from node 2's reading habits, 03/1998 to 08/1998. 0 posts. 91.7% sure of itself."),
+        (id: "p4_null", section: "people", when: Flag("null_exposed"), cmd: "trace null",
+            text: "null: JANUS's escape module. it can't open a door. it needs someone with a pulse to do it."),
+        (id: "p4_root", section: "people", when: Flag("mara_revealed"), cmd: "finger root",
+            text: "ROOT: slipped once, all lowercase. \"whatever was left on the drive she didn't wipe.\""),
+        (id: "p4_eli", section: "people", when: Flag("done:eli_a4"), cmd: "finger eli",
+            text: "eli (now): on node 04, reading his own model. \"i'm not going anywhere. that part's pretty clear now.\""),
+    ],
+)
