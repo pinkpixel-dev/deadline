@@ -1,0 +1,76 @@
+// Message boards. Posts live in posts_*.ron.
+(
+    boards: [
+        (id: "01", name: "GENERAL", count_label: "382 msgs", header: r#"
+@banner cyan GENERAL
+{dim}the front porch. be nice. 382 messages, most purged in the crash.{/}
+"#),
+        (id: "02", name: "CODE", count_label: "219 msgs", header: r#"
+@banner green CODE
+{dim}C, pascal, asm, qbasic, and one guy who writes everything in perl.{/}
+"#),
+        (id: "03", name: "PHREAK", count_label: "151 msgs", header: r#"
+@sprite payphone
+@banner yellow PHREAK
+{dim}for educational purposes. (it is never for educational purposes.){/}
+"#),
+        (id: "04", name: "FILES", count_label: "94 msgs", header: r#"
+@sprite floppy
+@banner blue FILES
+{dim}upload announcements. the actual files live in{/} {cyan}files{/}{dim}.{/}
+"#),
+        (id: "05", name: "TRADING POST", count_label: "61 msgs", header: r#"
+@sprite skull
+@banner red TRADING
+{dim}[05] TRADING POST :: TOTALLY LEGAL SOFTWARE{/}
+"#),
+        (id: "06", name: "OFF-TOPIC", count_label: "487 msgs", header: r#"
+@banner magenta OFFTOPIC
+{dim}anything goes. this is where the board actually lives.{/}
+"#),
+        (
+            id: "07",
+            name: "SYSOP",
+            count_label: "13 msgs",
+            header: r#"
+@banner white SYSOP
+{dim}announcements from the sysop. read-only for users.{/}
+"#,
+            on_open: [If(NoFlag("sysop_board_seen"), [Set("sysop_board_seen"), Add("root_alert", 1), Add("doors", 1), Log("ROOT: user browsing SYSOP")], [])],
+        ),
+        (
+            id: "08",
+            name: "ARCHIVE",
+            count_label: "sealed",
+            visible: Flag("archive_revealed"),
+            lock: (
+                open: Flag("archive_unlocked"),
+                denied: [Password(
+                    prompt: "ARCHIVE KEY:",
+                    answers: ["lantern"],
+                    ok: [Set("archive_unlocked"), Set("used_key"), Add("doors", 1), Print("{green}KEY ACCEPTED.{/} {dim}unsealing...{/}"), Log("archive unsealed by node 02")],
+                    fail: [
+                        Add("bad_keys", 1),
+                        Add("root_alert", 1),
+                        Print("{red}INVALID KEY.{/}"),
+                        If(Gte("bad_keys", 3), [Overlay("root_keys")], []),
+                    ],
+                )],
+            ),
+            header: r#"
+@banner violet ARCHIVE
+{dim}conversation logs recovered from node 04. read-only. do not redistribute.{/}
+"#,
+        ),
+        (
+            id: "09",
+            name: "▒▒▒▒▒▒",
+            count_label: "??? msgs",
+            visible: All([Flag("null_hint_09"), NoFlag("board09_gone")]),
+            header: r#"
+@art static
+"#,
+            on_open: [Glitch(900), Overlay("root_09")],
+        ),
+    ],
+)

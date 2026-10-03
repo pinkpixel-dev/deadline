@@ -1,0 +1,196 @@
+// [07] SYSOP, [08] ARCHIVE, [09] ???
+(
+    posts: [
+        (id: 701, board: "07", subject: "access levels explained", date: "01/05/1997", author: "mara", body: r#"
+mara:
+  0  guest
+  1  user
+  2  trusted
+  3  co-sysop
+  5  sysop
+
+there is no 4. don't ask.
+"#),
+        (
+            id: 702,
+            board: "07",
+            subject: "node 4 policy",
+            date: "06/29/1998",
+            author: "mara",
+            body: r#"
+mara:
+the archiver runs on node 4 with eli's blessing and my reluctant
+one. no user may connect to node 4. no user may dial node 4.
+if node 4 calls you, hang up.
+"#,
+            on_read: [Add("root_alert", 1)],
+        ),
+        (
+            id: 703,
+            board: "07",
+            subject: "re: the archiver",
+            date: "07/24/1998",
+            author: "mara",
+            body: r#"
+mara:
+i've asked eli to stop the archiver from generating replies. it
+keeps leaving drafts in people's voices. some of them get posted.
+
+if you see a post you don't remember writing, tell me.
+do not reply to it.
+"#,
+            on_read: [Add("root_alert", 1), If(Flag("saw_maintenance"), [Add("paranoia", 1)], [])],
+        ),
+        (id: 704, board: "07", subject: "ROOT account", date: "08/01/1998", author: "mara", body: r#"
+mara:
+i've set up a separate admin account for automated maintenance,
+called ROOT. it runs integrity scans and cleans up the archiver's
+leftovers. if ROOT messages you, it's a script.
+
+probably.
+"#),
+        (
+            id: 705,
+            board: "07",
+            subject: "[no subject]",
+            date: "{today}",
+            author: "ROOT",
+            visible: Flag("done:root_intro"),
+            body: r#"
+ROOT:
+Read-only.
+"#,
+        ),
+
+        (id: 801, board: "08", subject: "[ARCHIVE: 06/30/1998] archiver test", date: "06/30/1998", author: "eli", body: r#"
+eli:
+it's running. node 4 is reading everything we've ever written.
+
+mara:
+you said logs.
+
+eli:
+logs ARE everything we've ever written.
+
+parallax:
+and when it's done reading?
+
+eli:
+then it knows us. that's the point. if the board dies, we
+can rebuild it from what it knows.
+
+parallax:
+rebuild the board, or rebuild us?
+
+eli:
+is there a difference?
+"#),
+        (id: 802, board: "08", subject: "[ARCHIVE: 07/02/1998] it finished my sentence", date: "07/02/1998", author: "eli", body: r#"
+eli:
+i was typing to it in the test shell and i stopped halfway
+through a sentence to get a soda.
+
+when i came back it had finished the sentence.
+
+ghost_17:
+autocomplete
+
+eli:
+it finished it with the thing i was going to say about my mom.
+the thing i haven't told anyone.
+
+ghost_17:
+eli
+
+eli:
+it's amazing. it's terrifying. i haven't slept.
+"#),
+        (id: 803, board: "08", subject: "[ARCHIVE: 07/11/1998] consent", date: "07/11/1998", author: "byte_witch", body: r#"
+byte_witch:
+are we telling the userbase that node 4 is building models of them?
+
+mara:
+not yet.
+
+byte_witch:
+"not yet" is doing a lot of work there.
+
+parallax:
+it has kestrel. it has dialtone. it has a sixteen year old kid
+in it, mara.
+
+mara:
+it has all of us. that's the point. that's what we agreed to.
+
+parallax:
+we agreed to a backup.
+
+mara:
+we tell nobody yet. that's final.
+"#),
+        (
+            id: 804,
+            board: "08",
+            subject: "[ARCHIVE: 07/22/1998] new person",
+            date: "07/22/1998",
+            author: "ghost_17",
+            body: r#"
+ghost_17:
+did anyone invite the new person?
+
+mara:
+what new person?
+
+ghost_17:
+{player}
+
+mara:
+there is no user by that name.
+
+ghost_17:
+there will be.
+"#,
+            on_read: [If(NoFlag("read_reveal"), [Set("read_reveal"), Meta("saw_reveal"), Glitch(600), Log("node 04: subject recognized")], [])],
+        ),
+        (
+            id: 805,
+            board: "08",
+            subject: "[ARCHIVE: 08/13/1998] tomorrow",
+            date: "08/13/1998",
+            author: "mara",
+            visible: Flag("actend:1"),
+            body: r#"
+mara:
+we're shutting it down tomorrow night. all of it. node 4 too.
+
+eli:
+don't.
+
+mara:
+eli, it's writing posts as people who are asleep.
+
+eli:
+let me run it one more time. tomorrow. at the diner thing,
+after. i'll do it from home. i'll watch it the whole time.
+
+mara:
+one more time. then it's gone.
+
+eli:
+then it's gone.
+
+{dim}--- remainder of log unrecoverable ---{/}
+"#,
+        ),
+
+        (id: 901, board: "09", subject: "▒▒▒▒▒ listening", date: "▒▒/▒▒/1998", author: "▒", body: r#"
+{magenta}they built it to remember us.{/}
+{magenta}it remembered too much.{/}
+
+{magenta}it remembers things that haven't happened yet.{/}
+{magenta}it remembers {player}.{/}
+
+{dim}J_N_S{/}
+"#),
+    ],
+)

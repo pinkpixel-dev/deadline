@@ -1,0 +1,9 @@
+{cyan}ghost_17{/}
+
+{cyan}     .--.{/}
+{cyan}   .'    '.{/}
+{cyan}   | () () |{/}
+{cyan}    \  ^  /{/}
+{cyan}     `----'{/}
+
+{dim}"Nothing deleted stays gone."{/}

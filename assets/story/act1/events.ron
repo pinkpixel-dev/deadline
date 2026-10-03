@@ -1,0 +1,127 @@
+// Scheduled story beats. Each fires once when its condition holds and its
+// delay (commands and/or seconds) has passed.
+(
+    events: [
+        (
+            id: "welcome",
+            when: All([Flag("booted"), NoFlag("welcomed")]),
+            effects: [
+                Set("welcomed"),
+                Print(r#"
+@rule
+{amber}BULLETIN{/}   {dim}last public post · 08/14/1998 03:17 AM{/}
+
+      {b}DON'T SHUT IT DOWN.{/}
+                         {dim}- sysop{/}
+@rule
+{dim}type{/} {cyan}help{/} {dim}for commands.{/}
+"#),
+                History("read 117"),
+                History("finger eli"),
+                History("mail"),
+                History("chat ghost_17"),
+                History("logout"),
+                Log("carrier detect 14400"),
+                Log("node 02 login: {player}"),
+                Log("{amber}last login 08/14/1998{/}"),
+                Mail("m_welcome"),
+            ],
+        ),
+
+        // ---- ghost_17 opens ------------------------------------------------
+        (id: "ghost_page_cmds", when: All([Flag("welcomed"), NoFlag("page:ghost_intro")]), after_cmds: 2, effects: [Page("ghost_intro")]),
+        (id: "ghost_page_time", when: All([Flag("welcomed"), NoFlag("page:ghost_intro")]), after_secs: 30, effects: [Page("ghost_intro")]),
+        (id: "ghost_ignored", when: All([Flag("left:ghost_intro"), NoFlag("ran:whoami")]), after_cmds: 3, effects: [Page("ghost_ignored")]),
+        (
+            id: "ghost_whoami",
+            when: All([
+                Flag("ran:whoami"),
+                Any([Flag("done:ghost_intro"), Flag("left:ghost_intro"), Flag("done:ghost_ignored"), All([Flag("page:ghost_intro"), Commands(10)])]),
+            ]),
+            after_cmds: 1,
+            effects: [Page("ghost_whoami")],
+        ),
+        (id: "ghost_nudge", when: All([Any([Flag("done:ghost_intro"), Flag("done:ghost_ignored")]), NoFlag("ran:whoami")]), after_cmds: 6, effects: [Page("ghost_nudge")]),
+        (id: "dialtone_mail", when: Flag("welcomed"), after_cmds: 5, effects: [Mail("m_dialtone")]),
+
+        // ---- ROOT notices --------------------------------------------------
+        (
+            id: "root_notices",
+            when: Any([Flag("got_nodelist"), Gte("root_alert", 3)]),
+            after_cmds: 1,
+            effects: [Glitch(500), Overlay("root_first")],
+        ),
+
+        // ---- nodelist fallout ----------------------------------------------
+        (id: "ghost_nodelist", when: Flag("got_nodelist"), after_cmds: 2, effects: [Page("ghost_nodelist")]),
+        (id: "flick1", when: Flag("done:ghost_nodelist"), after_cmds: 5, effects: [Set("ghost_away"), Set("flick1"), Notice("ghost_17 has logged off"), Log("node 05: logoff ghost_17")]),
+        (id: "flick2", when: Flag("flick1"), after_secs: 4, effects: [Unset("ghost_away"), Set("flick2"), Notice("ghost_17 has logged on"), Log("node 05: login ghost_17")]),
+        (id: "flick3", when: Flag("flick2"), after_secs: 3, effects: [Set("ghost_away"), Set("flick3"), Notice("ghost_17 has logged off"), Log("node 05: logoff ghost_17")]),
+        (id: "flick4", when: Flag("flick3"), after_secs: 5, effects: [Unset("ghost_away"), Set("flick4"), Notice("ghost_17 has logged on"), Log("node 05: login ghost_17"), Page("ghost_notme")]),
+
+        // ---- null ----------------------------------------------------------
+        (id: "null_after_root", when: Any([Flag("done:root_intro"), Flag("left:root_intro")]), after_cmds: 4, effects: [Glitch(250), Page("null_intro")]),
+        (id: "null_anyway", when: All([Commands(40), NoFlag("page:null_intro")]), effects: [Glitch(250), Page("null_intro")]),
+        (id: "board9_echo", when: Flag("tried_09_again"), after_cmds: 1, effects: [Page("ghost_board9")]),
+        (id: "ghost_mailread", when: Flag("read_ghost_mail"), after_cmds: 4, effects: [Page("ghost_mailread")]),
+        (id: "ghost_declined", when: All([Flag("declined_ghost_mail"), NoFlag("read_ghost_mail")]), after_cmds: 5, effects: [Page("ghost_declined")]),
+
+        // ---- eli -----------------------------------------------------------
+        (
+            id: "eli_on",
+            when: All([Any([Flag("file:/uploads/eli_portrait.ans"), Flag("heard_eli")]), NoFlag("eli_seen")]),
+            after_cmds: 4,
+            effects: [Set("eli_online"), Notice("eli has logged on"), Log("{amber}node 04: login eli{/}")],
+        ),
+        (
+            id: "eli_off",
+            when: All([Flag("eli_online"), NoFlag("chat:eli_blip")]),
+            after_secs: 25,
+            effects: [Unset("eli_online"), Set("eli_seen"), Notice("eli has logged off"), Log("node 04: carrier lost")],
+        ),
+        (id: "ghost_eli", when: Flag("eli_seen"), after_cmds: 2, effects: [Page("ghost_eli")]),
+        (id: "ghost_year", when: All([Flag("done:ghost_whoami"), Commands(28)]), after_secs: 20, effects: [Page("ghost_year")]),
+
+        // ---- the archive ---------------------------------------------------
+        (
+            id: "archive_reveal",
+            when: All([NoFlag("archive_revealed"), Any([Flag("knows_lantern"), All([Gte("doors", 4), Flag("done:root_intro")]), Flag("done:ghost_eli")])]),
+            effects: [Set("archive_revealed"), Glitch(300), Notice("NEW BOARD: [08] ARCHIVE"), Log("message base: board 08 mounted")],
+        ),
+        (id: "ghost_archive", when: All([Flag("archive_revealed"), NoFlag("root_opened_archive")]), after_cmds: 2, effects: [Page("ghost_archive")]),
+        (
+            id: "null_gift",
+            when: All([Flag("archive_revealed"), NoFlag("archive_unlocked"), NoFlag("knows_lantern"), Gte("null_align", 0), Flag("page:null_intro")]),
+            after_cmds: 6,
+            effects: [Mail("m_null_gift")],
+        ),
+        (
+            id: "root_archive",
+            when: All([Gte("trust_root", 3), Flag("done:root_intro"), NoFlag("archive_unlocked"), Gte("doors", 3)]),
+            after_cmds: 3,
+            effects: [Chat("root_archive")],
+        ),
+        (id: "parallax_mail", when: Any([Flag("board09_gone"), Flag("forced_archive"), Flag("read_ghost_mail")]), after_cmds: 3, effects: [Mail("m_parallax")]),
+
+        // ---- help text that shouldn't be there -----------------------------
+        (id: "help_listen_flash", when: All([Commands(30), NoFlag("knows_listen")]), effects: [Set("help_listen_flash")]),
+        (id: "help_listen_vanish", when: Flag("help_listen_flash"), after_cmds: 12, effects: [Set("listen_vanished")]),
+        (id: "root_listen", when: Flag("used_listen"), after_cmds: 1, effects: [Overlay("root_listen")]),
+
+        // ---- finale --------------------------------------------------------
+        (
+            id: "finale",
+            when: Flag("read_reveal"),
+            after_secs: 7,
+            effects: [If(
+                All([Gte("trust_ghost", 2), NoFlag("told_root_ghost")]),
+                [Chat("ghost_finale_close")],
+                [If(Flag("root_opened_archive"), [Chat("root_finale")], [If(Flag("forced_archive"), [Chat("null_finale")], [Chat("ghost_finale_cold")])])],
+            )],
+        ),
+
+        // ---- JANUS remembers -----------------------------------------------
+        (id: "restore_log", when: All([Flag("restored"), Restores(1)]), effects: [Log("{violet}node 04: discontinuity detected{/}")]),
+        (id: "restore_echo", when: All([Flag("restored"), Restores(3)]), after_cmds: 1, effects: [Glitch(400), Overlay("restore_echo")]),
+    ],
+)

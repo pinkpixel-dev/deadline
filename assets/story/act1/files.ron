@@ -1,0 +1,157 @@
+// The file area.
+(
+    dirs: [
+        (path: "/uploads"),
+        (path: "/users"),
+        (path: "/sysop", lock: (open: Never, denied: [Print("{red}ACCESS DENIED.{/} {dim}LEVEL 5 REQUIRED.{/}"), Add("root_alert", 1)])),
+        (path: "/archive", lock: (open: Never, denied: [Print("{red}ARCHIVE RESTRUCTURING.{/} {dim}try again later.{/}"), If(Flag("archive_unlocked"), [Print("{dim}the message archive is on board 08.{/}")], [])])),
+    ],
+    files: [
+        (
+            path: "/uploads/nodelist.txt",
+            size: 612,
+            date: "03/11/1998",
+            uploader: "mara",
+            desc: "node assignments",
+            body: r#"
+{b}DEADLINE NODE LIST{/}                         {dim}rev. 03/11/1998{/}
+
+NODE  LINE        ASSIGNED        NOTES
+ 01   555-0141    mara            sysop console
+ 02   555-0142    {white}{player}{/}
+ 03   555-0143    (shared)
+ 04   555-0144    {amber}ARCHIVER{/}        DO NOT DIAL
+ 05   555-0145    ghost_17
+ 06   555-0146    (shared)
+ 07   555-0147    (unassigned)    {dim}see sysop{/}
+ 08   555-0148    (unassigned)
+"#,
+            on_open: [If(NoFlag("saw_nodelist"), [Set("saw_nodelist"), Add("paranoia", 1)], [])],
+            on_download: [Set("got_nodelist"), Add("root_alert", 2), Add("doors", 1), Overlay("root_took")],
+        ),
+        (
+            path: "/uploads/eli_portrait.ans",
+            size: 2048,
+            date: "07/02/1998",
+            uploader: "eli",
+            desc: "self portrait (be nice)",
+            body: r#"
+@sprite eli_portrait
+
+  {amber}{b}ELI VOSS{/}{/}
+  {dim}made in TheDraw. the sunglasses are canon.{/}
+"#,
+            alt: [(cond: All([Flag("file:/uploads/eli_portrait.ans"), Any([Flag("eli_seen"), Flag("read_ghost_mail"), Flag("read:802")])]), body: r#"
+@sprite eli_portrait
+
+  {amber}{b}ELI VOSS{/}{/}
+  {dim}made in TheDraw. the sunglasses are canon.{/}
+
+  {text}1978 - 1998{/}
+"#)],
+            on_open: [If(All([Flag("file:/uploads/eli_portrait.ans"), Any([Flag("eli_seen"), Flag("read_ghost_mail"), Flag("read:802")]), NoFlag("portrait_changed")]), [Set("portrait_changed"), Glitch(350), Log("eli_portrait.ans: size changed")], [])],
+        ),
+        (
+            path: "/uploads/manual.txt",
+            size: 1311,
+            date: "07/20/1998",
+            uploader: "unknown",
+            desc: "sysop manual p.3",
+            corrupt: true,
+            body: r#"
+DEADLINE SYSOP MANUAL                                    p. 3
+
+SYSOP COMMANDS
+  recover    rebuild a damaged file from slack space
+  shadow     (removed in 2.1)
+  listen     passive capture of all active nodes
+  fork       DO NOT USE
+
+note: listen does not announce itself to other nodes.
+note: if node 04 answers back, end the capture.
+"#,
+            on_open: [If(All([Flag("recovered:/uploads/manual.txt"), NoFlag("knows_listen")]), [Set("knows_listen"), Add("doors", 1), Log("shell: listen available")], [])],
+        ),
+        (
+            path: "/uploads/lastcall.txt",
+            size: 404,
+            date: "08/14/1998",
+            uploader: "SYSTEM",
+            desc: "caller log",
+            corrupt: true,
+            body: r#"
+{b}LAST CALLERS{/}                                08/14/1998
+
+  02:58  node 05   ghost_17     logoff
+  03:02  node 01   mara         login
+  03:09  node 04   eli          login     {dim}(remote){/}
+  03:17  node 02   {white}{player}{/}     login
+  03:17  node 01   mara         post #108
+  03:19  node 04   eli          {red}carrier lost{/}
+  03:21  node 01   mara         logoff
+  03:21  node 02   {white}{player}{/}     {amber}still connected{/}
+"#,
+            on_open: [If(All([Flag("recovered:/uploads/lastcall.txt"), NoFlag("saw_lastcall")]), [Set("saw_lastcall"), Add("paranoia", 2), Glitch(500), Meta("saw_lastcall")], [])],
+        ),
+        (
+            path: "/uploads/deadlin3.zip",
+            size: 184320,
+            date: "05/05/1998",
+            uploader: "crankshaft",
+            desc: "DEADLINE: THE GAME (door)",
+            body: r#"
+{dim}PKUNZIP (R) FAST! Extract Utility Version 2.04g{/}
+
+  DEADLIN3.EXE    112,402
+  DEADLIN3.DAT     58,110
+  README.TXT        2,140
+  SAVEGAME.DAT        {amber}1,024   08/14/1998 03:17{/}
+
+{dim}you'd need DOS for this. also, why is there a save file in it?{/}
+"#,
+        ),
+        (
+            path: "/uploads/modem_faq.txt",
+            size: 1890,
+            date: "02/02/1998",
+            uploader: "kestrel",
+            desc: "AT commands for humans",
+            body: r#"
+{b}MODEM FAQ FOR HUMANS{/}  by kestrel
+
+  ATZ      start over
+  ATDT     dial (tone)
+  ATDP     dial (pulse). why. who hurt you.
+  ATH0     hang up
+  ATH1     pick up
+  ATM0     shut up (speaker off)
+  +++      get the modem's attention. it's ignoring you.
+
+  there is no AT command to go back.
+"#,
+        ),
+        (
+            path: "/uploads/ghost_sig.ans",
+            size: 377,
+            date: "07/01/1998",
+            uploader: "ghost_17",
+            desc: "signature",
+            body: "@art ghost_sig",
+        ),
+        (
+            path: "/users/README",
+            size: 128,
+            date: "01/05/1997",
+            uploader: "mara",
+            desc: "",
+            body: "{dim}user .plan files are shown with{/} {cyan}finger <user>{/}{dim}.{/}",
+        ),
+        (
+            path: "/sysop/janus.cfg",
+            size: 0,
+            date: "??/??/????",
+            uploader: "ROOT",
+            body: "",
+        ),
+    ],
+)

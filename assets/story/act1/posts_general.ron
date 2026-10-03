@@ -1,0 +1,189 @@
+// [01] GENERAL
+(
+    posts: [
+        (id: 101, board: "01", subject: "welcome to DEADLINE (read this)", date: "01/03/1997", author: "mara", body: r#"
+mara:
+welcome. some rules, because apparently we need them now.
+
+1. no warez in GENERAL. that's what TRADING POST is for.
+   (TRADING POST is not for that.)
+2. be nice to the modem. it's older than some of you.
+3. don't ask me for access 5.
+4. if the board is down, the board is down. do not call my house.
+5. we keep everything. that's the point of this place.
+
+- mara, sysop
+"#),
+        (id: 102, board: "01", subject: "linux is not ready for desktop use", date: "04/03/1998", author: "kestrel", body: r#"
+kestrel:
+spent the whole weekend getting X to start. it started. i have
+a gray screen and a cursor shaped like an X. victory?
+
+mara:
+you people have been saying this for four years
+
+ghost_17:
+give it another twenty
+
+byte_witch:
+it's ready for MY desktop. my desktop is a cardboard box
+with a monitor on it, but still
+
+eli:
+i got sound working once. it played one beep and i cried.
+"#),
+        (id: 103, board: "01", subject: "who keeps dialing in at 3am", date: "05/19/1998", author: "dialtone", body: r#"
+dialtone:
+every night around 3am the line is busy. i'm trying to download
+and it's ALWAYS busy. who is up at 3am
+
+mara:
+the board is always up at 3am. that's the whole point of a board.
+
+ghost_17:
+some of us are nocturnal
+
+eli:
+some of us have deadlines
+
+kestrel:
+i see what you did there and i hate it
+"#),
+        (id: 104, board: "01", subject: "Y2K is going to end us all", date: "06/02/1998", author: "crankshaft", body: r#"
+crankshaft:
+i'm serious. 00 rolls over and every clock thinks it's 1900.
+planes. banks. VCRs. i'm stockpiling canned beans.
+
+byte_witch:
+the VCRs have been blinking 12:00 since 1985. they're fine.
+
+crankshaft:
+you'll see. you'll all see. and i'll have beans.
+
+ghost_17:
+what happens to the board in 2000
+
+mara:
+the board will be fine.
+
+eli:
+the board will outlive all of us. that's kind of the plan.
+"#),
+        (id: 105, board: "01", subject: "post your setup", date: "06/14/1998", author: "byte_witch", body: r#"
+byte_witch:
+486DX2/66, 8 megs, USR 14.4, and a chair that hates me.
+
+eli:
+P166, voodoo card, 32 megs. i have achieved godhood.
+
+kestrel:
+my brother's old 386. it has a turbo button. it does nothing.
+
+ghost_17:
+a laptop with three keys missing. guess which three.
+
+dialtone:
+Q, W and E
+
+ghost_17:
+the E is fine. i just don't use the letter "it".
+
+mara:
+the server. obviously.
+"#),
+        (
+            id: 106,
+            board: "01",
+            subject: "maintenance",
+            date: "07/21/1998",
+            author: "mara",
+            visible: Flag("done:ghost_whoami"),
+            body: r#"
+mara:
+node 4 is going down tonight.
+
+eli:
+again?
+
+mara:
+yes.
+
+{player}:
+don't bring it back up.
+"#,
+            on_read: [If(NoFlag("saw_maintenance"), [Set("saw_maintenance"), Add("paranoia", 1), Glitch(450), Log("message 106: author field mismatch")], [])],
+        ),
+        (id: 107, board: "01", subject: "the board is quiet lately", date: "08/10/1998", author: "kestrel", body: r#"
+kestrel:
+where is everyone? used to be 40 posts a night.
+
+ghost_17:
+summer
+
+parallax:
+or something else.
+
+kestrel:
+what does that mean
+
+parallax:
+ask eli what's on node 4.
+
+eli:
+it's a backup. it's a fancy backup. relax.
+"#),
+        (
+            id: 108,
+            board: "01",
+            subject: "DON'T SHUT IT DOWN.",
+            date: "08/14/1998 03:17 AM",
+            author: "mara",
+            body: r#"
+DON'T SHUT IT DOWN.
+
+- sysop
+"#,
+            alt: [(cond: Flag("actend:1"), body: r#"
+DON'T SHUT IT DOWN.
+
+- sysop
+
+{dim}--- reply posted {today} ---{/}
+ROOT:
+It was never mine to shut down.
+"#)],
+        ),
+        (
+            id: 109,
+            board: "01",
+            subject: "first post on the new board!!",
+            date: "01/04/1997",
+            author: "dialtone",
+            body: r#"
+dialtone:
+FIRST!!!
+
+mara:
+it's a new board, dialtone. everything is first.
+
+dialtone:
+FIRST!!! (again)
+"#,
+            alt: [(cond: Flag("eli_seen"), body: r#"
+dialtone:
+FIRST!!!
+
+mara:
+it's a new board, dialtone. everything is first.
+
+dialtone:
+FIRST!!! (again)
+
+{dim}--- reply posted {today} 03:17 AM ---{/}
+eli:
+still here.
+"#)],
+            on_read: [If(All([Flag("eli_seen"), NoFlag("saw_eli_reply")]), [Set("saw_eli_reply"), Add("paranoia", 1), Glitch(300)], [])],
+        ),
+    ],
+)

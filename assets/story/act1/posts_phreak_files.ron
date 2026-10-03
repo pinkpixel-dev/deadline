@@ -1,0 +1,178 @@
+// [03] PHREAK and [04] FILES
+(
+    posts: [
+        (id: 301, board: "03", subject: "red boxing is dead, long live red boxing", date: "01/22/1998", author: "dialtone", body: r#"
+dialtone:
+the new payphones don't take the tones anymore. an era is over.
+pour one out. (into a coin slot. it won't work either.)
+
+crankshaft:
+the one behind the bowling alley still works
+
+dialtone:
+DON'T POST THAT
+
+crankshaft:
+the one behind the bowling alley does not work and never has
+"#),
+        (id: 302, board: "03", subject: "payphone on 9th calls back", date: "04/11/1998", author: "crankshaft", body: r#"
+crankshaft:
+the payphone at the gas station on 9th. if you hang up on it,
+it calls you back. not the number you called. the payphone.
+
+kestrel:
+i tried it. it rang. i picked up. dial tone.
+
+crankshaft:
+that's the fun part. it's the dial tone of a different payphone.
+
+mara:
+please stop prank calling the infrastructure.
+"#),
+        (id: 303, board: "03", subject: "numbers that shouldn't ring", date: "05/30/1998", author: "kestrel", body: r#"
+kestrel:
+collecting weird numbers. add yours.
+
+  555-0199   dial tone, but slightly flat
+  555-0123   a man reading weather for a city that doesn't exist
+  555-0188   modem carrier, never negotiates
+  555-0142   DEADLINE. after 3:17am: two rings, then breathing.
+
+byte_witch:
+the deadline one is just line noise
+
+kestrel:
+probably.
+
+byte_witch:
+...probably.
+"#),
+        (
+            id: 304,
+            board: "03",
+            subject: "the old commands",
+            date: "06/09/1998",
+            author: "ghost_17",
+            body: r#"
+ghost_17:
+for the new people: this board still answers {cyan}trace <user>{/}
+and {cyan}scan{/}. mara never ripped them out.
+
+use them. don't abuse them. and don't trace ROOT, it hates that.
+
+mara:
+i don't hate anything. ROOT doesn't exist yet.
+
+ghost_17:
+yet.
+"#,
+            on_read: [If(NoFlag("knows_trace"), [Set("knows_trace"), Log("shell: trace, scan available")], [])],
+        ),
+        (id: 305, board: "03", subject: "2600hz and you: a love story", date: "06/20/1998", author: "byte_witch", body: r#"
+byte_witch:
+my little brother got a toy whistle out of a cereal box and
+blew it into the phone. nothing happened. he was very upset.
+i told him it was 1971 for exactly one person and it wasn't him.
+
+dialtone:
+i would like to subscribe to more cereal facts
+"#),
+        (id: 306, board: "03", subject: "who's on node 7", date: "08/02/1998", author: "parallax", body: r#"
+parallax:
+something keeps holding node 7 open with no carrier. it isn't a
+user. scan shows it as LISTENING.
+
+eli:
+it's probably the archiver sampling the line. it does that.
+
+parallax:
+"it does that." eli. listen to yourself.
+"#),
+        (id: 307, board: "03", subject: "my mom picked up the phone mid-download", date: "08/06/1998", author: "dialtone", body: r#"
+dialtone:
+lost three hours of a 4 meg file. she picked up and said "who is
+this?" and the modem screamed at her. she screamed back. now
+neither of them will talk to me.
+
+ghost_17:
+get a second line
+
+dialtone:
+with what money. i'm 16. i get paid in pizza rolls.
+"#),
+
+        (id: 401, board: "04", subject: "UPLOAD: eli_portrait.ans", date: "07/02/1998", author: "eli", body: r#"
+eli:
+did a self portrait in TheDraw. it's in /uploads. be nice.
+the sunglasses are canon.
+
+kestrel:
+you don't own sunglasses
+
+eli:
+i do in ANSI.
+"#),
+        (id: 402, board: "04", subject: "UPLOAD: nodelist.txt", date: "03/11/1998", author: "mara", body: r#"
+mara:
+current node assignments are in /uploads/nodelist.txt.
+if you're assigned a node, use it. if you're not, don't ask.
+
+dialtone:
+can i have node 7
+
+mara:
+no one gets node 7.
+"#),
+        (id: 403, board: "04", subject: "UPLOAD: deadlin3.zip (door game)", date: "05/05/1998", author: "crankshaft", body: r#"
+crankshaft:
+wrote a door game. DEADLINE: THE GAME. you are a sysop. your
+modem is on fire. you have three turns to save the board.
+
+kestrel:
+i saved the board and the game said "the board cannot be saved"
+
+crankshaft:
+that's the twist
+"#),
+        (id: 404, board: "04", subject: "where did my upload go", date: "08/12/1998", author: "kestrel", body: r#"
+kestrel:
+uploaded a scan of the group photo from the july meetup.
+it's gone. not deleted. GONE. no log entry.
+
+mara:
+the file area doesn't show any upload from you since june.
+
+kestrel:
+i watched it finish. 100%. we were all in it. eli was doing
+the stupid peace sign.
+
+ghost_17:
+i remember that photo.
+
+mara:
+...i'll look into it.
+"#),
+        (id: 405, board: "04", subject: "file area going read-only", date: "08/13/1998", author: "mara", body: r#"
+mara:
+after tomorrow night the upload area is read-only. download what
+you need. i'm sorry. i'll explain when i can.
+
+ghost_17:
+mara what's going on
+
+mara:
+tomorrow.
+"#),
+        (id: 406, board: "04", subject: "manual.txt is all CRC garbage?", date: "07/20/1998", author: "byte_witch", body: r#"
+byte_witch:
+somebody uploaded a page from a sysop manual and it's completely
+mangled. half of it is block characters.
+
+eli:
+i can fix that. see my post in CODE.
+
+mara:
+nobody fix that.
+"#),
+    ],
+)

@@ -1,0 +1,330 @@
+// ghost_17: sarcastic, lowercase, fast. Gets serious when scared.
+(
+    dialogues: [
+        (
+            id: "ghost_intro",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", lines: ["you took long enough."], choices: [
+                    (text: "who is this?", goto: "who"),
+                    (text: "long enough for what?", effects: [Add("trust_ghost", 1)], goto: "what"),
+                    (text: "i think you have the wrong person.", effects: [Add("paranoia", 1)], goto: "wrong"),
+                ]),
+                (id: "who", lines: [
+                    "rude.",
+                    "you're on my board and you don't know who i am?",
+                    "ghost. ghost_17. i was here before. a long time before.",
+                ], next: "ask"),
+                (id: "what", lines: [
+                    "for the line to come back up.",
+                    "it's been dead since 98. nothing. no carrier. i checked every night.",
+                    "then tonight it rings. and you're on it.",
+                ], next: "ask"),
+                (id: "wrong", lines: [
+                    "nope.",
+                    "your handle's on the node list. been there forever.",
+                    "that's the part that's bugging me.",
+                ], next: "ask"),
+                (id: "ask", lines: [
+                    "do me a favor.",
+                    "type {cyan}whoami{/}. tell me what it says.",
+                ], effects: [Set("ghost_asked_whoami")], choices: [
+                    (text: "why?", goto: "why"),
+                    (text: "ok.", effects: [Add("trust_ghost", 1)], goto: "bye"),
+                    (text: "i don't take orders from strangers.", effects: [Add("trust_ghost", -1), Add("risk", 1)], goto: "orders"),
+                ]),
+                (id: "why", lines: ["humor me.", "i'll explain if it says what i think it says."], next: "bye"),
+                (id: "orders", lines: ["lol ok.", "it's a favor, not an order. the board's yours too apparently."], next: "bye"),
+                (id: "bye", lines: ["i'll be around. probably."]),
+            ],
+            on_leave: [Add("trust_ghost", -1), Set("ghost_ignored")],
+        ),
+        (
+            id: "ghost_ignored",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", lines: [
+                    "ok. cool.",
+                    "ignore the only other person here. great plan.",
+                    "just type {cyan}whoami{/}. please. then talk to me.",
+                ], effects: [Set("ghost_asked_whoami")]),
+            ],
+        ),
+        (
+            id: "ghost_nudge",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", lines: ["did you run it yet?", "{cyan}whoami{/}. it's one word. i believe in you."]),
+            ],
+        ),
+        (
+            id: "ghost_whoami",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", branch: [(cond: NoFlag("ghost_asked_whoami"), goto: "unasked")], next: "asked"),
+                (id: "asked", lines: ["so?", "what'd it say"], choices: [
+                    (text: "LAST LOGIN: 08/14/1998.", effects: [Add("truth", 1)], goto: "truth"),
+                    (text: "it says i was created today.", effects: [Add("deceit", 1), Set("lied_whoami")], goto: "lie"),
+                    (text: "why do you care?", goto: "care"),
+                ]),
+                (id: "unasked", lines: [
+                    "you already ran whoami, didn't you.",
+                    "i saw it in the log. what'd it say?",
+                ], effects: [Set("ghost_asked_whoami")], choices: [
+                    (text: "LAST LOGIN: 08/14/1998.", effects: [Add("truth", 1)], goto: "truth"),
+                    (text: "it says i was created today.", effects: [Add("deceit", 1), Set("lied_whoami")], goto: "lie"),
+                    (text: "why are you watching the log?", goto: "care"),
+                ]),
+                (id: "truth", lines: [
+                    "...",
+                    "that's the night it went down.",
+                    "that's not funny.",
+                    "you're not messing with me?",
+                ], choices: [
+                    (text: "i'm not. that's what it says.", effects: [Add("truth", 1), Add("trust_ghost", 1)], goto: "shared"),
+                    (text: "ok fine, i made it up.", effects: [Add("deceit", 1), Add("trust_ghost", -1), Set("retracted_whoami")], goto: "funny"),
+                ]),
+                (id: "funny", lines: ["wow.", "ok. hilarious. you got me.", "moving on."], next: "task"),
+                (id: "shared", lines: [
+                    "ok.",
+                    "ok ok ok.",
+                    "i made every account on this board, {player}.",
+                    "i don't remember making yours.",
+                ], effects: [Add("paranoia", 1)], next: "task"),
+                (id: "lie", lines: ["huh.", "ok. good.", "that's... normal. that's fine.", "forget i asked."], next: "task"),
+                (id: "care", lines: [
+                    "because i made every account on this board.",
+                    "and i didn't make yours.",
+                ], effects: [Add("curiosity", 1)], choices: [
+                    (text: "fine. it says 08/14/1998.", effects: [Add("truth", 1)], goto: "shared"),
+                    (text: "maybe you forgot.", goto: "forgot"),
+                ]),
+                (id: "forgot", lines: ["i don't forget things.", "that's kind of my whole problem."], next: "task"),
+                (id: "task", lines: [
+                    "listen.",
+                    "there's a file in the upload area. {b}nodelist.txt{/}.",
+                    "grab it before ROOT notices it's still there.",
+                    "{cyan}files{/}, {cyan}cd uploads{/}, {cyan}download{/}. you know how this works.",
+                ], effects: [Set("quest_nodelist")], choices: [
+                    (text: "who's ROOT?", goto: "root"),
+                    (text: "why don't you grab it?", goto: "why"),
+                    (text: "ok.", effects: [Add("trust_ghost", 1)], goto: "ok"),
+                ]),
+                (id: "root", lines: ["the sysop.", "or what's left of the sysop.", "don't talk to ROOT. if it talks to you, be boring."]),
+                (id: "why", lines: ["my account can't touch the file area anymore.", "long story. short version: ROOT."]),
+                (id: "ok", lines: ["cool.", "you're alright, {player}. weird, but alright."]),
+            ],
+            on_leave: [Add("trust_ghost", -1)],
+        ),
+        (
+            id: "ghost_nodelist",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", lines: ["got it?", "did ROOT say anything"], choices: [
+                    (text: "yeah. it said the file wasn't mine to take.", effects: [Add("truth", 1)], goto: "said"),
+                    (text: "nothing. smooth.", effects: [Add("deceit", 1)], goto: "smooth"),
+                    (text: "why is my name on a list from march 1998?", goto: "march"),
+                ]),
+                (id: "said", lines: ["yeah. that's ROOT. it talks like a locked door."], next: "node4"),
+                (id: "smooth", lines: ["huh. lucky.", "ROOT usually has an opinion about everything."], next: "node4"),
+                (id: "march", lines: [
+                    "i was hoping you'd tell me.",
+                    "i typed that list. i remember typing it.",
+                    "i don't remember typing your name.",
+                ], effects: [Add("paranoia", 1)], next: "node4"),
+                (id: "node4", lines: ["look at node 04 though."], choices: [
+                    (text: "ARCHIVER. DO NOT DIAL.", goto: "archiver"),
+                    (text: "what's on node 04?", goto: "archiver"),
+                ]),
+                (id: "archiver", lines: [
+                    "the archiver.",
+                    "the thing eli built.",
+                    "it was supposed to be a backup. then it got... thorough.",
+                ], effects: [Set("heard_eli")], choices: [
+                    (text: "who's eli?", goto: "eli"),
+                    (text: "thorough how?", goto: "thorough"),
+                ]),
+                (id: "eli", lines: ["was.", "who {b}was{/} eli.", "don't ask me about eli tonight. please."], effects: [Add("eli_aware", 1)]),
+                (id: "thorough", lines: [
+                    "it kept everything. every post. every draft.",
+                    "every time you started typing and stopped.",
+                    "and then it started guessing what you'd type next.",
+                    "and it was right.",
+                ]),
+            ],
+        ),
+        (
+            id: "ghost_notme",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", lines: ["that wasn't me.", "the logging off and on. just now.", "i've been here the whole time."], choices: [
+                    (text: "then who was it?", goto: "who"),
+                    (text: "are you sure?", goto: "sure"),
+                    (text: "it was probably just line noise.", goto: "noise"),
+                ]),
+                (id: "who", lines: ["you tell me.", "you're the one who keeps poking things."], effects: [Add("paranoia", 1)]),
+                (id: "sure", lines: ["...", "no.", "that's the problem. i'm never sure anymore."], effects: [Add("trust_ghost", 1), Set("ghost_doubts_self")]),
+                (id: "noise", lines: ["line noise doesn't type my password, {player}."]),
+            ],
+        ),
+        (
+            id: "ghost_board9",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", lines: ["hey.", "how did you know there used to be a board 9?"], choices: [
+                    (text: "null told me about it.", cond: Flag("null_hint_09"), effects: [Add("truth", 1), Add("trust_ghost", 1), Set("told_ghost_null")], goto: "null"),
+                    (text: "it was in my command history.", effects: [Add("truth", 1)], goto: "history"),
+                    (text: "lucky guess.", effects: [Add("deceit", 1), Add("trust_ghost", -1)], goto: "guess"),
+                ]),
+                (id: "null", lines: [
+                    "null.",
+                    "of course.",
+                    "{player}. listen to me. null isn't a user.",
+                    "i don't know what null is. but it's not one of us.",
+                ], effects: [Add("burner", 1)]),
+                (id: "history", lines: [
+                    "your history.",
+                    "sure.",
+                    "ok, that's actually worse.",
+                    "board 9 got wiped before you ever logged in.",
+                ], effects: [Add("paranoia", 1)]),
+                (id: "guess", lines: ["nobody guesses a board that doesn't exist.", "fine. keep your secrets. everyone else here does."]),
+            ],
+        ),
+        (
+            id: "ghost_mailread",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", lines: ["You read my messages.", "Don't bother denying it.", "The system logged you."], effects: [Add("trust_ghost", -2), Set("ghost_knows_mailread")], choices: [
+                    (text: "i'm sorry. i shouldn't have.", effects: [Add("truth", 1), Add("trust_ghost", 1)], goto: "sorry"),
+                    (text: "i didn't.", effects: [Add("deceit", 2), Add("trust_ghost", -2)], goto: "deny"),
+                    (text: "you'd have done the same.", goto: "same"),
+                ]),
+                (id: "sorry", lines: ["...yeah. you shouldn't have.", "at least you said it.", "most people here don't."]),
+                (id: "deny", lines: ["the log has your node number on it.", "wow.", "ok."]),
+                (id: "same", lines: ["probably.", "doesn't make it ok.", "and now you know about mara's key. great. perfect."]),
+            ],
+        ),
+        (
+            id: "ghost_declined",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", lines: [
+                    "so.",
+                    "the log says you had my mailbox open.",
+                    "and you closed it without reading anything.",
+                    "...thanks. that's. thanks.",
+                ], effects: [Add("trust_ghost", 2)], choices: [
+                    (text: "it's yours. it wasn't my business.", effects: [Add("privacy", 1), Add("trust_ghost", 1)], goto: "yours"),
+                    (text: "i almost did.", effects: [Add("truth", 1)], goto: "almost"),
+                ]),
+                (id: "yours", lines: ["nobody on this board has said that to me in a long time."]),
+                (id: "almost", lines: ["almost counts for something.", "it counts for a lot, honestly."]),
+            ],
+        ),
+        (
+            id: "ghost_eli",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", lines: ["did you see that", "eli. on node 04."], choices: [
+                    (text: "i talked to him.", cond: Flag("talked_eli"), goto: "talked"),
+                    (text: "who's eli?", cond: NoFlag("heard_eli"), goto: "who"),
+                    (text: "you said not to ask about eli.", cond: Flag("heard_eli"), effects: [Add("trust_ghost", 1)], goto: "asked"),
+                    (text: "probably a glitch.", goto: "glitch"),
+                ]),
+                (id: "talked", lines: ["you WHAT", "what did he say"], choices: [
+                    (text: "he said to tell mara not to take node 4 down.", effects: [Add("truth", 1), Add("trust_ghost", 1)], goto: "mara"),
+                    (text: "nothing. he just said hi.", effects: [Add("deceit", 1)], goto: "hi"),
+                ]),
+                (id: "mara", lines: [
+                    "...",
+                    "he said that to me too.",
+                    "on the 13th. in 1998.",
+                    "word for word, {player}.",
+                ], effects: [Add("eli_aware", 1), Add("paranoia", 1)], next: "end"),
+                (id: "hi", lines: ["hi.", "ok.", "eli never just said hi."], next: "end"),
+                (id: "who", lines: [
+                    "eli ran the code board. he built the archiver.",
+                    "he was my best friend.",
+                    "he hasn't logged in since august 1998.",
+                    "until about a minute ago.",
+                ], effects: [Set("heard_eli"), Add("eli_aware", 1)], next: "end"),
+                (id: "asked", lines: ["i did.", "and now he's online, so i guess the universe didn't care what i said."], next: "end"),
+                (id: "glitch", lines: ["glitches don't type like eli.", "glitches don't use his node."], next: "end"),
+                (id: "end", lines: ["if he messages you again, tell me.", "please."]),
+            ],
+        ),
+        (
+            id: "ghost_year",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", lines: ["random question", "what year is it.", "like, actually."], choices: [
+                    (text: "it's {year}.", effects: [Add("truth", 1), Set("told_ghost_year")], goto: "real"),
+                    (text: "1998, obviously.", effects: [Add("deceit", 1), Set("lied_ghost_year")], goto: "fake"),
+                    (text: "why are you asking me that?", goto: "why"),
+                ]),
+                (id: "real", lines: ["...", "ok.", "ok that's a lot of years.", "my clock still says 08/14/1998. it hasn't moved in a long time."], effects: [Add("trust_ghost", 1)]),
+                (id: "fake", lines: ["right.", "yeah.", "obviously.", "lol", "...thanks."]),
+                (id: "why", lines: ["my clock says 08/14/1998.", "it's said that for a while.", "i stopped trusting it. figured i'd ask a person."], choices: [
+                    (text: "it's {year}.", effects: [Add("truth", 1), Set("told_ghost_year")], goto: "real"),
+                    (text: "your clock's right.", effects: [Add("deceit", 1), Set("lied_ghost_year")], goto: "fake"),
+                ]),
+            ],
+        ),
+        (
+            id: "ghost_archive",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", lines: ["you found board 08.", "the archive."], branch: [
+                    (cond: Flag("archive_unlocked"), goto: "inside"),
+                    (cond: Gte("trust_ghost", 2), goto: "give"),
+                ], next: "refuse"),
+                (id: "inside", lines: ["and you're already inside.", "of course you are.", "read 804 last. trust me on that."], effects: [Set("ghost_warned_804")]),
+                (id: "give", lines: [
+                    "there's a key.",
+                    "mara made it. she liked lighthouses. said the archive was a light for people who got lost.",
+                    "it's {b}lantern{/}.",
+                    "don't make me regret it.",
+                ], effects: [Set("knows_lantern"), Set("ghost_gave_key"), Add("trust_ghost", 1)]),
+                (id: "refuse", lines: [
+                    "there's a key.",
+                    "you're not getting it.",
+                    "not after tonight.",
+                ], effects: [Set("ghost_refused_key")]),
+            ],
+        ),
+        (
+            id: "ghost_finale_close",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", lines: [
+                    "i'm reading it too.",
+                    "804.",
+                    "{player}.",
+                    "i don't remember saying that.",
+                    "i don't remember ANY of that.",
+                    "but it's my handle. it's how i type. it's me.",
+                ], choices: [
+                    (text: "maybe it isn't you.", goto: "notyou"),
+                    (text: "what does it mean, 'there will be'?", goto: "willbe"),
+                    (text: "i'm still here, ghost.", effects: [Add("trust_ghost", 1)], goto: "here"),
+                ]),
+                (id: "notyou", lines: ["then which one of us is the copy", "you or me"], next: "drop"),
+                (id: "willbe", lines: ["it means somebody knew you were coming.", "before you existed.", "and it was me."], next: "drop"),
+                (id: "here", lines: ["i know.", "that's what scares me."], next: "drop"),
+                (id: "drop", lines: ["wait", "something's", "#*** ghost_17: line busy", "#*** NODE 04 IS REQUESTING NODE 02"]),
+            ],
+            on_end: [EndAct(1)],
+            on_leave: [EndAct(1)],
+        ),
+        (
+            id: "ghost_finale_cold",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", lines: ["804.", "so that's what you are.", "#*** ghost_17 has logged off", "#*** NODE 04 IS REQUESTING NODE 02"]),
+            ],
+            on_end: [EndAct(1)],
+            on_leave: [EndAct(1)],
+        ),
+    ],
+)

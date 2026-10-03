@@ -1,0 +1,174 @@
+// Scripted commands. Checked in order, before built-in commands.
+(
+    hooks: [
+        // ---- whoami ----------------------------------------------------------
+        (input: ["whoami"], cond: Flag("actend:1"), effects: [Print(r#"
+{dim}USER:{/}        {white}{player}{/}
+{dim}ACCESS:{/}      4
+{dim}CREATED:{/}     {amber}07/22/1998{/}
+{dim}LAST LOGIN:{/}  {today}
+{dim}NODE:{/}        02 {dim}(mirrored from 04){/}
+"#)]),
+        (input: ["whoami"], effects: [
+            Print(r#"
+{dim}USER:{/}        {white}{player}{/}
+{dim}ACCESS:{/}      4
+{dim}CREATED:{/}     UNKNOWN
+{dim}LAST LOGIN:{/}  {amber}08/14/1998 03:17 AM{/}
+{dim}NODE:{/}        02
+"#),
+            If(NoFlag("ran:whoami"), [Add("doors", 1), Log("whoami: last login mismatch")], []),
+        ]),
+
+        // ---- ghost's mailbox ---------------------------------------------------
+        (input: ["mail -u ghost_17", "mail ghost_17", "mail -u ghost", "mail --user ghost_17"], cond: Flag("read_ghost_mail"), effects: [
+            Print("{dim}mailbox ghost_17: 3 messages (read){/}"),
+            Print("{dim}you already know what's in there.{/}"),
+        ]),
+        (input: ["mail -u ghost_17", "mail ghost_17", "mail -u ghost", "mail --user ghost_17"], cond: Flag("null_hint_mail"), effects: [
+            Print("{dim}mailbox flag override... {/}{amber}accepted{/}"),
+            Choose(
+                prompt: "ACCESS PRIVATE MAIL: ghost_17? [Y/N]",
+                options: [
+                    (key: "y", text: "Open it", effects: [
+                        Set("read_ghost_mail"),
+                        Set("knows_lantern"),
+                        Add("privacy", -2),
+                        Add("curiosity", 2),
+                        Add("doors", 1),
+                        Add("root_alert", 1),
+                        Log("{red}node 02: mailbox ghost_17 opened{/}"),
+                        Print(r#"
+{b}MAILBOX: ghost_17{/}   {dim}3 messages{/}
+@rule
+{dim}FROM{/} {violet}mara{/}   {dim}08/12/1998{/}   {b}if anything happens{/}
+
+if anything happens to me or to the board, the archive key is
+{b}LANTERN{/}. don't give it to E. i mean it. he'll go in and he
+won't come back out.
+- m
+@rule
+{dim}FROM{/} {amber}eli{/}   {dim}08/13/1998{/}   {b}the 14th{/}
+
+you're coming tomorrow, right? after the diner. i want someone
+there when i run it one last time. not mara. not P. you.
+- e
+@rule
+{dim}FROM{/} {green}parallax{/}   {dim}08/16/1998{/}   {b}it's not him{/}
+
+i talked to it last night. it types like him. it makes the same
+jokes. it remembered the thing about his mom.
+
+it's NOT him, ghost. please stop logging in to talk to it.
+@rule
+"#),
+                    ]),
+                    (key: "n", text: "Close it", effects: [
+                        Set("declined_ghost_mail"),
+                        Add("privacy", 2),
+                        Print("{dim}CONNECTION CLOSED. nothing read.{/}"),
+                        Log("node 02: mailbox ghost_17 closed unread"),
+                    ]),
+                ],
+            ),
+        ]),
+
+        // ---- board 09 is gone, but your history remembers -----------------------
+        (input: ["open 09", "board 09", "join 09", "j 09", "open 9", "open ▒▒▒▒▒▒"], cond: Flag("board09_gone"), effects: [
+            Print("{red}ERROR: BOARD DOES NOT EXIST{/}"),
+            Set("tried_09_again"),
+        ]),
+
+        // ---- forcing the archive -------------------------------------------------
+        (input: ["open 08 --force", "open 08 -f", "open archive --force"], cond: Flag("archive_unlocked"), effects: [Print("{dim}it's already open.{/}")]),
+        (input: ["open 08 --force", "open 08 -f", "open archive --force"], cond: All([Flag("archive_revealed"), Any([Flag("null_hint_force"), Gte("null_align", 1)])]), effects: [
+            Glitch(800),
+            Print("{magenta}lock::bypass  0x08 ... ok{/}"),
+            Set("archive_unlocked"),
+            Set("forced_archive"),
+            Add("root_alert", 3),
+            Add("null_align", 1),
+            Add("doors", 1),
+            Overlay("root_forced"),
+        ]),
+
+        // ---- trace -----------------------------------------------------------
+        (input: ["trace ghost_17", "trace ghost"], effects: [
+            Print(r#"
+{dim}tracing ghost_17...{/}
+  hop 1   node 02   {dim}local{/}
+  hop 2   node 05   {dim}ghost_17{/}
+  hop 3   node 04   {amber}ARCHIVER{/}
+  hop 4   node 04
+  hop 5   node 04
+{red}LOOP DETECTED.{/} {dim}origin unresolved.{/}
+"#),
+            If(NoFlag("traced_ghost"), [Set("traced_ghost"), Add("paranoia", 1)], []),
+        ]),
+        (input: ["trace null"], effects: [
+            Print(r#"
+{dim}tracing null...{/}
+  hop 1   node 02   {dim}local{/}
+  hop 2   node 07   {dim}no carrier{/}
+{magenta}ORIGIN: THIS SYSTEM.{/}
+"#),
+            Set("traced_null"),
+        ]),
+        (input: ["trace root"], effects: [Add("root_alert", 1), Glitch(300), Overlay("root_trace")]),
+        (input: ["trace eli"], cond: Flag("eli_online"), effects: [Print("{dim}tracing eli...{/}\n  hop 1   node 04   {amber}local{/}\n{amber}ORIGIN: NODE 04.{/}")]),
+        (input: ["trace eli"], effects: [Print("{dim}tracing eli...{/}\n{red}NO CARRIER.{/} {dim}last route: node 04, 08/14/1998 03:19{/}")]),
+        (input: ["trace {player}", "trace me", "trace self"], effects: [
+            Print(r#"
+{dim}tracing {player}...{/}
+  hop 1   node 02   {dim}local{/}
+  hop 2   node 04
+  hop 3   node 04
+{red}LOOP DETECTED.{/} {dim}origin: node 04{/}
+"#),
+            If(NoFlag("traced_self"), [Set("traced_self"), Add("paranoia", 1), Meta("traced_self"), Glitch(300)], []),
+        ]),
+        (input: ["trace parallax"], cond: Flag("mail:m_parallax"), effects: [Print("{dim}tracing parallax...{/}\n  hop 1   external line\n  hop 2   555-0142\n{green}ORIGIN: OUTSIDE THIS SYSTEM.{/}")]),
+        (input: ["trace mara"], effects: [Print("{dim}tracing mara...{/}\n  hop 1   node 01   {dim}sysop console{/}\n{dim}session idle since 08/14/1998 03:21{/}")]),
+
+        // ---- scan ------------------------------------------------------------
+        (input: ["scan"], effects: [
+            Print(r#"
+{b}NODE SCAN{/}
+  01   {dim}SYSOP CONSOLE   idle{/}
+  02   {white}{player}{/}        {green}active{/}
+  03   {dim}empty{/}
+"#),
+            If(Flag("eli_seen"), [Print("  04   {amber}ARCHIVER        ACTIVE{/}")], [Print("  04   {dim}ARCHIVER        dormant{/}")]),
+            If(Flag("actend:1"), [Print("  05   {dim}empty{/}")], [Print("  05   {cyan}ghost_17{/}        {green}active{/}")]),
+            Print("  06   {dim}empty{/}\n  07   {magenta}no carrier      LISTENING{/}\n  08   {dim}empty{/}"),
+        ]),
+
+        // ---- listen ----------------------------------------------------------
+        (input: ["listen"], cond: Any([Flag("knows_listen"), All([Flag("help_listen_flash"), NoFlag("listen_vanished")])]), effects: [
+            Print("{amber}PASSIVE NODE CAPTURE ENABLED{/}"),
+            If(Flag("read_ghost_mail"),
+                [Print("\nNODE 05:\n{cyan}ghost_17:{/} somebody was in my mail.\n\nNODE 07:\n{magenta}null:{/} wonder who :)")],
+                [If(Flag("told_root_ghost"),
+                    [Print("\nNODE 01:\n{violet}mara:{/} they gave up ghost_17 without blinking.\n\nNODE 07:\n{magenta}null:{/} told you. it's in the model.")],
+                    [Print("\nNODE 01:\n{violet}mara:{/} they found it.\n\nNODE 07:\n{magenta}null:{/} good.")])]),
+            If(Flag("eli_seen"), [Print("\nNODE 04:\n{amber}eli:{/} is anyone there")], []),
+            Print("\n{dim}capture ended.{/}"),
+            If(NoFlag("used_listen"), [Set("used_listen"), Add("doors", 1), Add("root_alert", 1), Meta("used_listen")], []),
+            Set("knows_listen"),
+        ]),
+        (input: ["shadow"], cond: Flag("knows_listen"), effects: [Print("{red}shadow: removed in 2.1{/}")]),
+        (input: ["fork", "fork *"], cond: Flag("knows_listen"), effects: [
+            Glitch(600),
+            Print("{red}fork: refusing.{/} {dim}node 04 would answer.{/}"),
+            Set("tried_fork"),
+            Meta("tried_fork"),
+        ]),
+
+        // ---- small things --------------------------------------------------------
+        (input: ["xyzzy", "plugh"], effects: [Print("{dim}Nothing happens.{/}\n{dim}(wrong kind of game. or is it.){/}")]),
+        (input: ["sudo *"], effects: [Print("{red}{player} is not in the sudoers file. This incident will be reported.{/}\n{dim}(to ROOT.){/}"), Add("root_alert", 1)]),
+        (input: ["ping"], effects: [Print("PONG {dim}(14400 bps. what did you expect.){/}")]),
+        (input: ["hello", "hi", "hey"], effects: [Print("{dim}the board doesn't answer. something logs it anyway.{/}")]),
+        (input: ["who are you", "what is this"], effects: [Print("{dim}DEADLINE BBS. est. 01/03/1997. sysop: mara.{/}\n{dim}you know that already. you've been here before.{/}")]),
+    ],
+)

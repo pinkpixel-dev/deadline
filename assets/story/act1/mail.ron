@@ -1,0 +1,79 @@
+// The player's mailbox.
+(
+    mail: [
+        (
+            id: "m_welcome",
+            from: "mara",
+            subject: "your account",
+            date: "08/14/1998",
+            body: r#"
+your account has been restored.
+
+please don't make me regret it.
+
+- m
+"#,
+        ),
+        (
+            id: "m_dialtone",
+            from: "dialtone",
+            subject: "MY DISKS",
+            date: "08/13/1998",
+            body: r#"
+you still have my doom ii disks. all five. i know you're
+reading this. the board says you read everything.
+
+give them back or i'm telling mara.
+
+- dt
+"#,
+        ),
+        (
+            id: "m_root_notice",
+            from: "ROOT",
+            subject: "FILE TRANSFER LOGGED",
+            date: "{date}",
+            body: r#"
+TRANSFER: nodelist.txt
+NODE:     02
+TIME:     {time}
+
+This has been noted.
+"#,
+        ),
+        (
+            id: "m_parallax",
+            from: "parallax",
+            subject: "get off this board",
+            date: "{today}",
+            body: r#"
+whoever you are: hang up.
+
+don't talk to ghost. don't talk to ROOT. and if something
+called null offers you anything, say no.
+
+i'm calling from outside. i'm the only one on this board
+who still has a pulse, and i'd like to keep it that way.
+
+you should check whether you do.
+
+- P
+"#,
+            on_read: [Add("burner", 1), Add("paranoia", 1)],
+        ),
+        (
+            id: "m_null_gift",
+            from: "null",
+            subject: "0x08",
+            date: "--/--/----",
+            body: r#"
+locks have bugs.
+
+  open 08 --force
+
+ROOT will notice. ROOT always notices. so what.
+"#,
+            on_read: [Set("null_hint_force")],
+        ),
+    ],
+)

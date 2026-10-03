@@ -1,0 +1,76 @@
+fps 8
+palette
+. none
+a d66cc8
+b 7a3a72
+c 3a2038
+d e9e7e2
+e 101114
+frame
+.....ccccbb.....
+...bcabbbddcb...
+..ccbcdcaccacb..
+..badbbdcababb..
+.bbbccbcabcaacb.
+.cabbbacadbcccb.
+.babaeedbeeccab.
+.cbcceeadeeadbb.
+.bbacccbdcdcacb.
+..cadcacbdbccb..
+..cadadabdbccc..
+...bacccbabac.a.
+....bcdbacbc....
+..ccccadcaabcc..
+.cbcabbacbbccbb.
+cbbaccdcdbdbbdcc
+frame
+.....bcbbcc.....
+...bcaccacacc...
+..ccbbbbccdbcb..
+..cbbbdcccbabc..
+.baaccccbbcbcbb.
+.cbbcacbcdbccab.
+.cbcceecceebccb.
+.cacceeabeecabc.
+.baabcaabbdbcdc.
+..cdbdaabbccbc..
+..ccbaacdbcadb..
+...bdcabaaabc...
+....ccacdccc....
+..bcbacabbbcbb..
+.cccbbdcbbcbccc.
+babdcbccccababac
+frame
+.....bcccbb.....
+...cccbbccabb...
+..bbcccabbbbac..
+..ccbccababcbc..
+.ccbdcacbbdbbab.
+.bccbbdbbacaccc.
+.caaaeeabeebcab.
+.cbcceecbeecbcb.
+.ccdbadcbcaabab.
+..bcbcccbccbbca.
+..cacbcbbdbccb..
+...cbccadbccb...
+....ccbbabbc....
+..cbbbdbdaabcca.
+.bcacacabbdbdbca
+cabbdddcdbbbabcc
+frame
+.....bccccb.....
+...ccdadccbcb...
+..cbcabbbbbcdc..
+..cbdcccbdbbbc..
+.bbcdcbbabcdcbc.
+.cbbabccbbcdcab.
+.baadeecceeabbc.
+.bccaeebceeaccc.
+.cccaabcaaacdcc.
+..cbaaccdbacbb..
+..cbacabaaabac..
+...cbbbcadacb...
+....ccbbcbbc....
+..ccbbaabbdacb..
+.bccabcbabcbdbc.
+bdaadbccccbabcac

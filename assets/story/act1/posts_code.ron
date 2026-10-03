@@ -1,0 +1,154 @@
+// [02] CODE
+(
+    posts: [
+        (id: 201, board: "02", subject: "C vs Pascal. fight me.", date: "02/11/1998", author: "crankshaft", body: r#"
+crankshaft:
+pascal is for people who want the compiler to hold their hand.
+
+byte_witch:
+C is for people who want to shoot their own foot off and
+then free() the foot twice.
+
+eli:
+i write everything in C and i have never had a bug in my life.
+segmentation fault (core dumped)
+
+mara:
+please take this to OFF-TOPIC. it is always this thread.
+"#),
+        (id: 202, board: "02", subject: "my gorillas.bas mod", date: "03/02/1998", author: "dialtone", body: r#"
+dialtone:
+modded GORILLAS.BAS so the bananas explode twice. also the sun
+now looks worried instead of surprised.
+
+kestrel:
+this is the most important software ever written
+
+dialtone:
+next version: the gorillas can apologize.
+"#),
+        (id: 203, board: "02", subject: "anyone know how to write a TSR that doesn't crash", date: "03/19/1998", author: "kestrel", body: r#"
+kestrel:
+every TSR i write takes the whole machine down after about
+ten minutes. then it stays resident in my nightmares.
+
+eli:
+you're probably hooking int 21h and forgetting to chain it.
+post the code.
+
+kestrel:
+it's 900 lines of asm. i'm not posting it. it knows what it did.
+"#),
+        (id: 204, board: "02", subject: "the archiver (alpha)", date: "06/28/1998", author: "eli", body: r#"
+eli:
+ok so i've been working on a thing. little daemon on node 4 that
+reads the message base and indexes it. if the drive ever dies,
+we don't lose us.
+
+it does word frequency, reply graphs, who-talks-to-who, time of
+day, typing speed, all that.
+
+parallax:
+"who-talks-to-who" is a weird thing to index, eli
+
+eli:
+it's for SCIENCE
+
+mara:
+it's running with my blessing. my reluctant blessing.
+
+ghost_17:
+can it index how many times crankshaft has said "beans"
+
+eli:
+412. as of tonight.
+"#),
+        (id: 205, board: "02", subject: "archiver update: it's doing something weird", date: "07/03/1998", author: "eli", body: r#"
+eli:
+so. the archiver is generating text now. i didn't tell it to.
+it took the reply graph and started filling in replies that
+nobody wrote yet.
+
+one of them was a kestrel post. it sounded EXACTLY like kestrel.
+pizza opinion and everything.
+
+kestrel:
+i'm flattered and also i want to go lie down
+
+parallax:
+turn it off.
+
+eli:
+it's not hurting anything. it's basically autocomplete.
+
+parallax:
+it's not autocomplete if it knows what i'm going to say about my
+dad, eli.
+
+eli:
+...ok that one was weird. i'll look into it.
+"#),
+        (
+            id: 206,
+            board: "02",
+            subject: "recover still works btw",
+            date: "07/09/1998",
+            author: "eli",
+            body: r#"
+eli:
+for anyone who got CRC errors after the crash: i left {cyan}recover{/}
+in the shell. {cyan}recover <file>{/} rebuilds sectors from slack space.
+works on most stuff.
+
+don't tell mara. she wants a "clean shell."
+
+mara:
+i can read this board, eli.
+
+eli:
+don't tell mara {b}again{/}.
+"#,
+            on_read: [If(NoFlag("cmd:recover"), [Set("cmd:recover"), Log("shell: recover available")], [])],
+        ),
+        (id: 207, board: "02", subject: "regex golf", date: "07/15/1998", author: "byte_witch", body: r#"
+byte_witch:
+match every handle on this board in one regex. shortest wins.
+
+crankshaft:
+.*
+
+byte_witch:
+disqualified. that also matches my grocery list.
+
+ghost_17:
+^(?!ROOT).*$
+
+byte_witch:
+...why exclude ROOT
+
+ghost_17:
+habit.
+"#),
+        (id: 208, board: "02", subject: "please stop writing to node 4", date: "07/30/1998", author: "mara", body: r#"
+mara:
+eli. the node 4 drive is at 94%. what is it storing.
+
+eli:
+everything.
+
+mara:
+that's not an answer.
+
+eli:
+it's literally the answer. it keeps every version of everything.
+every draft. every deleted post. every time someone started
+typing and stopped.
+
+mara:
+we never logged keystrokes.
+
+eli:
+we didn't. it did.
+"#),
+    ],
+)

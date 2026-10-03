@@ -1,0 +1,147 @@
+// ROOT: clean grammar, short, authoritative.
+// null: fragmented, weird spacing, jokes mixed with warnings.
+// eli: casual, a little too cheerful, stuck in 1998.
+(
+    dialogues: [
+        (
+            id: "root_intro",
+            with: "ROOT",
+            nodes: [
+                (id: "start", lines: ["Who gave you this number?"], choices: [
+                    (text: "ghost_17 told me to grab that file.", effects: [Set("told_root_ghost"), Add("trust_root", 2), Add("archivist", 1)], goto: "betray"),
+                    (text: "Nobody. I found it on an old dialer list.", effects: [Add("trust_root", 1)], goto: "found"),
+                    (text: "Who are you?", goto: "who"),
+                    (text: "None of your business.", effects: [Add("root_alert", 2), Set("defied_root"), Add("risk", 1)], goto: "defy"),
+                ]),
+                (id: "who", lines: ["The administrator.", "That is all you need."], choices: [
+                    (text: "ghost_17 sent me for the file.", effects: [Set("told_root_ghost"), Add("trust_root", 2), Add("archivist", 1)], goto: "betray"),
+                    (text: "Nobody gave me the number. I found it.", effects: [Add("trust_root", 1)], goto: "found"),
+                    (text: "That's not an answer.", effects: [Add("root_alert", 1), Set("defied_root")], goto: "defy"),
+                ]),
+                (id: "betray", lines: ["Thank you. That was honest.", "ghost_17 should not be here either."], next: "doors"),
+                (id: "found", lines: ["Old lists.", "Yes. That is how they all find it."], next: "doors"),
+                (id: "defy", lines: ["Everything on this system is my business.", "Including you."], next: "doors"),
+                (id: "doors", lines: [
+                    "There are doors in this system you were not meant to open.",
+                    "You have opened {word:doors}.",
+                ], choices: [
+                    (text: "What happens if I keep opening them?", effects: [Add("curiosity", 1)], goto: "keep"),
+                    (text: "I'll stop.", effects: [Set("promised_root"), Add("trust_root", 1)], goto: "stop"),
+                    (text: "[say nothing]", say: "...", goto: "silent"),
+                ]),
+                (id: "keep", lines: ["Then you will find out what this place is.", "I would prefer you didn't."]),
+                (id: "stop", lines: ["Good.", "Most people say that."]),
+                (id: "silent", lines: ["Silence is also an answer."]),
+            ],
+            on_leave: [Add("root_alert", 2), Set("defied_root"), Print("{white}ROOT:{/} {b}Closing the channel does not close the question.{/}")],
+        ),
+        (
+            id: "root_archive",
+            with: "ROOT",
+            nodes: [
+                (id: "start", lines: [
+                    "You have been honest with me.",
+                    "So I will be honest with you.",
+                    "There is an archive on this system. Board 08.",
+                    "I will open it for you.",
+                    "Read it. Then you will understand why this board must stay closed.",
+                ], effects: [Set("archive_revealed"), Set("archive_unlocked"), Set("root_opened_archive"), Add("archivist", 1)], choices: [
+                    (text: "Why help me now?", goto: "why"),
+                    (text: "Thank you.", effects: [Add("trust_root", 1)], goto: "thanks"),
+                ]),
+                (id: "why", lines: ["Because you will open it either way.", "I would rather you did it in front of me."]),
+                (id: "thanks", lines: ["Don't thank me yet."]),
+            ],
+        ),
+        (
+            id: "root_finale",
+            with: "ROOT",
+            nodes: [
+                (id: "start", lines: [
+                    "Now you understand why I asked who sent you.",
+                    "You were expected.",
+                    "I never knew by whom.",
+                ], choices: [
+                    (text: "Expected by what?", goto: "what"),
+                    (text: "Who are you really?", goto: "who"),
+                ]),
+                (id: "what", lines: ["By the thing on node 04.", "It has been waiting for you longer than you have been alive.", "#*** NODE 04 IS REQUESTING NODE 02"]),
+                (id: "who", lines: ["Someone who kept the lights on.", "#*** NODE 04 IS REQUESTING NODE 02"]),
+            ],
+            on_end: [EndAct(1)],
+            on_leave: [EndAct(1)],
+        ),
+        (
+            id: "null_intro",
+            with: "null",
+            nodes: [
+                (id: "start", lines: ["your access level is fake."], choices: [
+                    (text: "why?", goto: "why"),
+                    (text: "who are you?", goto: "who"),
+                    (text: "go away.", effects: [Add("null_align", -1)], goto: "rude"),
+                ]),
+                (id: "why", lines: [
+                    "because level 4 doesn't exist.",
+                    "levels go 0 1 2 3 5. mara skipped 4. superstitious.",
+                    "so whoever made you   made you wrong.",
+                    "or on purpose.",
+                ], next: "offer"),
+                (id: "who", lines: ["nobody.", "literally.", "check the user list :)"], next: "offer"),
+                (id: "rude", lines: ["rude.", "ok.", "but you'll want this later:"], next: "offer"),
+                (id: "offer", lines: [
+                    "try:    {cyan}open 09{/}",
+                    "and if you want to know what ghost isn't telling you:",
+                    "        {cyan}mail -u ghost_17{/}",
+                    "(mailbox flags never got fixed after the crash. ROOT knows. ROOT doesn't care.)",
+                ], effects: [Set("null_hint_09"), Set("null_hint_mail")], choices: [
+                    (text: "why are you helping me?", effects: [Add("null_align", 1)], goto: "helping"),
+                    (text: "thanks.", effects: [Add("null_align", 1)], goto: "thanks"),
+                    (text: "i'm not reading someone's private mail.", effects: [Add("privacy", 1), Set("refused_mail_idea")], goto: "noble"),
+                ]),
+                (id: "helping", lines: ["who said helping.", "i'm curious what you'll do.", "that's all. promise. ▓"]),
+                (id: "thanks", lines: ["don't thank me.", "thank the bug."]),
+                (id: "noble", lines: ["noble.", "boring.", "the offer stands."]),
+            ],
+            on_leave: [Print("{magenta}null:{/} ignoring me is a choice too. noted."), Set("null_hint_09"), Set("null_hint_mail"), Add("null_align", -1)],
+        ),
+        (
+            id: "null_finale",
+            with: "null",
+            nodes: [
+                (id: "start", lines: [
+                    "there it is :)",
+                    "told you level 4 was fake.",
+                    "you're not level 4.",
+                    "you're node 04.",
+                    "welcome home.",
+                    "#*** NODE 04 IS REQUESTING NODE 02",
+                ]),
+            ],
+            on_end: [EndAct(1)],
+            on_leave: [EndAct(1)],
+        ),
+        (
+            id: "eli_blip",
+            with: "eli",
+            nodes: [
+                (id: "start", lines: [
+                    "oh hey!",
+                    "is anyone actually here? the board's been dead quiet all night.",
+                ], effects: [Set("talked_eli"), Meta("talked_eli")], choices: [
+                    (text: "who is this?", goto: "who"),
+                    (text: "eli? ghost said you haven't logged in since 1998.", goto: "since"),
+                    (text: "yeah, i'm here.", goto: "here"),
+                ]),
+                (id: "who", lines: ["eli! code board guy. archiver guy. the sunglasses guy."], next: "mara"),
+                (id: "since", lines: ["lol what", "it IS 1998. ghost's being weird again."], effects: [Add("eli_aware", 1)], next: "mara"),
+                (id: "here", lines: ["cool. hi. nice to have company."], next: "mara"),
+                (id: "mara", lines: [
+                    "hey, if you see mara tonight, tell her don't take node 4 down.",
+                    "it's not done. it's so close to done.",
+                    "#*** eli: carrier lost",
+                ], effects: [Unset("eli_online"), Set("eli_seen")]),
+            ],
+            on_leave: [Unset("eli_online"), Set("eli_seen"), Notice("eli has logged off")],
+        ),
+    ],
+)

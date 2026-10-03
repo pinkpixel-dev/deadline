@@ -1,0 +1,42 @@
+fps 3
+palette
+. none
+k 101114
+d 2c2e35
+D 4a4d57
+w e9e7e2
+W 6a6d78
+frame 10
+.....kkkkkk.....
+...kkDDDDDDkk...
+..kDDddddddDDk..
+..kDddddddddDk..
+.kDdddwwwwdddDk.
+.kDddwwddwwddDk.
+.kDddddddwwddDk.
+.kDddddwwwdddDk.
+.kDddddwwddddDk.
+..kDddddddddDk..
+..kDdddwwdddDk..
+...kDDddddDDk...
+....kkDDDDkk....
+..kkDDDDDDDDkk..
+.kDDDDDDDDDDDDk.
+kDDDDDDDDDDDDDDk
+frame
+.....kkkkkk.....
+...kkDDDDDDkk...
+..kDDddddddDDk..
+..kDddddddddDk..
+.kDdddWWWWdddDk.
+.kDddWWddWWddDk.
+.kDddddddWWddDk.
+.kDddddWWWdddDk.
+.kDddddWWddddDk.
+..kDddddddddDk..
+..kDdddWWdddDk..
+...kDDddddDDk...
+....kkDDDDkk....
+..kkDDDDDDDDkk..
+.kDDDDDDDDDDDDk.
+kDDDDDDDDDDDDDDk

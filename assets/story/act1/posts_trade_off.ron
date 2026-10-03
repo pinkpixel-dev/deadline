@@ -1,0 +1,219 @@
+// [05] TRADING POST and [06] OFF-TOPIC
+(
+    posts: [
+        (id: 501, board: "05", subject: "WTB: 28.8 modem, will trade comics", date: "08/05/1998", author: "eli", body: r#"
+eli:
+moving at the end of the month and i need speed. trading my
+whole uncanny x-men run, 201 through 350. bagged. boarded.
+smells a little like my basement.
+
+ghost_17:
+you're really selling the x-men
+
+eli:
+can't take them with me.
+
+ghost_17:
+they're comics, eli, they fit in a box
+
+eli:
+you know what i mean.
+"#),
+        (id: 502, board: "05", subject: "FS: doom ii (totally legal, came in a ziploc)", date: "04/18/1998", author: "crankshaft", body: r#"
+crankshaft:
+doom ii. five disks. totally legal. the box is a ziploc bag,
+which is how the store sells it.
+
+dialtone:
+those are MY disks
+
+crankshaft:
+these are my disks that look like your disks
+
+dialtone:
+{player} has my disks. i'll find out who has the copies.
+"#),
+        (id: 503, board: "05", subject: "anyone have a working keygen for", date: "05/14/1998", author: "dialtone", body: r#"
+dialtone:
+anyone have a working keygen for
+
+mara:
+THIS THREAD IS NOW ABOUT SANDWICHES.
+
+kestrel:
+turkey and swiss on rye
+
+byte_witch:
+peanut butter and pickle. don't look at me like that.
+
+ghost_17:
+the gas station egg salad. i'm not proud.
+
+eli:
+grilled cheese with the crusts cut off, and i'm 22
+"#),
+        (id: 504, board: "05", subject: "trading: 50 AOL CDs", date: "06/01/1998", author: "byte_witch", body: r#"
+byte_witch:
+i have fifty AOL trial CDs. i have built a small fort.
+willing to trade the fort for one (1) stick of ram.
+
+crankshaft:
+coasters. they're coasters. i use them as coasters.
+
+kestrel:
+i hung mine from the ceiling. it's art now.
+"#),
+        (id: 505, board: "05", subject: "WTB: ram, any ram, please", date: "07/06/1998", author: "kestrel", body: r#"
+kestrel:
+will pay in exposure. you'd be credited in my TSR.
+
+byte_witch:
+the TSR that crashes
+
+kestrel:
+the TSR that's "experimental"
+"#),
+        (id: 506, board: "05", subject: "free to good home: one CRT, slightly haunted", date: "07/18/1998", author: "ghost_17", body: r#"
+ghost_17:
+14" CRT. great picture. sometimes it turns on by itself at 3:17
+in the morning and shows a login screen. otherwise great picture.
+
+dialtone:
+i'll take it
+
+ghost_17:
+it'll take you. i mean. yes. come get it.
+"#),
+
+        (id: 601, board: "06", subject: "rate my ANSI", date: "03/14/1998", author: "dialtone", body: r#"
+dialtone:
+made this in TheDraw. be honest.
+
+@art dialtone_ansi
+
+kestrel:
+is it a dog
+
+dialtone:
+it's a sunset
+
+ghost_17:
+it's a dog watching a sunset. 8/10.
+"#),
+        (id: 602, board: "06", subject: "best pizza topping, final answer", date: "04/22/1998", author: "kestrel", body: r#"
+kestrel:
+pineapple. i will not be taking questions.
+
+crankshaft:
+banned. you're banned. mara ban him.
+
+mara:
+i'm not banning anyone over pizza.
+
+eli:
+pineapple AND jalapeno. it's balance. it's yin and yang.
+
+ghost_17:
+eli you put ranch on everything, your opinion is void
+"#),
+        (id: 603, board: "06", subject: "i think my cat is a sysop", date: "05/09/1998", author: "byte_witch", body: r#"
+byte_witch:
+she walked across my keyboard and somehow typed a valid command.
+mara, did you give my cat access 5
+
+mara:
+your cat has the same access as everyone else.
+
+byte_witch:
+then why does she have a mailbox
+"#),
+        (id: 604, board: "06", subject: "x-files theory thread", date: "06/07/1998", author: "crankshaft", body: r#"
+crankshaft:
+the black oil is a metaphor for bad ram. think about it.
+
+kestrel:
+i have thought about it and i'm worse now
+
+ghost_17:
+my theory: the cigarette smoking man is just a guy who really
+needs a smoke break and keeps getting pulled into meetings.
+"#),
+        (
+            id: 605,
+            board: "06",
+            subject: "who's the new person on node 2",
+            date: "08/13/1998",
+            author: "kestrel",
+            visible: Commands(10),
+            body: r#"
+kestrel:
+there's someone logged in on node 2 every night. no handle shown.
+they just sit there. reading.
+
+ghost_17:
+node 2 is empty, kestrel. it's been empty since march.
+
+kestrel:
+then who is reading my posts. the counter goes up.
+
+ghost_17:
+...
+
+ghost_17:
+hello, node 2.
+"#,
+            on_read: [If(NoFlag("saw_node2"), [Set("saw_node2"), Add("paranoia", 1)], [])],
+        ),
+        (id: 606, board: "06", subject: "signature contest", date: "07/01/1998", author: "dialtone", body: r#"
+dialtone:
+post your sig. best one wins nothing.
+
+ghost_17:
+@art ghost_sig
+
+kestrel:
+"If you're reading this, my modem finally worked."
+
+byte_witch:
+"rm -rf / is just spring cleaning"
+
+eli:
+"i'll sleep when the archiver finishes indexing"
+
+mara:
+"keep the lights on."
+"#),
+        (id: 607, board: "06", subject: "eli's going-away thing", date: "08/11/1998", author: "mara", body: r#"
+mara:
+eli's moving at the end of the month. meetup at the diner on
+the 14th, after the board's nightly maintenance. eli's paying.
+(eli doesn't know yet.)
+
+eli:
+eli does know now.
+
+ghost_17:
+i'll be there
+
+parallax:
+i'll be there.
+
+eli:
+everyone's going to be so weird about it. don't be weird about it.
+"#),
+        (id: 608, board: "06", subject: "worst error message you've ever seen", date: "07/27/1998", author: "byte_witch", body: r#"
+byte_witch:
+"Keyboard not found. Press F1 to continue."
+
+crankshaft:
+"Abort, Retry, Fail?" and every one of them is a lie
+
+kestrel:
+"General failure reading drive A." who is General Failure
+and why is he reading my drive
+
+ghost_17:
+"user does not exist" when i'm literally typing to you
+"#),
+    ],
+)
