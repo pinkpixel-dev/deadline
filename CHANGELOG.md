@@ -6,6 +6,7 @@
 
 - The session now autosaves every 10 commands and whenever an act ends, you restore a snapshot or the story rewinds you. Before, it only saved on `logout`, Ctrl+C or ROOT's kick, so closing the terminal window could throw away a whole act
 - Snapshots JANUS planted (like `before_you`) are cleared when a new act starts, so a leftover from an earlier run can't be restored before Act IV writes it again
+- Restoring `before_you` while you were already inside it made the replay its own way back, so it looped forever. It now keeps the original return point and always drops you back in your own timeline
 
 ## 0.6.1 - October 3, 2026
 

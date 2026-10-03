@@ -292,11 +292,19 @@ impl App {
         if snap.has("planted") {
             // JANUS wrote this one. It's rebuilt from who you are now, and it
             // remembers where you were so the story can send you back.
-            let mut here = self.st.clone();
-            here.mark = None;
+            // Restoring it again from inside keeps the original way back,
+            // or the replay would become its own return point.
+            let here = match &self.st.mark {
+                Some(mark) if self.st.has("planted") => mark.clone(),
+                _ => {
+                    let mut here = self.st.clone();
+                    here.mark = None;
+                    Box::new(here)
+                }
+            };
             snap.vars = self.st.vars.clone();
             snap.journal = self.st.journal.clone();
-            snap.mark = Some(Box::new(here));
+            snap.mark = Some(here);
         }
         // The command history and your own notes belong to your side of the
         // modem, not the timeline.

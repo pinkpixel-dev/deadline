@@ -123,6 +123,35 @@ fn janus_plants_before_you_and_restoring_it_sends_you_back() {
 }
 
 #[test]
+fn restoring_before_you_from_inside_it_still_leads_home() {
+    let mut a = act4("plant-twice");
+    see_my_model(&mut a);
+    answer(&mut a, "parallax_a4");
+    pick(&mut a, "how do I know");
+    finish_chat(&mut a);
+    for _ in 0..4 {
+        cmd(&mut a, "users");
+    }
+    assert!(a.st.has("before_you_planted"));
+    if a.chat.is_some() {
+        a.end_chat(false);
+    }
+    cmd(&mut a, "restore before_you");
+    skip(&mut a);
+    cmd(&mut a, "restore before_you");
+    skip(&mut a);
+    assert!(a.st.has("planted"), "still inside the replay");
+
+    answer(&mut a, "root_alt");
+    pick(&mut a, "Why are you");
+    finish_chat(&mut a);
+    run(&mut a, 0.5);
+    skip(&mut a);
+    assert!(!a.st.has("planted") && !a.st.has("alt_timeline"), "back in your own timeline, not the replay");
+    assert!(a.st.has("parallax_proof"));
+}
+
+#[test]
 fn act_four_autosaves_without_a_logout() {
     let mut a = act4("autosave");
     for _ in 0..10 {
