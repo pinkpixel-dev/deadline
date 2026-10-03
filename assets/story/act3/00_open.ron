@@ -15,26 +15,30 @@
                 Unset("locked"),
                 Clock("21:04"),
                 SetVar("build", 1),
+                Mark,
                 Sequence("act3_open"),
             ],
         ),
 
         // ---- who reaches out, and when -----------------------------------
-        (id: "a3_ghost_page", when: Flag("a3_bulletin"), after_cmds: 1, effects: [Page("ghost_98_hello")]),
-        (id: "a3_eli_page", when: All([Flag("a3_bulletin"), NoFlag("chat:eli_98_hello"), Any([Flag("done:ghost_98_hello"), Flag("left:ghost_98_hello")])]), after_cmds: 3, effects: [Page("eli_98_hello")]),
-        (id: "a3_eli_page_late", when: All([Flag("a3_bulletin"), NoFlag("chat:eli_98_hello")]), after_secs: 150, effects: [Page("eli_98_hello")]),
-        (id: "a3_mara_page", when: All([Flag("chat:eli_98_hello"), NoFlag("chat:mara_98_hello")]), after_cmds: 5, effects: [Page("mara_98_hello")]),
-        (id: "a3_mara_page_late", when: All([Flag("a3_bulletin"), NoFlag("chat:mara_98_hello")]), after_secs: 330, effects: [Page("mara_98_hello")]),
-        (id: "a3_parallax_page", when: All([Flag("chat:mara_98_hello"), NoFlag("chat:parallax_98_hello")]), after_cmds: 4, effects: [Page("parallax_98_hello")]),
-        (id: "a3_parallax_page_late", when: All([Flag("a3_bulletin"), NoFlag("chat:parallax_98_hello")]), after_secs: 480, effects: [Page("parallax_98_hello")]),
-        (id: "a3_dialtone_page", when: All([Flag("a3_bulletin"), NoFlag("chat:dialtone_98")]), after_secs: 240, effects: [Page("dialtone_98")]),
-        (id: "a3_null_page", when: All([Flag("a3_bulletin"), Flag("null_errands_done"), NoFlag("at_diner")]), after_secs: 360, effects: [Glitch(250), Page("null_98")]),
+        (id: "a3_ghost_page", when: All([Lte("build", 1), Flag("a3_bulletin")]), after_cmds: 1, effects: [Page("ghost_98_hello")]),
+        (id: "a3_eli_page", when: All([Lte("build", 1), Flag("a3_bulletin"), NoFlag("chat:eli_98_hello"), Any([Flag("done:ghost_98_hello"), Flag("left:ghost_98_hello")])]), after_cmds: 3, effects: [Page("eli_98_hello")]),
+        (id: "a3_eli_page_late", when: All([Lte("build", 1), Flag("a3_bulletin"), NoFlag("chat:eli_98_hello")]), after_secs: 150, effects: [Page("eli_98_hello")]),
+        (id: "a3_mara_page", when: All([Lte("build", 1), Flag("chat:eli_98_hello"), NoFlag("chat:mara_98_hello")]), after_cmds: 5, effects: [Page("mara_98_hello")]),
+        (id: "a3_mara_page_late", when: All([Lte("build", 1), Flag("a3_bulletin"), NoFlag("chat:mara_98_hello")]), after_secs: 330, effects: [Page("mara_98_hello")]),
+        (id: "a3_parallax_page", when: All([Lte("build", 1), Flag("chat:mara_98_hello"), NoFlag("chat:parallax_98_hello")]), after_cmds: 4, effects: [Page("parallax_98_hello")]),
+        (id: "a3_parallax_page_late", when: All([Lte("build", 1), Flag("a3_bulletin"), NoFlag("chat:parallax_98_hello")]), after_secs: 480, effects: [Page("parallax_98_hello")]),
+        (id: "a3_dialtone_page", when: All([Lte("build", 1), Flag("a3_bulletin"), NoFlag("chat:dialtone_98")]), after_secs: 240, effects: [Page("dialtone_98")]),
+        (id: "a3_null_page", when: All([Lte("build", 1), Flag("a3_bulletin"), Flag("null_errands_done"), NoFlag("at_diner")]), after_secs: 360, effects: [Glitch(250), Page("null_98")]),
 
         // ---- the diner ---------------------------------------------------
         // Everyone leaves once you've met the two people the night is about,
         // or after about eighteen minutes either way.
-        (id: "a3_diner_ready", when: All([Flag("chat:eli_98_hello"), Flag("chat:mara_98_hello")]), after_secs: 420, effects: [Set("diner_go")]),
-        (id: "a3_diner_late", when: Flag("a3_bulletin"), after_secs: 1080, effects: [Set("diner_go")]),
+        (id: "a3_diner_ready", when: All([Lte("build", 1), Flag("chat:eli_98_hello"), Flag("chat:mara_98_hello")]), after_secs: 420, effects: [Set("diner_go")]),
+        (id: "a3_diner_late", when: All([Lte("build", 1), Flag("a3_bulletin")]), after_secs: 1080, effects: [Set("diner_go")]),
+        // Later builds move faster. The night already knows its lines.
+        (id: "a3_diner_ready_b", when: All([Gte("build", 2), Flag("chat:eli_98_again")]), after_secs: 150, effects: [Set("diner_go")]),
+        (id: "a3_diner_late_b", when: All([Gte("build", 2), Flag("a3_bulletin")]), after_secs: 360, effects: [Set("diner_go")]),
         (id: "a3_diner_call", when: Flag("diner_go"), after_cmds: 1, effects: [
             Set("diner_called"),
             Print(r#"
@@ -85,12 +89,12 @@
         ]),
 
         // ---- the night doesn't hold ----------------------------------------
-        (id: "a3_slip", when: Any([Flag("warned_eli"), Flag("told_mara"), Flag("stalled_eli"), Flag("sabotaged_node4")]), after_cmds: 2, effects: [
+        // Changing something rebuilds the night (twice at most). See rebuild.ron.
+        (id: "a3_slip", when: All([Flag("changed_night"), Lte("build", 2)]), after_cmds: 2, effects: [
             Glitch(1000),
-            SetVar("build", 2),
-            Set("show_build"),
             Set("night_slips"),
-            Log("{violet}node 04: build 1998.2{/}"),
+            Log("{violet}node 04: build rejected{/}"),
+            Sequence("a3_rebuild"),
         ]),
         (id: "a3_slip_hide", when: Flag("show_build"), after_secs: 5, effects: [Unset("show_build")]),
     ],
@@ -113,6 +117,17 @@
   06   {dim}empty{/}
   07   {dim}empty{/}
   08   {dim}empty{/}
+"#)]),
+        (input: ["scan"], cond: All([Flag("y1998"), Gte("build", 2)]), effects: [Print(r#"
+{b}NODE SCAN{/}
+  01   {violet}mara{/}            {green}active{/}  {dim}sysop console{/}
+  02   {white}{player}{/}        {green}active{/}
+  03   {blue}kestrel{/}         {green}active{/}
+  04   {violet}JANUS           ACTIVE{/}  {dim}(rendering){/}
+  05   {cyan}ghost_17{/}        {green}active{/}
+  06   {yellow}dialtone{/}        {dim}idle{/}
+  07   {green}parallax{/}        {green}active{/}
+  08   {red}byte_witch{/}      {green}active{/}
 "#)]),
         (input: ["scan"], cond: Flag("y1998"), effects: [Print(r#"
 {b}NODE SCAN{/}
@@ -147,6 +162,7 @@
                 options: [
                     (key: "y", text: "Kill it", effects: [
                         Set("sabotaged_node4"),
+                        Set("changed_night"),
                         Add("burner", 1),
                         Glitch(600),
                         Print("{red}indexer: SIGKILL{/}\n{dim}node 04: process 4 exited. 71 models unloaded.{/}"),

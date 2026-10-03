@@ -207,6 +207,11 @@ pub fn check(c: &Content) -> Vec<String> {
             Effect::Clock(t) if crate::systems::clock::parse(t).is_none() => {
                 errs.push(format!("bad clock time: {t}"))
             }
+            Effect::Rewind(keep) => {
+                for f in keep.iter().filter(|f| !set.contains(*f)) {
+                    errs.push(format!("rewind keeps a flag that is never set: {f}"));
+                }
+            }
             _ => {}
         }
     }

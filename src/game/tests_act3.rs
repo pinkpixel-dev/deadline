@@ -1,7 +1,7 @@
 //! Act III playthroughs, starting from a finished Act II.
 
 use super::tests::{app, cmd, finish_chat, pick, run, screen};
-use super::tests_act2::{answer, next_login};
+use super::tests_act2::{answer, next_login, skip};
 use crate::app::App;
 use crate::systems::clock;
 
@@ -71,13 +71,143 @@ fn warning_eli_makes_the_night_slip() {
     finish_chat(&mut a);
     assert!(a.st.has("warned_eli"));
 
-    cmd(&mut a, "users");
-    cmd(&mut a, "users");
-    assert!(a.st.has("night_slips"));
+    rebuilt(&mut a);
     assert_eq!(a.st.var("build"), 2);
+    assert!(a.st.has("night_slips") && a.st.has("warned_eli"), "what you did carries into the next build");
     assert!(a.st.has("show_build"), "the header shows the build number");
     run(&mut a, 6.0);
     assert!(!a.st.has("show_build"), "only for a moment");
+}
+
+/// Keep typing until the night rebuilds, then let the cinematic play out.
+fn rebuilt(a: &mut App) {
+    for _ in 0..5 {
+        if a.seq.is_some() {
+            break;
+        }
+        cmd(a, "users");
+    }
+    assert!(a.seq.as_ref().is_some_and(|s| s.id == "a3_rebuild"), "the night rebuilds
+{}", screen(a));
+    skip(a);
+    run(a, 0.5);
+}
+
+/// Wait for dawn and eli's question, and read it.
+fn dawn(a: &mut App) {
+    run(a, 26.0);
+    assert!(a.st.has("dawn"), "dawn comes\n{}", screen(a));
+    assert_eq!(clock::date_string(&a.st), "08/15/1998");
+    run(a, 9.0);
+    answer(a, "eli_98_news");
+    finish_chat(a);
+}
+
+#[test]
+fn three_builds_then_the_newspaper_then_the_collapse() {
+    let mut a = app();
+    act3(&mut a);
+    a.st.set("heard_wipe");
+    cmd(&mut a, "open 04 --node");
+    cmd(&mut a, "y");
+    rebuilt(&mut a);
+
+    // BUILD 1998.2: back to 9:04, and the cracks show.
+    assert_eq!(a.st.var("build"), 2);
+    assert!(clock::time_string(&a.st).starts_with("09:04"), "{}", clock::time_string(&a.st));
+    assert!(a.st.has("sabotaged_node4") && !a.st.has("changed_night"));
+    assert!(screen(&a).contains("(AGAIN.)"));
+    answer(&mut a, "ghost_98_again");
+    pick(&mut a, "because it is");
+    finish_chat(&mut a);
+    assert!(a.st.has("heard_there_will_be"));
+    cmd(&mut a, "scan");
+    assert!(screen(&a).contains("JANUS"), "node 04 shows up as JANUS now");
+    cmd(&mut a, "inspect /uploads/diner_0814.gif");
+    assert!(screen(&a).contains("hasn't happened yet"));
+    answer(&mut a, "eli_98_again");
+    finish_chat(&mut a);
+    answer(&mut a, "mara_98_again");
+    finish_chat(&mut a);
+    cmd(&mut a, "chat mara");
+    pick(&mut a, "something happens to eli");
+    pick(&mut a, "hasn't slept");
+    finish_chat(&mut a);
+    rebuilt(&mut a);
+
+    // BUILD 1998.3: the last one. Changing anything now just brings dawn.
+    assert_eq!(a.st.var("build"), 3);
+    assert!(a.st.has("told_mara") && a.st.has("sabotaged_node4"));
+    answer(&mut a, "ghost_98_loop");
+    pick(&mut a, "three");
+    finish_chat(&mut a);
+    answer(&mut a, "eli_98_again");
+    finish_chat(&mut a);
+    cmd(&mut a, "chat eli");
+    pick(&mut a, "don't run the archiver");
+    pick(&mut a, "trust me");
+    finish_chat(&mut a);
+    cmd(&mut a, "users");
+    cmd(&mut a, "users");
+    assert!(a.seq.is_none(), "no fourth build");
+    dawn(&mut a);
+
+    cmd(&mut a, "reply eli");
+    pick(&mut a, "You died");
+    finish_chat(&mut a);
+    assert!(a.st.has("eli_told_death") && a.st.has("eli_decided"));
+    run(&mut a, 11.0);
+    answer(&mut a, "parallax_breakin");
+    pick(&mut a, "Both can be true");
+    finish_chat(&mut a);
+    run(&mut a, 7.0);
+    assert!(a.seq.as_ref().is_some_and(|s| s.id == "a3_collapse"));
+    skip(&mut a);
+    assert!(a.st.has("seq:act3_end") || a.st.has("act3_complete"), "the act ends after the collapse");
+    skip(&mut a);
+    assert!(a.st.has("act3_complete"));
+    assert_eq!(a.st.act, 4);
+    assert!(!a.st.has("y1998"), "back in the present");
+    assert!(clock::time_string(&a.st).starts_with("03:17"));
+
+    cmd(&mut a, "view /var/janus/builds.log");
+    let s = screen(&a);
+    assert!(s.contains("1998.3") && s.contains("informed subject mara.q") && s.contains("terminated indexer"), "{s}");
+}
+
+#[test]
+fn letting_eli_go_brings_dawn_and_you_can_send_him_the_article() {
+    let mut a = app();
+    act3(&mut a);
+    a.st.set("eli_running");
+    dawn(&mut a);
+    assert_eq!(a.st.var("build"), 1, "no rebuilds if you never change anything");
+    cmd(&mut a, "download /archive/news/eli_voss.txt");
+    cmd(&mut a, "send eli eli_voss.txt");
+    run(&mut a, 0.5);
+    assert!(a.st.has("eli_article_sent"));
+    assert!(a.st.has("chat:eli_98_reads"), "eli reads it himself");
+}
+
+#[test]
+fn deleting_the_article_or_hanging_up_also_answer_eli() {
+    let mut a = app();
+    act3(&mut a);
+    a.st.set("eli_running");
+    dawn(&mut a);
+    cmd(&mut a, "delete /archive/news/eli_voss.txt");
+    cmd(&mut a, "y");
+    assert!(a.st.has("eli_article_deleted") && a.st.has("eli_decided"));
+
+    let mut a = app();
+    act3(&mut a);
+    a.st.set("eli_running");
+    dawn(&mut a);
+    cmd(&mut a, "logout");
+    assert!(a.st.has("fled_eli"));
+    assert!(a.seq.as_ref().is_some_and(|s| s.id == "a3_redial"), "the modem dials back");
+    skip(&mut a);
+    assert!(!a.quit, "you don't actually get to leave");
 }
 
 #[test]

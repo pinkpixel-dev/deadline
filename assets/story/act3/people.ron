@@ -105,8 +105,8 @@
                     (text: "nothing. just checking in.", goto: "nothing"),
                 ]),
                 (id: "tell", lines: ["what do you mean, happens."], choices: [
-                    (text: "he drives to your place at dawn to stop the wipe. he doesn't make it.", cond: Any([Flag("parallax_told_death"), Flag("eli_found_draft")]), effects: [Set("told_mara"), Set("told_mara_dawn"), Add("truth", 2)], goto: "dawn"),
-                    (text: "he hasn't slept in days. don't let him be alone tonight.", effects: [Set("told_mara"), Add("truth", 1)], goto: "alone"),
+                    (text: "he drives to your place at dawn to stop the wipe. he doesn't make it.", cond: Any([Flag("parallax_told_death"), Flag("eli_found_draft")]), effects: [Set("told_mara"), Set("told_mara_dawn"), Set("changed_night"), Add("truth", 2)], goto: "dawn"),
+                    (text: "he hasn't slept in days. don't let him be alone tonight.", effects: [Set("told_mara"), Set("changed_night"), Add("truth", 1)], goto: "alone"),
                     (text: "never mind.", goto: "nothing"),
                 ]),
                 (id: "dawn", lines: [

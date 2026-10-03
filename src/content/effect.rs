@@ -46,6 +46,11 @@ pub enum Effect {
     /// Set the BBS clock to a time of day (`"21:04"` or `"21:04:30"`). It keeps
     /// running from there.
     Clock(String),
+    /// Remember this moment of the timeline so `Rewind` can return to it.
+    Mark,
+    /// Go back to the last `Mark`. Vars, history, notes and the journal carry
+    /// forward, plus any of these flags that are set now.
+    Rewind(Vec<String>),
     /// Finish an act.
     EndAct(u8),
     /// Save the session and hang up.

@@ -1,0 +1,192 @@
+// ACT III: the night rebuilds. Changing something sends you back to 9:04 PM
+// (BUILD 1998.2, then 1998.3). What you did carries over. The night half
+// remembers it too, and that's how the cracks start to show.
+(
+    act: 3,
+    events: [
+        (id: "a3b_ghost", when: All([Gte("build", 2), Flag("a3_bulletin")]), after_cmds: 1, effects: [
+            If(Gte("build", 3), [Page("ghost_98_loop")], [Page("ghost_98_again")]),
+        ]),
+        (id: "a3b_eli", when: All([Gte("build", 2), Flag("a3_bulletin"), NoFlag("chat:eli_98_again")]), after_cmds: 3, effects: [Page("eli_98_again")]),
+        (id: "a3b_eli_late", when: All([Gte("build", 2), Flag("a3_bulletin"), NoFlag("chat:eli_98_again")]), after_secs: 90, effects: [Page("eli_98_again")]),
+        (id: "a3b_mara", when: All([Gte("build", 2), Flag("chat:eli_98_again"), NoFlag("chat:mara_98_again")]), after_cmds: 3, effects: [Page("mara_98_again")]),
+        (id: "a3b_board", when: All([Gte("build", 3), Flag("a3_bulletin")]), effects: [
+            Set("live_110"), Set("live_110b"), Set("live_609"), Set("live_609b"), Set("live_609c"),
+            Log("message base: [06] thread already complete"),
+        ]),
+    ],
+
+    files: [
+        (
+            path: "/uploads/diner_0814.gif",
+            size: 40960,
+            date: "{today}",
+            uploader: "kestrel",
+            desc: "diner, tonight",
+            visible: All([Flag("y1998"), Gte("build", 2)]),
+            body: r#"
+@sprite meetup
+
+  {dim}eli's going-away thing at the diner. left to right:{/}
+  kestrel, dialtone, byte_witch, eli {dim}(peace sign){/}, mara, ghost_17, parallax,
+  {white}{player}{/} {dim}(in the seat we saved){/}
+"#,
+            on_open: [If(NoFlag("saw_diner_photo"), [Set("saw_diner_photo"), Add("paranoia", 2), Glitch(400), Meta("saw_diner_photo")], [])],
+            on_inspect: [Print("{dim}the photo is of a dinner that hasn't happened yet. and it was uploaded today.{/}")],
+        ),
+    ],
+
+    dialogues: [
+        (
+            id: "ghost_98_again",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", lines: [
+                    "hello, node 2.",
+                    "...why does that feel like a rerun.",
+                ], choices: [
+                    (text: "because it is.", effects: [Add("truth", 1)], goto: "seat"),
+                    (text: "deja vu.", goto: "seat"),
+                ]),
+                (id: "seat", lines: [
+                    "anyway. there's a seat for you at the diner.",
+                    "there will be. there will be a diner, and a seat, and a tonight.",
+                    "why do i keep saying will. it's tonight. it's happening right now.",
+                ], effects: [Add("paranoia", 1), Set("heard_there_will_be")]),
+            ],
+        ),
+        (
+            id: "ghost_98_loop",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", lines: [
+                    "hello, node 2.",
+                    "how many times have you said hi to me tonight?",
+                ], choices: [
+                    (text: "three.", effects: [Add("truth", 1)], goto: "three"),
+                    (text: "this is the first time.", effects: [Add("deceit", 1)], goto: "first"),
+                ]),
+                (id: "three", lines: ["yeah. i can feel the other two. like footprints under snow."], next: "over"),
+                (id: "first", lines: ["liar. i'm not mad. i'd lie too."], next: "over"),
+                (id: "over", lines: [
+                    "whatever you're trying to fix, {player}, it already happened.",
+                    "that's the thing about 1998. it's over. it's been over for a long time.",
+                    "i don't know how i know that.",
+                ], effects: [Add("paranoia", 1)]),
+            ],
+        ),
+        (
+            id: "eli_98_again",
+            with: "eli",
+            nodes: [
+                (id: "start", branch: [
+                    (cond: Gte("build", 3), goto: "third"),
+                    (cond: Flag("warned_eli"), goto: "warned"),
+                    (cond: Flag("told_mara"), goto: "mara"),
+                    (cond: Flag("stalled_eli"), goto: "stalled"),
+                    (cond: Flag("sabotaged_node4"), goto: "killed"),
+                ], next: "plain"),
+                (id: "third", lines: [
+                    "node 2. hi.",
+                    "is it just me or has tonight already happened?",
+                    "like, twice?",
+                ], next: "plan"),
+                (id: "warned", lines: [
+                    "hey node 2.",
+                    "weird thing. i took a nap before the diner and woke up with a sentence in my head.",
+                    "\"don't run it tonight.\" like somebody typed it at me.",
+                ], next: "plan"),
+                (id: "mara", lines: [
+                    "hey node 2.",
+                    "mara called me at like 8:30. out of nowhere. she sounded scared and she wouldn't say why.",
+                    "she never calls. she has a whole rule about phones.",
+                ], next: "plan"),
+                (id: "stalled", lines: [
+                    "hey node 2.",
+                    "i had the strangest dream. i talked about x-men for four hours with someone on a BBS and then went to bed.",
+                    "who does that. besides me.",
+                ], next: "plan"),
+                (id: "killed", lines: [
+                    "hey node 2.",
+                    "my indexer crashed in a dream last night. i woke up and checked. it's fine. it's totally fine.",
+                ], next: "plan"),
+                (id: "plain", lines: ["hey node 2. have we... no. never mind."], next: "plan"),
+                (id: "plan", lines: [
+                    "diner at 10. archiver after. same as always.",
+                    "...same as always? i've only ever done this once.",
+                ], effects: [Set("eli_plans_run")]),
+            ],
+        ),
+        (
+            id: "mara_98_again",
+            with: "mara",
+            nodes: [
+                (id: "start", lines: ["node 2."], branch: [(cond: Flag("told_mara"), goto: "told")], next: "kestrel"),
+                (id: "told", lines: [
+                    "you're the one who told me to call eli.",
+                    "no. you didn't. we've never talked.",
+                    "why do i remember you saying it?",
+                ], effects: [Add("paranoia", 1)], next: "wipe"),
+                (id: "kestrel", lines: [
+                    "kestrel says you said hi to them last night.",
+                    "you've never been online before tonight. so how did you say hi last night?",
+                ], next: "wipe"),
+                (id: "wipe", lines: [
+                    "doesn't matter. node 4 comes down tonight, after the diner.",
+                ], effects: [Set("heard_wipe")]),
+            ],
+        ),
+    ],
+
+    sequences: [
+        (
+            id: "a3_rebuild",
+            steps: [
+                Glitch(900),
+                Pause(700),
+                Clear,
+                Line("{violet}node 04: build rejected{/}"),
+                Pause(700),
+                Type("{violet}REBUILDING 08/14/1998{/}"),
+                Pause(900),
+                When(Lte("build", 1), [Type("{violet}BUILD 1998.2{/}")]),
+                When(Gte("build", 2), [Type("{violet}BUILD 1998.3{/}")]),
+                Pause(1200),
+                Glitch(500),
+                Clear,
+                Line("{green}CONNECT 14400/ARQ/V32BIS{/}"),
+                Pause(500),
+                Type("{b}DATE: 08/14/1998{/}"),
+                Type("{b}TIME: 09:04 PM{/}"),
+                Pause(1400),
+            ],
+            on_end: [
+                Rewind(["warned_eli", "told_mara", "told_mara_dawn", "stalled_eli", "sabotaged_node4", "knows_door", "knows_eli_awake", "heard_wipe", "mara_denied_108", "shadowed_eli_98", "night_slips", "heard_there_will_be", "saw_diner_photo"]),
+                Add("build", 1),
+                Set("show_build"),
+                Set("a3_bulletin"),
+                If(Gte("build", 3), [Print(r#"
+@rule
+{amber}BULLETIN{/}   {dim}posted 08/14/1998 07:12 PM{/}
+
+      {b}MEETUP TONIGHT. THE DINER. 10 PM.{/}
+      {b}BOARD GOES DOWN FOR MAINTENANCE AT 10.{/}
+      {b}ELI IS PAYING. ELI IS PAYING. ELI IS PAYING.{/}
+                                      {dim}- mara{/}
+@rule
+"#)], [Print(r#"
+@rule
+{amber}BULLETIN{/}   {dim}posted 08/14/1998 07:12 PM{/}
+
+      {b}MEETUP TONIGHT. THE DINER. 10 PM.{/}
+      {b}BOARD GOES DOWN FOR MAINTENANCE AT 10.{/}
+      {b}ELI IS PAYING. (AGAIN.){/}
+                                      {dim}- mara{/}
+@rule
+"#)]),
+                Print("{dim}9 users online.{/} {cyan}users{/}"),
+                Log("{violet}node 04: build 1998.{var:build}{/}"),
+            ],
+        ),
+    ],
+)

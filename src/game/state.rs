@@ -34,6 +34,8 @@ pub struct GameState {
     pub notes: Vec<(String, String)>,
     /// Set by the `Clock` effect: (elapsed when set, seconds past midnight).
     pub clock: Option<(f64, u32)>,
+    /// Set by the `Mark` effect. `Rewind` returns here.
+    pub mark: Option<Box<GameState>>,
 }
 
 impl Default for GameState {
@@ -62,6 +64,7 @@ impl GameState {
             journal: Vec::new(),
             notes: Vec::new(),
             clock: None,
+            mark: None,
         }
     }
 
@@ -87,6 +90,24 @@ impl GameState {
 
     pub fn set_var(&mut self, name: &str, value: i32) {
         self.vars.insert(name.to_string(), value);
+    }
+
+    /// Return to the marked moment, keeping what belongs to the player rather
+    /// than the timeline: vars, history, notes, the journal and `keep` flags.
+    pub fn rewind(&mut self, keep: &[String]) -> bool {
+        let Some(mark) = self.mark.clone() else { return false };
+        let mut back = (*mark).clone();
+        back.mark = Some(mark);
+        back.player = self.player.clone();
+        back.vars = std::mem::take(&mut self.vars);
+        back.history = std::mem::take(&mut self.history);
+        back.notes = std::mem::take(&mut self.notes);
+        back.journal = std::mem::take(&mut self.journal);
+        for f in keep.iter().filter(|f| self.has(f)) {
+            back.set(f);
+        }
+        *self = back;
+        true
     }
 
     /// Called on login. If an act ended last session, open the next one by
@@ -134,6 +155,30 @@ mod tests {
         assert!(st.begin_act());
         assert!(st.has("act:2"));
         assert!(!st.begin_act());
+    }
+
+    #[test]
+    fn rewind_returns_to_the_mark_but_keeps_the_player_s_side() {
+        let mut st = GameState::new("x");
+        st.set("night");
+        let mut marked = st.clone();
+        marked.mark = None;
+        st.mark = Some(Box::new(marked));
+        st.set("warned");
+        st.set("posted");
+        st.add("truth", 2);
+        st.history.push("chat eli".into());
+        st.notes.push(("09:10 PM".into(), "eli is tired".into()));
+        assert!(st.rewind(&["warned".to_string()]));
+        assert!(st.has("night") && st.has("warned"));
+        assert!(!st.has("posted"), "the rest of the night is undone");
+        assert_eq!(st.var("truth"), 2);
+        assert_eq!(st.history, vec!["chat eli".to_string()]);
+        assert_eq!(st.notes.len(), 1);
+        assert!(st.mark.is_some(), "the mark stays for the next rewind");
+        st.set("posted");
+        assert!(st.rewind(&[]));
+        assert!(!st.has("posted") && !st.has("warned"));
     }
 
     #[test]

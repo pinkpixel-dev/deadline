@@ -73,8 +73,8 @@
                     "i left myself a back door on every node. {cyan}open 04 --node{/}. it's how i babysit the indexer from home.",
                 ], effects: [Set("knows_door")]),
                 (id: "warn", lines: ["huh.", "why not?"], choices: [
-                    (text: "you haven't slept in days. you're going to get hurt.", effects: [Set("warned_eli"), Add("truth", 1), Add("eli_trust", 1)], goto: "warned"),
-                    (text: "i can't explain. just trust me.", effects: [Set("warned_eli")], goto: "vague"),
+                    (text: "you haven't slept in days. you're going to get hurt.", effects: [Set("warned_eli"), Set("changed_night"), Add("truth", 1), Add("eli_trust", 1)], goto: "warned"),
+                    (text: "i can't explain. just trust me.", effects: [Set("warned_eli"), Set("changed_night")], goto: "vague"),
                     (text: "never mind.", goto: "end"),
                 ]),
                 (id: "warned", lines: [
@@ -118,7 +118,7 @@
                 ], choices: [
                     (text: "good luck. say goodbye properly.", effects: [Add("eli_trust", 1)], goto: "go"),
                     (text: "wait. talk to me for a bit first.", goto: "s1"),
-                    (text: "eli, please don't. go to sleep.", cond: NoFlag("warned_eli"), effects: [Set("warned_eli"), Add("truth", 1)], goto: "plea"),
+                    (text: "eli, please don't. go to sleep.", cond: NoFlag("warned_eli"), effects: [Set("warned_eli"), Set("changed_night"), Add("truth", 1)], goto: "plea"),
                 ]),
                 (id: "plea", lines: [
                     "you sound like ghost.",
@@ -153,7 +153,8 @@
                     "it's almost 4am. i've been talking to you for four hours. i didn't even notice.",
                     "that never happens. usually it's the indexer i lose hours to.",
                 ], effects: [Clock("03:58")], choices: [
-                    (text: "maybe skip the run tonight.", effects: [Set("stalled_eli"), Add("eli_trust", 2)], goto: "stalled"),
+                    (text: "maybe skip the run tonight.", cond: NoFlag("stalled_eli"), effects: [Set("stalled_eli"), Set("changed_night"), Add("eli_trust", 2)], goto: "stalled"),
+                    (text: "maybe skip the run tonight.", cond: Flag("stalled_eli"), effects: [Add("paranoia", 1)], goto: "again"),
                     (text: "ok. now you can go.", goto: "go"),
                 ]),
                 (id: "stalled", lines: [
@@ -163,6 +164,12 @@
                     "thanks, node 2. goodnight.",
                     "#*** eli has logged off",
                 ], effects: [Set("eli_asleep")]),
+                (id: "again", lines: [
+                    "i did that once. i think.",
+                    "i skipped it and went to bed, and then i woke up here at 9pm and it was the 14th again.",
+                    "that's a dream, right? tell me that's a dream.",
+                    "...i'm going to run it. i need to know what it remembers.",
+                ], next: "go"),
                 (id: "go", lines: [
                     "ok. here goes.",
                     "#*** node 04: eli session open",

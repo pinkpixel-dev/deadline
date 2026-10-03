@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.5.0 - October 3, 2026
+
+### 📼 Act III: 1998 (complete)
+
+- Changing the night now rebuilds it: back to 9:04 PM as `BUILD 1998.2`, then `1998.3`. What you tried carries over, and some people half remember it
+- Each build plays a little differently. Eli, Mara and ghost_17 have new lines, the bulletin changes, `scan` shows node 04 as JANUS, and a diner photo shows up before the diner happens
+- Letting Eli run the archiver, or changing anything in the third build, skips to dawn on 08/15/1998 and the newspaper appears
+- Eli asks if you know what happened to him. You answer with commands: `reply eli`, `send eli eli_voss.txt`, `delete` the article, or try to `logout`
+- Present-day parallax calls in on the external line, then the night collapses and you're back in the present with a new `/var/janus` directory
+- Act III ends with its own end card, and ROOT hangs up five minutes later like the other acts
+
+### 🧹 Maintenance
+
+- New `Mark` and `Rewind` story effects for returning to an earlier moment while keeping chosen flags, vars, history, notes and the journal
+
 ## 0.4.0 - October 3, 2026
 
 ### 📼 Act III: 1998 (first half)

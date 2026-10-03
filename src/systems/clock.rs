@@ -32,7 +32,9 @@ pub fn time_string(st: &GameState) -> String {
 
 /// The system date. Normally today, but some timelines disagree.
 pub fn date_string(st: &GameState) -> String {
-    if st.has("clock:1998") {
+    if st.has("clock:0815") {
+        "08/15/1998".to_string()
+    } else if st.has("clock:1998") {
         "08/14/1998".to_string()
     } else {
         chrono::Local::now().format("%m/%d/%Y").to_string()

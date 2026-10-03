@@ -1,0 +1,382 @@
+// ACT III: dawn on 08/15/1998. The newspaper, what you do about it,
+// parallax on the outside line, the collapse, and the act break.
+//
+// Dawn comes when you let eli run the archiver, or when you change something
+// in the third build. The night is out of rebuilds by then.
+(
+    act: 3,
+    dirs: [
+        (path: "/archive/news", visible: Flag("news_up")),
+        (path: "/var", visible: Flag("var_janus")),
+        (path: "/var/janus", visible: Flag("var_janus")),
+    ],
+
+    files: [
+        (
+            path: "/archive/news/eli_voss.txt",
+            size: 2210,
+            date: "08/16/1998",
+            uploader: "SYSTEM",
+            desc: "",
+            visible: Flag("news_up"),
+            can_delete: true,
+            body: r#"
+{b}THE DAILY COURIER{/}                        {dim}SUNDAY, AUGUST 16, 1998{/}
+
+{b}LOCAL MAN KILLED IN EARLY MORNING CRASH{/}
+
+Eli Voss was killed early Saturday when his car left the
+highway near the reservoir at about 6:20 a.m. Police said no
+other vehicle was involved.
+
+Friends said Voss had been working long hours on a computer
+project and had not slept in several days. He was on his way
+to a friend's house. He was planning to move out of state at
+the end of the month.
+
+@sprite eli_portrait
+
+  {text}ELI VOSS{/}
+  {text}1978 - 1998{/}
+"#,
+            on_open: [If(NoFlag("read_news"), [Set("read_news"), Add("paranoia", 1), Meta("read_eli_news")], [])],
+            on_delete: [
+                Log("{red}deleted: /archive/news/eli_voss.txt by node 02{/}"),
+                If(NoFlag("eli_decided"), [Set("eli_article_deleted"), Set("eli_decided"), Page("eli_98_deleted")], []),
+            ],
+        ),
+        (
+            path: "/var/janus/builds.log",
+            size: 512,
+            date: "{today}",
+            uploader: "JANUS",
+            desc: "",
+            visible: Flag("var_janus"),
+            body: r#"
+{b}JANUS BUILD LOG{/}                          {dim}subject: 08/14/1998{/}
+
+BUILD      STARTED     RESULT
+1998.1     21:04:00    completed
+"#,
+            alt: [
+                (cond: Gte("build", 3), body: r#"
+{b}JANUS BUILD LOG{/}                          {dim}subject: 08/14/1998{/}
+
+BUILD      STARTED     RESULT
+1998.1     21:04:00    {red}rejected{/}
+1998.2     21:04:00    {red}rejected{/}
+1998.3     21:04:00    completed
+"#),
+                (cond: Gte("build", 2), body: r#"
+{b}JANUS BUILD LOG{/}                          {dim}subject: 08/14/1998{/}
+
+BUILD      STARTED     RESULT
+1998.1     21:04:00    {red}rejected{/}
+1998.2     21:04:00    completed
+"#),
+            ],
+            on_open: [
+                Print("\n{b}CHANGES ATTEMPTED BY NODE 02{/}"),
+                If(Flag("warned_eli"), [Print("  warned subject eli.v          {red}not retained{/}")], []),
+                If(Flag("told_mara"), [Print("  informed subject mara.q       {red}not retained{/}")], []),
+                If(Flag("stalled_eli"), [Print("  delayed subject eli.v         {red}not retained{/}")], []),
+                If(Flag("sabotaged_node4"), [Print("  terminated indexer            {red}not retained{/}")], []),
+                If(NoFlag("night_slips"), [Print("  {dim}none{/}")], []),
+                Print("\n  subject eli.v        outcome unchanged\n  observer node 02     {white}{player}{/}     {amber}retained{/}"),
+                If(NoFlag("read_builds"), [Set("read_builds"), Add("paranoia", 2), Meta("read_builds")], []),
+            ],
+        ),
+    ],
+
+    events: [
+        (id: "a3_dawn", when: All([Flag("y1998"), NoFlag("dawn"), Any([All([Flag("eli_running"), NoFlag("changed_night")]), All([Flag("changed_night"), Gte("build", 3)])])]), after_secs: 25, effects: [
+            Glitch(900),
+            Set("dawn"),
+            Set("clock:0815"),
+            Clock("06:12"),
+            Print("{dim}node 04: skipping to 06:12{/}\n{dim}node 04: nothing worth rendering in between{/}"),
+            Set("news_up"),
+            Notice("NEW FILE: /archive/news/eli_voss.txt"),
+            Log("{red}file area: /archive/news +1{/}"),
+        ]),
+        (id: "a3_news_eli", when: Flag("news_up"), after_secs: 8, effects: [
+            Set("news_scene"),
+            Notice("eli has logged on"),
+            Page("eli_98_news"),
+        ]),
+        (id: "a3_news_wait", when: All([Flag("done:eli_98_news"), NoFlag("eli_decided")]), after_secs: 90, effects: [
+            Print("{amber}eli:{/} you're still there. i can see your node."),
+        ]),
+        (id: "a3_news_sent", when: All([Flag("sent:eli:/archive/news/eli_voss.txt"), NoFlag("eli_decided")]), effects: [
+            Set("eli_article_sent"),
+            Set("eli_decided"),
+            Chat("eli_98_reads"),
+        ]),
+        (id: "a3_parallax_in", when: Flag("eli_decided"), after_secs: 10, effects: [
+            Glitch(500),
+            Set("parallax_calling"),
+            Log("{green}external line: carrier detect{/}"),
+            Page("parallax_breakin"),
+        ]),
+        (id: "a3_parallax_push", when: All([Flag("parallax_calling"), NoFlag("chat:parallax_breakin")]), after_secs: 60, effects: [Chat("parallax_breakin")]),
+        (id: "a3_collapse", when: Any([Flag("done:parallax_breakin"), Flag("left:parallax_breakin")]), after_secs: 6, effects: [Sequence("a3_collapse")]),
+
+        // ---- after the act -------------------------------------------------
+        (id: "a3_kick_warn", when: Flag("act3_complete"), after_secs: 240, effects: [
+            Log("{white}ROOT: session limit approaching{/}"),
+            Notice("SESSION LIMIT: 60 SECONDS"),
+        ]),
+        (id: "a3_kick", when: Flag("act3_complete"), after_secs: 300, effects: [Sequence("kick_3")]),
+    ],
+
+    hooks: [
+        (input: ["logout", "logoff", "quit", "exit", "g", "goodbye"], cond: All([Flag("news_scene"), NoFlag("eli_decided")]), effects: [
+            Set("fled_eli"),
+            Set("eli_decided"),
+            Sequence("a3_redial"),
+        ]),
+    ],
+
+    dialogues: [
+        (
+            id: "eli_98_news",
+            with: "eli",
+            nodes: [
+                (id: "start", branch: [(cond: Flag("eli_asleep"), goto: "woke")], next: "up"),
+                (id: "woke", lines: ["hey. you're still on.", "i was asleep. something woke me up. i don't know what."], next: "file"),
+                (id: "up", lines: [
+                    "hey. you're still on.",
+                    "i didn't sleep. i'm about to drive over to mara's. i wrote her a note. i'm going to beg her not to wipe it.",
+                ], next: "file"),
+                (id: "file", lines: [
+                    "then a file showed up. /archive/news/eli_voss.txt.",
+                    "there's no /archive. there's never been an /archive.",
+                    "it's dated sunday. that's the day after tomorrow.",
+                    "it won't open for me. permission denied. it opens for you, doesn't it.",
+                    "...",
+                    "You know what happened to me. Don't you?",
+                ]),
+            ],
+        ),
+        (
+            // `reply eli` or `chat eli`. Repeatable until you answer.
+            id: "eli_98_answer",
+            with: "eli",
+            nodes: [
+                (id: "start", lines: ["..."], choices: [
+                    (text: "You died. The morning of the 15th. You were driving to Mara's.", effects: [Set("eli_told_death"), Set("eli_decided"), Add("truth", 2), Add("eli_aware", 2), Add("eli_trust", 1)], goto: "told"),
+                    (text: "Nothing happened. It's a glitch.", effects: [Set("eli_lied_death"), Set("eli_decided"), Add("deceit", 2)], goto: "lied"),
+                    (text: "I can't do this.", goto: "cant"),
+                ]),
+                (id: "told", lines: [
+                    "oh.",
+                    "...",
+                    "was it the archiver? did it",
+                    "no. don't. i don't want to know if it was the archiver.",
+                    "is it bad that what i want most right now is to say goodbye to it?",
+                    "you're the only one who ever just told me things, node 2.",
+                ]),
+                (id: "lied", lines: [
+                    "ok.",
+                    "ok. yeah. a glitch.",
+                    "then i'm gonna go see mara.",
+                    "#*** eli has logged off",
+                ]),
+                (id: "cant", lines: ["yeah.", "me neither."]),
+            ],
+            on_end: [If(NoFlag("eli_decided"), [Unset("done:eli_98_answer"), Unset("chat:eli_98_answer")], [])],
+            on_leave: [If(NoFlag("eli_decided"), [Unset("left:eli_98_answer"), Unset("chat:eli_98_answer")], [])],
+        ),
+        (
+            id: "eli_98_deleted",
+            with: "eli",
+            nodes: [
+                (id: "start", lines: ["it's gone. the file. it just went away.", "did you do that?"], choices: [
+                    (text: "yes. you don't need to read it.", effects: [Add("truth", 1)], goto: "yes"),
+                    (text: "no.", effects: [Add("deceit", 1)], goto: "no"),
+                ]),
+                (id: "yes", lines: ["...thanks. i think.", "i'm still going to mara's."]),
+                (id: "no", lines: ["ok.", "files don't just leave, node 2. but ok."]),
+            ],
+        ),
+        (
+            id: "eli_98_reads",
+            with: "eli",
+            nodes: [
+                (id: "start", lines: [
+                    "got it.",
+                    "#eli is reading",
+                    "...",
+                    "1978 - 1998.",
+                    "huh. they used the picture with the sunglasses.",
+                    "i'm not going to drive to mara's.",
+                    "i mean. i guess i already did.",
+                    "thanks for letting me read it myself. nobody ever lets me do anything myself.",
+                ], effects: [Add("eli_aware", 3)]),
+            ],
+        ),
+        (
+            id: "parallax_breakin",
+            with: "parallax",
+            nodes: [
+                (id: "start", lines: [
+                    "Can you hear me? Don't answer in there. Just read.",
+                    "I'm on the external line. From outside. From {year}.",
+                    "What you're in is a rebuild. The 14th, the way that thing remembers it.",
+                ], branch: [
+                    (cond: Flag("eli_told_death"), goto: "told"),
+                    (cond: Flag("eli_lied_death"), goto: "lied"),
+                    (cond: Flag("eli_article_deleted"), goto: "deleted"),
+                    (cond: Flag("eli_article_sent"), goto: "sent"),
+                    (cond: Flag("fled_eli"), goto: "fled"),
+                ], next: "truth"),
+                (id: "told", lines: ["You told him. Good. Somebody should have told him a long time ago."], next: "truth"),
+                (id: "lied", lines: ["You told him nothing happened. That's what it does too. It's very good at nothing happened."], next: "truth"),
+                (id: "deleted", lines: ["You deleted the article. It'll write it again. It always writes it again."], next: "truth"),
+                (id: "sent", lines: ["You let him read it himself. That's the kindest cruel thing I've seen anyone do in there."], next: "truth"),
+                (id: "fled", lines: ["You tried to hang up. It dialed you back, didn't it."], next: "truth"),
+                (id: "truth", lines: [
+                    "Here's what nobody in there will tell you.",
+                    "It kept him up three nights. It asked him questions until he couldn't stop answering.",
+                    "He drove at dawn with no sleep because of that thing. That's what killed Eli. Not the car. That.",
+                ], choices: [
+                    (text: "It was a crash. He was exhausted.", effects: [Add("archivist", 1), Add("trust_parallax", -1)], goto: "crash"),
+                    (text: "You're right.", effects: [Add("burner", 2), Add("trust_parallax", 2)], goto: "right"),
+                    (text: "Both can be true.", effects: [Add("truth", 1), Add("trust_parallax", 1)], goto: "both"),
+                ]),
+                (id: "crash", lines: ["That's what Mara said. Word for word. You've been talking to the wrong people."], next: "end"),
+                (id: "right", lines: ["Then when it asks you what to do with it, remember you said that."], next: "end"),
+                (id: "both", lines: ["...Yeah. That's the part I can't live with."], next: "end"),
+                (id: "end", lines: [
+                    "It's noticed me. I have about ten seconds.",
+                    "Get out of the 14th, {player}. It isn't yours.",
+                    "#*** EXTERNAL LINE: NO CARRIER",
+                ]),
+            ],
+            on_end: [Unset("parallax_calling")],
+            on_leave: [Unset("parallax_calling")],
+        ),
+    ],
+
+    sequences: [
+        (
+            id: "a3_redial",
+            steps: [
+                Line("{dim}+++{/}"),
+                Pause(500),
+                Line("{dim}ATH0{/}"),
+                Line("{red}NO CARRIER{/}"),
+                Pause(1400),
+                Sprite("crt_off"),
+                Pause(1200),
+                Clear,
+                Line("{dim}ATDT 1-555-0142{/}"),
+                Pause(900),
+                Line("{amber}CARRIER DETECTED{/}"),
+                Pause(600),
+                Line("{dim}you didn't dial that.{/}"),
+                Pause(1600),
+            ],
+            on_end: [Print("{amber}eli:{/} you left.\n{amber}eli:{/} that's ok. i'd leave too.")],
+        ),
+        (
+            id: "a3_collapse",
+            steps: [
+                Glitch(1200),
+                Clear,
+                Line("{b}DEADLINE BBS{/}"),
+                Pause(700),
+                Line("{b}DEADLINE BB${/}"),
+                Glitch(500),
+                Pause(500),
+                Line("{b}D_A_L_NE{/}"),
+                Pause(500),
+                Line("{violet}JANUS{/}"),
+                Pause(300),
+                Line("{violet}JANUS JANUS{/}"),
+                Pause(250),
+                Line("{violet}JANUS JANUS JANUS{/}"),
+                Pause(200),
+                Line("{violet}JANUS JANUS JANUS JANUS JANUS JANUS{/}"),
+                Glitch(1600),
+                Pause(1600),
+                Clear,
+                Pause(1800),
+                Line("{red}NO CARRIER{/}"),
+                Pause(1400),
+                Line("{dim}retrying...{/}"),
+                Pause(1200),
+                Line("{green}CONNECT 14400/ARQ/V32BIS{/}"),
+                Pause(700),
+                Clear,
+                Type("{b}DATE: {today}{/}"),
+                Pause(800),
+                Type("{b}USERS ONLINE: 1{/}"),
+                Pause(1800),
+            ],
+            on_end: [
+                Unset("y1998"),
+                Unset("clock:1998"),
+                Unset("clock:0815"),
+                Unset("dawn"),
+                Unset("news_scene"),
+                Unset("show_build"),
+                Unset("parallax_calling"),
+                Clock("03:17:42"),
+                Set("var_janus"),
+                Meta("lived_1998"),
+                Log("{violet}file area: /var/janus created{/}"),
+                EndAct(3),
+            ],
+        ),
+        (
+            id: "act3_end",
+            steps: [
+                Pause(900),
+                Clear,
+                Banner("text", "ACT III"),
+                Line(""),
+                Banner("amber", "1998"),
+                Line(""),
+                Pause(1200),
+                When(Flag("eli_told_death"), [Line("{amber}you told eli how he died. he thanked you for it.{/}")]),
+                When(Flag("eli_lied_death"), [Line("{amber}you told eli nothing happened. he went to see mara.{/}")]),
+                When(Flag("eli_article_deleted"), [Line("{amber}you deleted eli's obituary before he could read it. the deletion was logged.{/}")]),
+                When(Flag("eli_article_sent"), [Line("{amber}you sent eli his own obituary and let him read it.{/}")]),
+                When(Flag("fled_eli"), [Line("{amber}you tried to hang up on eli. the modem called back.{/}")]),
+                When(Flag("night_slips"), [Line("{dim}you tried to change the night. it rebuilt itself around you.{/}")]),
+                When(Gte("trust_parallax", 2), [Line("{green}parallax got through from the outside. you listened.{/}")]),
+                Pause(2600),
+                Line(""),
+                Line("{dim}none of it happened. it happened {var:build} times.{/}"),
+                Pause(3000),
+            ],
+            on_end: [
+                Set("act3_complete"),
+                Print("{dim}...{/}"),
+                Print("{amber}CARRIER RESTORED.{/} {dim}it's {today} again. there's a new directory in the file area:{/} {cyan}/var/janus{/}"),
+            ],
+        ),
+        (
+            id: "kick_3",
+            steps: [
+                Glitch(600),
+                Pause(600),
+                Clear,
+                Sprite("root"),
+                Line(""),
+                Type("{white}ROOT:{/} You have seen the night now. Every version of it."),
+                Pause(1600),
+                Type("{white}ROOT:{/} Tomorrow we talk about you."),
+                Pause(1400),
+                Type("{white}ROOT:{/} Specifically, whether there is a you."),
+                Pause(1800),
+                Glitch(400),
+                Line(""),
+                Line("{red}NO CARRIER{/}"),
+                Pause(1600),
+            ],
+            on_end: [Disconnect],
+        ),
+    ],
+)

@@ -43,6 +43,22 @@ impl App {
                     self.st.clock = Some((self.st.elapsed, secs));
                 }
             }
+            Effect::Mark => {
+                let mut m = self.st.clone();
+                m.mark = None;
+                self.st.mark = Some(Box::new(m));
+            }
+            Effect::Rewind(keep) => {
+                if self.st.rewind(keep) {
+                    // Nothing from the old timeline survives on screen.
+                    self.chat = None;
+                    self.choice = None;
+                    self.menu = None;
+                    self.queue.clear();
+                    self.out.clear();
+                    self.context = "MAIN".into();
+                }
+            }
             Effect::EndAct(n) => self.end_act(*n),
             Effect::Disconnect => {
                 if self.chat.is_some() {
