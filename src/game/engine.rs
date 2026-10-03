@@ -176,7 +176,8 @@ impl App {
 
     /// Fire every event whose condition holds and whose delay has passed.
     pub fn check_events(&mut self) {
-        if self.modal() {
+        // Nothing happens on a line that has already hung up.
+        if self.modal() || self.quit {
             return;
         }
         self.check_journal();

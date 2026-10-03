@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.7.0 - October 3, 2026
+
+### 🎬 Act V: DECISION
+
+- The last night is playable. JANUS opens the act and frames it by whichever way you leaned all game: keeping things, burning them, or letting them out
+- `options` lists everything that can be done with JANUS. Each ending is a typed command (`burn`, `burn --keep-source`, `preserve`, `fork`, `prove`, `stay`, `override`, `isolate eli`), and they all work from the first minute if you've earned them
+- Locked endings still answer, and say who's in the way: Parallax won't give you the kill code, null isn't answering, ROOT refuses
+- Every ending asks you to confirm first, since it ends the run
+- Nine endings, including a secret one, each with its own closing scene and a credits screen that tracks which ones you've found
+- If you never decide, ROOT eventually hangs up, and JANUS picks it back up on your next login
+
+### 🔁 Replay
+
+- Finishing an ending ends the run. Your next launch starts a fresh game, and everything the game remembers across runs stays
+- The opening screen picks up a small detail for every ending you've seen
+
+### 🧹 Maintenance
+
+- New story effects `Ending(id)` and `Rebuild`, and conditions `More(a, b)` and `Endings(n)`
+- Nothing fires after the line has hung up
+
 ## 0.6.3 - October 3, 2026
 
 ### 🐛 Fixes

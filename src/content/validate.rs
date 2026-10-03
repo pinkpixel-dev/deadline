@@ -185,6 +185,10 @@ pub fn check(c: &Content) -> Vec<String> {
             Cond::Gte(v, _) | Cond::Lte(v, _) => {
                 out.insert(v.clone());
             }
+            Cond::More(a, b) => {
+                out.insert(a.clone());
+                out.insert(b.clone());
+            }
             Cond::All(cs) | Cond::Any(cs) => cs.iter().for_each(|c| vars(c, out)),
             Cond::Not(c) => vars(c, out),
             _ => {}
