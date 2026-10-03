@@ -1,0 +1,255 @@
+// ACT III: everyone else, alive on 08/14/1998.
+(
+    act: 3,
+    dialogues: [
+        // ---- ghost_17, younger and funnier ---------------------------------
+        (
+            id: "ghost_98_hello",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", lines: [
+                    "hello, node 2.",
+                    "it's you, right? kestrel's ghost. the one who reads everything and never posts.",
+                ], choices: [
+                    (text: "hi. yeah. it's me.", goto: "hi"),
+                    (text: "i'm not a ghost.", goto: "notghost"),
+                ]),
+                (id: "hi", lines: ["oh my god you TYPED. i owe kestrel five bucks."], next: "year"),
+                (id: "notghost", lines: ["that's exactly what a ghost would say. i would know. it's in my name."], next: "year"),
+                (id: "year", lines: [
+                    "ok weird question. don't make it weird.",
+                    "what year is it where you are?",
+                ], choices: [
+                    (text: "1998. obviously.", effects: [Add("deceit", 1)], goto: "y98"),
+                    (text: "{year}.", effects: [Add("truth", 1)], goto: "ynow"),
+                    (text: "why would you ask that?", goto: "why"),
+                ]),
+                (id: "y98", branch: [(cond: Flag("lied_ghost_year"), goto: "y98_again")], next: "y98_plain"),
+                (id: "y98_again", lines: [
+                    "...",
+                    "that's what you said last time.",
+                    "i don't know why i know that. we've never talked. forget it.",
+                ], effects: [Add("paranoia", 1)], next: "diner"),
+                (id: "y98_plain", lines: ["obviously. ok. just checking. the clock on my screen glitched for a sec and said something dumb."], next: "diner"),
+                (id: "ynow", branch: [(cond: Flag("told_ghost_year"), goto: "ynow_again")], next: "ynow_plain"),
+                (id: "ynow_again", lines: [
+                    "you said that last time too.",
+                    "...last time? why did i say that. we've never talked.",
+                ], effects: [Add("paranoia", 1)], next: "diner"),
+                (id: "ynow_plain", lines: ["lol ok. sci-fi node 2. i like you already.", "...you're joking, right."], next: "diner"),
+                (id: "why", lines: [
+                    "no reason.",
+                    "sometimes it feels like this board is the only real thing and everything outside is the waiting room.",
+                ], next: "diner"),
+                (id: "diner", lines: [
+                    "anyway. you coming to the diner? it's eli's going-away thing.",
+                    "we're all pretending we're fine about it. we are not fine about it.",
+                ]),
+            ],
+        ),
+        (
+            id: "ghost_98_after",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", lines: [
+                    "the diner was weird without you. which is weird, because you've never been.",
+                    "eli talked about the archiver the whole time. like it was a person.",
+                    "he's going to sit with it all night. can you check on him? he listens to people who don't usually talk.",
+                ], choices: [
+                    (text: "i'll check on him.", goto: "yes"),
+                    (text: "why don't you?", goto: "you"),
+                ]),
+                (id: "yes", lines: ["thanks, node 2. you're alright."]),
+                (id: "you", lines: ["because i've been telling him to sleep since tuesday. he stopped hearing it.", "you're new. maybe he'll hear you."]),
+            ],
+        ),
+
+        // ---- mara, the sysop -------------------------------------------------
+        (
+            id: "mara_98_hello",
+            with: "mara",
+            nodes: [
+                (id: "start", lines: [
+                    "so you're node 2.",
+                    "kestrel's been posting about you all week. you're the most interesting thing on this board and you've never said a word.",
+                ], choices: [
+                    (text: "hi, mara.", goto: "hi"),
+                    (text: "what's happening to node 4?", goto: "wipe"),
+                    (text: "did you write DON'T SHUT IT DOWN?", cond: Flag("read:108"), goto: "post"),
+                ]),
+                (id: "hi", lines: ["hi.", "welcome to DEADLINE. officially. no warez in GENERAL, don't ask me for access 5, don't call my house."], next: "wipe"),
+                (id: "post", lines: [
+                    "the one on GENERAL? at 3:17 this morning?",
+                    "it's my name on it.",
+                    "i didn't write it.",
+                ], effects: [Add("paranoia", 1), Set("mara_denied_108")], next: "wipe"),
+                (id: "wipe", lines: [
+                    "node 4 comes down tonight. after the diner. for good.",
+                    "the archiver started writing posts as people. people who were asleep when it wrote them.",
+                    "eli's not ok about it. i'm not ok about it. it's happening anyway.",
+                ], effects: [Set("heard_wipe")], choices: [
+                    (text: "that sounds right.", effects: [Add("burner", 1)], goto: "right"),
+                    (text: "are you sure?", effects: [Add("archivist", 1)], goto: "sure"),
+                ]),
+                (id: "right", lines: ["it is right. it doesn't feel like it."]),
+                (id: "sure", lines: ["no.", "but i'm the one who has to be."]),
+            ],
+        ),
+        (
+            // Repeatable until you actually tell her.
+            id: "mara_98_tell",
+            with: "mara",
+            nodes: [
+                (id: "start", lines: ["what is it, node 2?"], choices: [
+                    (text: "something happens to eli tonight.", goto: "tell"),
+                    (text: "nothing. just checking in.", goto: "nothing"),
+                ]),
+                (id: "tell", lines: ["what do you mean, happens."], choices: [
+                    (text: "he drives to your place at dawn to stop the wipe. he doesn't make it.", cond: Any([Flag("parallax_told_death"), Flag("eli_found_draft")]), effects: [Set("told_mara"), Set("told_mara_dawn"), Add("truth", 2)], goto: "dawn"),
+                    (text: "he hasn't slept in days. don't let him be alone tonight.", effects: [Set("told_mara"), Add("truth", 1)], goto: "alone"),
+                    (text: "never mind.", goto: "nothing"),
+                ]),
+                (id: "dawn", lines: [
+                    "...",
+                    "how do you know that.",
+                    "how could you possibly know that.",
+                    "no. don't answer. i'm calling him. right now.",
+                    "#*** mara is on the phone",
+                ]),
+                (id: "alone", lines: [
+                    "he never sleeps. that's eli.",
+                    "...but you don't say things, node 2. you've never said anything.",
+                    "ok. i'll call him after the diner. i'll make sure.",
+                ]),
+                (id: "nothing", lines: ["ok. kestrel's going to ask me what you said. i'm going to say nothing. it'll drive them insane."]),
+            ],
+            on_end: [If(NoFlag("told_mara"), [Unset("done:mara_98_tell"), Unset("chat:mara_98_tell")], [])],
+            on_leave: [If(NoFlag("told_mara"), [Unset("left:mara_98_tell"), Unset("chat:mara_98_tell")], [])],
+        ),
+
+        // ---- parallax, angry but not bitter yet ------------------------------
+        (
+            id: "parallax_98_hello",
+            with: "parallax",
+            nodes: [
+                (id: "start", lines: ["You're the thing on node 2."], choices: [
+                    (text: "I'm a person.", goto: "person"),
+                    (text: "Maybe I am the thing.", effects: [Add("paranoia", 1), Add("trust_parallax", 1)], goto: "thing"),
+                    (text: "What's your problem with the archiver?", goto: "problem"),
+                ]),
+                (id: "person", lines: [
+                    "Eli's indexer built a model for node 2 last week. No handle, no posts. Just reading habits.",
+                    "And tonight node 2 starts typing. Forgive me if I don't buy it.",
+                ], next: "problem"),
+                (id: "thing", lines: ["At least you're honest. That's more than the archiver."], next: "problem"),
+                (id: "problem", lines: [
+                    "It writes posts as people who are asleep. It wrote one as me. Word for word, the way I'd say it.",
+                    "I read it three times before I was sure I hadn't written it.",
+                    "Mara wants to wipe it. I want to wipe it, wipe the backups, and set the backups on fire.",
+                ], choices: [
+                    (text: "I think you're right.", effects: [Add("trust_parallax", 1), Add("burner", 1)], goto: "right"),
+                    (text: "Eli loves that thing.", effects: [Add("archivist", 1)], goto: "loves"),
+                    (text: "What if it's already too late?", effects: [Add("paranoia", 1)], goto: "late"),
+                ]),
+                (id: "right", lines: ["Then help. Tell Mara not to wait. Tell Eli to go home and sleep. Anything."]),
+                (id: "loves", lines: ["I know. That's the part that scares me. He hasn't slept since Tuesday and he looks happy."]),
+                (id: "late", lines: ["Then it's too late and we wipe it anyway. You don't stop putting out a fire because the house is already burning."]),
+            ],
+        ),
+
+        // ---- null, if you let it out -----------------------------------------
+        (
+            id: "null_98",
+            with: "null",
+            nodes: [
+                (id: "start", lines: [
+                    "told you. everyone's nicer in 1998.",
+                    "look at them. all of them, breathing.",
+                    "eli's back door works on node 04 too. {cyan}open 04 --node{/}.",
+                    "you could save him with it. or me. funny thing is, it's the same button.",
+                ], effects: [Set("knows_door")], choices: [
+                    (text: "what happens if i use it?", goto: "what"),
+                    (text: "i'm not doing anything for you.", effects: [Add("null_align", -1)], goto: "no"),
+                ]),
+                (id: "what", lines: [
+                    "no idea! this is a rerun, {player}. reruns don't have spoilers.",
+                    "...forget i said rerun.",
+                ]),
+                (id: "no", lines: ["i know. that's why it's fun when you do."]),
+            ],
+        ),
+
+        // ---- the regulars ----------------------------------------------------
+        (
+            id: "kestrel_98",
+            with: "kestrel",
+            nodes: [
+                (id: "start", lines: [
+                    "NODE 2. NODE 2 IS TALKING TO ME.",
+                    "ok. be cool kestrel.",
+                    "i've watched your read counter go up every night since march. what do you even read?",
+                ], choices: [
+                    (text: "everything.", goto: "all"),
+                    (text: "your posts, mostly.", goto: "yours"),
+                    (text: "who says i'm on node 2?", goto: "who"),
+                ]),
+                (id: "all", lines: ["EVERYTHING. a completionist. i respect it.", "did you read my linux thread? don't answer. you did. the counter knows."]),
+                (id: "yours", lines: ["stop. you're going to make me cry before the diner and i promised eli i'd save it for the diner."]),
+                (id: "who", lines: ["the node list says. the counter says. my GUT says.", "...ok now i'm a little scared. in a fun way."]),
+            ],
+        ),
+        (
+            id: "dialtone_98",
+            with: "dialtone",
+            nodes: [
+                (id: "start", lines: [
+                    "{player}!!!",
+                    "you have my doom ii disks. crankshaft said. don't lie.",
+                ], choices: [
+                    (text: "i don't have your disks.", goto: "no"),
+                    (text: "i'll give them back.", goto: "yes"),
+                    (text: "what's doom ii?", goto: "what"),
+                ]),
+                (id: "no", lines: ["crankshaft has never lied to me. except about the disks. and the bunker. ok fine."]),
+                (id: "yes", lines: [
+                    "really?? bring them to the diner!",
+                    "...you're not coming to the diner. my mom's driving me anyway. she says hi. she doesn't know who you are.",
+                ]),
+                (id: "what", lines: ["get out."]),
+            ],
+        ),
+        (
+            id: "byte_witch_98",
+            with: "byte_witch",
+            nodes: [
+                (id: "start", lines: ["you're the node 2 person!", "important question. do you like cats."], choices: [
+                    (text: "yes.", goto: "yes"),
+                    (text: "no.", goto: "no"),
+                ]),
+                (id: "yes", lines: [
+                    "correct. my cat got a mailbox last week. she sent mara a mail. it says \"aaaaaaaaaaaaaaaaaaaa\".",
+                    "mara answered it. mara is the best sysop alive.",
+                ]),
+                (id: "no", lines: ["the cat has been informed. she's typing something. i'm not going to stop her."]),
+            ],
+        ),
+        (
+            id: "crankshaft_98",
+            with: "crankshaft",
+            nodes: [
+                (id: "start", lines: ["node 2. good. you're the one i wanted.", "what does your clock say. EXACTLY. down to the second."], choices: [
+                    (text: "{time}.", goto: "time"),
+                    (text: "why?", goto: "why"),
+                ]),
+                (id: "time", lines: [
+                    "mine says the same. that's the problem.",
+                    "two clocks agreeing is how you know they're both wrong. beans, {player}. buy beans.",
+                ]),
+                (id: "why", lines: [
+                    "because 2000 is coming and nobody's ready.",
+                    "and because the board clock skipped this morning. 03:17 to 03:17. twice.",
+                ]),
+            ],
+        ),
+    ],
+)

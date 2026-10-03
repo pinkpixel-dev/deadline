@@ -97,7 +97,12 @@ impl App {
     /// Run the first matching story hook. Returns true if it consumed the command.
     fn run_hooks(&mut self, input: &str) -> bool {
         let content = self.content.clone();
-        for hook in &content.hooks {
+        // The act in play gets first say, so a later act can override an
+        // earlier act's catch-all for the same command.
+        let act = self.st.act_started;
+        let current = content.hooks.iter().filter(|h| h.act == act);
+        let rest = content.hooks.iter().filter(|h| h.act != act);
+        for hook in current.chain(rest) {
             let player = self.st.player.clone();
             if !hook.input.iter().any(|p| pattern_matches(&p.replace("{player}", &player), input)) {
                 continue;
@@ -142,7 +147,14 @@ impl App {
                     self.chat_with(args)
                 }
             }
-            "reply" => self.reply(),
+            "reply" | "re" => {
+                if args.is_empty() {
+                    self.reply()
+                } else {
+                    self.chat_with(args)
+                }
+            }
+            "send" => self.cmd_send(args),
             "leave" | "close" | "part" => self.leave_chat(),
             "bye" if self.chat.is_some() => self.leave_chat(),
             "files" | "ls" | "dir" => self.cmd_files(args),

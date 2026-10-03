@@ -55,7 +55,7 @@ probably.
             subject: "[no subject]",
             date: "{today}",
             author: "ROOT",
-            visible: Flag("done:root_intro"),
+            visible: All([Flag("done:root_intro"), NoFlag("y1998")]),
             body: r#"
 ROOT:
 Read-only.

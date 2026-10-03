@@ -38,6 +38,11 @@ impl App {
                 let branch = branch.clone();
                 self.apply(&branch);
             }
+            Effect::Clock(t) => {
+                if let Some(secs) = crate::systems::clock::parse(t) {
+                    self.st.clock = Some((self.st.elapsed, secs));
+                }
+            }
             Effect::EndAct(n) => self.end_act(*n),
             Effect::Disconnect => {
                 if self.chat.is_some() {

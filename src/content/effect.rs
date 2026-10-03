@@ -43,6 +43,9 @@ pub enum Effect {
     Password(PasswordPrompt),
     /// Conditional effects.
     If(Cond, Vec<Effect>, Vec<Effect>),
+    /// Set the BBS clock to a time of day (`"21:04"` or `"21:04:30"`). It keeps
+    /// running from there.
+    Clock(String),
     /// Finish an act.
     EndAct(u8),
     /// Save the session and hang up.

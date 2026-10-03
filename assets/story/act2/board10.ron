@@ -7,7 +7,7 @@
             id: "10",
             name: "YOU",
             count_label: "3 msgs",
-            visible: All([Flag("board10_open"), NoFlag("board10_gone")]),
+            visible: All([Flag("board10_open"), NoFlag("board10_gone"), NoFlag("y1998")]),
             header: r#"
 @banner white YOU
 {dim}posts by {player}. 1998.{/}
@@ -18,7 +18,7 @@
             id: "11",
             name: "DON'T GO IN HERE",
             count_label: "",
-            visible: All([Flag("board11_up"), NoFlag("board11_gone")]),
+            visible: All([Flag("board11_up"), NoFlag("board11_gone"), NoFlag("y1998")]),
             header: r#"
 {red}it's empty.{/}
 

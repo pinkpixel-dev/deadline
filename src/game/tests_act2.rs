@@ -4,7 +4,7 @@ use super::tests::{act1_close, app, cmd, dismiss, finish_chat, pick, run, screen
 use crate::app::App;
 
 /// Skip a running cinematic.
-fn skip(a: &mut App) {
+pub(super) fn skip(a: &mut App) {
     for _ in 0..20 {
         match a.seq.as_mut() {
             Some(s) => s.fast = true,
@@ -15,7 +15,7 @@ fn skip(a: &mut App) {
 }
 
 /// Open a waiting private message by dialogue id.
-fn answer(a: &mut App, id: &str) {
+pub(super) fn answer(a: &mut App, id: &str) {
     for _ in 0..40 {
         if a.st.pages.iter().any(|p| p == id) {
             break;
@@ -31,7 +31,7 @@ fn answer(a: &mut App, id: &str) {
 }
 
 /// Log off and back on, the way a real next session starts.
-fn next_login(a: &mut App) {
+pub(super) fn next_login(a: &mut App) {
     skip(a);
     a.st.begin_act();
     a.start_sequence("reconnect");

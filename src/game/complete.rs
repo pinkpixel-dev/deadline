@@ -38,7 +38,7 @@ impl App {
                     }
                 }
             }
-            "chat" | "finger" | "trace" | "page" | "talk" => {
+            "chat" | "finger" | "trace" | "page" | "talk" | "reply" | "send" => {
                 for u in &self.content.users {
                     if u.id.starts_with('$') {
                         continue;

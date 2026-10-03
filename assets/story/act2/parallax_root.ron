@@ -81,7 +81,6 @@ This is not a request.
             Add("trust_root", 2),
             Add("trust_parallax", -2),
         ]),
-        (input: ["send *"], effects: [Print("{dim}send <user> <file>{/}")]),
 
         // listen, Act II flavor
         (input: ["listen"], cond: All([Flag("act:2"), Flag("knows_listen")]), effects: [

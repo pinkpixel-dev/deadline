@@ -68,7 +68,7 @@ the board will be fine.
 
 eli:
 the board will outlive all of us. that's kind of the plan.
-"#, alt: [(cond: Flag("act:2"), body: r#"
+"#, alt: [(cond: All([Flag("act:2"), NoFlag("y1998")]), body: r#"
 crankshaft:
 i'm serious. 00 rolls over and every clock thinks it's 1900.
 planes. banks. VCRs. i'm stockpiling canned beans.
@@ -166,7 +166,7 @@ DON'T SHUT IT DOWN.
 
 - sysop
 "#,
-            alt: [(cond: Flag("actend:1"), body: r#"
+            alt: [(cond: All([Flag("actend:1"), NoFlag("y1998")]), body: r#"
 DON'T SHUT IT DOWN.
 
 - sysop
@@ -192,7 +192,7 @@ it's a new board, dialtone. everything is first.
 dialtone:
 FIRST!!! (again)
 "#,
-            alt: [(cond: Flag("eli_seen"), body: r#"
+            alt: [(cond: All([Flag("eli_seen"), NoFlag("y1998")]), body: r#"
 dialtone:
 FIRST!!!
 
@@ -206,7 +206,7 @@ FIRST!!! (again)
 eli:
 still here.
 "#)],
-            on_read: [If(All([Flag("eli_seen"), NoFlag("saw_eli_reply")]), [Set("saw_eli_reply"), Add("paranoia", 1), Glitch(300)], [])],
+            on_read: [If(All([Flag("eli_seen"), NoFlag("saw_eli_reply"), NoFlag("y1998")]), [Set("saw_eli_reply"), Add("paranoia", 1), Glitch(300)], [])],
         ),
     ],
 )

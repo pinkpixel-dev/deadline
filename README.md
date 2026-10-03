@@ -20,7 +20,7 @@ There are no dialogue menus floating over the game. You type commands like you w
 
 The story keeps track of what you do without showing you a single number. Who you trust, what you read, who you lied to, and which doors you opened all change what people will tell you later. Some choices look tiny. A few of them really aren't.
 
-Right now the game contains **Act I: CONNECTION** and **Act II: ARCHIVES**. Each act has several routes and four ways to end, depending on who you've trusted and who you've been honest with, and how Act I ends changes how Act II begins. Acts III through V are planned and build on the same engine.
+Right now the game contains **Act I: CONNECTION**, **Act II: ARCHIVES** and the first half of **Act III: 1998**. Acts I and II each have several routes and four ways to end, depending on who you've trusted and who you've been honest with, and how Act I ends changes how Act II begins. Act III drops you into the night of 08/14/1998 with everyone still alive. Its second half and Acts IV and V are planned and build on the same engine.
 
 Acts happen on different nights. When you finish one, the board lets you poke around for a few more minutes, then ROOT hangs up on you. Log in again to start the next act.
 
@@ -50,10 +50,10 @@ If you'd rather type everything, the commands are all still there. Type `help` o
 | `read <#>`, `n` | read a message, next unread |
 | `mail [#]` | your mailbox |
 | `users`, `finger <user>` | who's online, look someone up |
-| `chat <user>`, `reply`, `leave` | private channels |
+| `chat <user>`, `reply [user]`, `leave` | private channels |
 | `files`, `cd <dir>`, `view <file>` | the file area |
 | `inspect <file>`, `download <file>` | file details, ZMODEM |
-| `send <user> <file>` | send a file from local storage (once someone asks for one) |
+| `send <user> <file>` | send a downloaded file to someone who's online |
 | `journal`, `note <text>` | what you've learned, your own notes |
 | `history` | your command history |
 | `snapshot [name]`, `restore [name]` | save and load |

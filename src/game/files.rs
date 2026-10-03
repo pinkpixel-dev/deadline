@@ -321,6 +321,43 @@ impl App {
         self.apply(&f.on_download);
     }
 
+    /// Send a downloaded file to another user. Story content reacts to the
+    /// `sent:<user>:<path>` flag.
+    pub fn cmd_send(&mut self, args: &str) {
+        let Some((who, arg)) = args.split_once(' ').filter(|(_, a)| !a.trim().is_empty()) else {
+            self.dim("send <user> <file>");
+            return;
+        };
+        let Some(user) = self.content.user(who).filter(|u| !u.id.starts_with('$')).cloned() else {
+            self.err(&format!("send: {who}: no such user"));
+            return;
+        };
+        let Some(f) = self.resolve_file(arg) else {
+            self.err(&format!("send: {}: no such file", arg.trim()));
+            return;
+        };
+        let name = basename(&f.path).to_string();
+        if !self.st.has(&format!("dl:{}", f.path)) {
+            self.err(&format!("send: {name}: not in local storage.  {{dim}}download it first.{{/}}"));
+            return;
+        }
+        if self.presence(&user.id).is_none() {
+            self.err(&format!("send: {} is not online.", user.id));
+            return;
+        }
+        self.print_lines(vec![
+            Line::styled(format!("  ZMODEM  sending {name} to {}  ({} bytes)", user.id, f.size), theme::dim()),
+            Line::from(vec![
+                Span::raw("  "),
+                Span::styled("━".repeat(24), Style::default().fg(theme::GREEN)),
+                Span::styled(" 100%", theme::dim()),
+            ]),
+            Line::styled("  TRANSFER COMPLETE", theme::bold(theme::GREEN)),
+        ]);
+        self.st.set(&format!("sent:{}:{}", user.id, f.path));
+        self.log(&format!("sent {name} to {}", user.id));
+    }
+
     pub fn cmd_delete(&mut self, arg: &str) {
         let Some(f) = self.need_file("delete", arg) else { return };
         if !f.can_delete {

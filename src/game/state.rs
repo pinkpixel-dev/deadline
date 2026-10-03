@@ -32,6 +32,8 @@ pub struct GameState {
     pub journal: Vec<String>,
     /// The player's own notes: (BBS clock time, text).
     pub notes: Vec<(String, String)>,
+    /// Set by the `Clock` effect: (elapsed when set, seconds past midnight).
+    pub clock: Option<(f64, u32)>,
 }
 
 impl Default for GameState {
@@ -59,6 +61,7 @@ impl GameState {
             cwd: "/".to_string(),
             journal: Vec::new(),
             notes: Vec::new(),
+            clock: None,
         }
     }
 

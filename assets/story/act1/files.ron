@@ -4,7 +4,7 @@
         (path: "/uploads"),
         (path: "/users"),
         (path: "/sysop", lock: (open: Flag("root_spool"), denied: [Print("{red}ACCESS DENIED.{/} {dim}LEVEL 5 REQUIRED.{/}"), Add("root_alert", 1)])),
-        (path: "/archive", lock: (open: Flag("archive_mounted"), denied: [Print("{red}ARCHIVE RESTRUCTURING.{/} {dim}try again later.{/}"), If(Flag("archive_unlocked"), [Print("{dim}the message archive is on board 08.{/}")], [])])),
+        (path: "/archive", visible: NoFlag("y1998"), lock: (open: Flag("archive_mounted"), denied: [Print("{red}ARCHIVE RESTRUCTURING.{/} {dim}try again later.{/}"), If(Flag("archive_unlocked"), [Print("{dim}the message archive is on board 08.{/}")], [])])),
     ],
     files: [
         (

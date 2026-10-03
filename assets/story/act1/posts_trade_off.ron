@@ -200,7 +200,7 @@ i'll be there.
 
 eli:
 everyone's going to be so weird about it. don't be weird about it.
-"#, alt: [(cond: Flag("act:2"), body: r#"
+"#, alt: [(cond: All([Flag("act:2"), NoFlag("y1998")]), body: r#"
 mara:
 eli's moving at the end of the month. meetup at the diner on
 the 14th, after the board's nightly maintenance. eli's paying.

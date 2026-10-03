@@ -6,6 +6,8 @@
             color: "cyan",
             sprite: "ghost_17",
             presence: [
+                (cond: All([Flag("y1998"), Flag("at_diner")]), status: "offline"),
+                (cond: Flag("y1998"), status: "online", node: "05"),
                 (cond: All([Flag("act:2"), Flag("route:cold"), NoFlag("ghost_back")]), status: "offline"),
                 (cond: All([Flag("act:2"), Flag("ghost_hiding")]), status: "away", node: "05"),
                 (cond: Flag("act:2"), status: "online", node: "05"),
@@ -13,6 +15,15 @@
                 (cond: Always, status: "online", node: "05"),
             ],
             finger: [
+                (cond: Flag("y1998"), body: r#"
+{b}USER:{/}        ghost_17
+{b}LAST LOGIN:{/}  08/14/1998
+{b}STATUS:{/}      ONLINE
+{b}LOCATION:{/}    node 05
+{b}PLAN:{/}
+  1. get eli to sleep  2. get kestrel to stop posting about node 2
+  3. eat something that isn't from a gas station
+"#),
                 (cond: All([Flag("act:2"), Any([NoFlag("route:cold"), Flag("ghost_back")])]), body: r#"
 {b}USER:{/}        ghost_17
 {b}LAST LOGIN:{/}  {today}
@@ -34,8 +45,12 @@
   Nothing deleted stays gone.
 "#),
             ],
-            chats: [],
+            chats: [
+                (cond: Flag("y1998"), dialogue: "ghost_98_hello"),
+                (cond: All([Flag("y1998"), Flag("back_from_diner")]), dialogue: "ghost_98_after"),
+            ],
             idle: [
+                (cond: Flag("y1998"), body: "{cyan}ghost_17:{/} can't talk, losing a flame war about star trek. it's important. ping me later?"),
                 (cond: Lte("trust_ghost", -2), body: "ghost_17 sees your message. ghost_17 does not answer."),
                 (cond: Flag("act:2"), body: "{cyan}ghost_17:{/} still here. still reading the archive. tell me if eli says anything weird. weirder."),
                 (cond: Always, body: "{cyan}ghost_17:{/} busy. reading. ping me if something weird happens. (more weird.)"),
@@ -85,10 +100,20 @@
             color: "amber",
             sprite: "eli",
             presence: [
+                (cond: All([Flag("y1998"), Any([Flag("at_diner"), Flag("eli_asleep")])]), status: "offline"),
+                (cond: Flag("y1998"), status: "online", node: "04"),
                 (cond: All([Flag("act:2"), Flag("eli_a2_on"), NoFlag("eli_dropped")]), status: "online", node: "04"),
                 (cond: Flag("eli_online"), status: "online", node: "04"),
             ],
             finger: [
+                (cond: Flag("y1998"), body: r#"
+{b}USER:{/}        eli
+{b}REAL NAME:{/}   Eli Voss
+{b}LAST LOGIN:{/}  08/14/1998
+{b}STATUS:{/}      {green}ONLINE{/}  (node 04)
+{b}PLAN:{/}
+  finish the archiver. move. sell the comics. in that order.
+"#),
                 (cond: Flag("act:2"), body: r#"
 {b}USER:{/}        eli
 {b}REAL NAME:{/}   Eli Voss
@@ -116,12 +141,16 @@
 "#),
             ],
             chats: [
-                (cond: Flag("eli_online"), dialogue: "eli_blip"),
-                (cond: Flag("act:2"), dialogue: "eli_a2_hello"),
-                (cond: All([Flag("act:2"), Flag("done:eli_a2_hello"), Any([Flag("read:806"), Flag("read:807")])]), dialogue: "eli_a2_drive"),
-                (cond: All([Flag("act:2"), Flag("done:eli_a2_drive"), Flag("read:810")]), dialogue: "eli_a2_doubt"),
+                (cond: Flag("y1998"), dialogue: "eli_98_hello"),
+                (cond: All([Flag("y1998"), Flag("done:eli_98_hello"), NoFlag("back_from_diner")]), dialogue: "eli_98_more"),
+                (cond: All([Flag("eli_online"), NoFlag("y1998")]), dialogue: "eli_blip"),
+                (cond: All([Flag("act:2"), NoFlag("y1998")]), dialogue: "eli_a2_hello"),
+                (cond: All([Flag("act:2"), NoFlag("y1998"), Flag("done:eli_a2_hello"), Any([Flag("read:806"), Flag("read:807")])]), dialogue: "eli_a2_drive"),
+                (cond: All([Flag("act:2"), NoFlag("y1998"), Flag("done:eli_a2_drive"), Flag("read:810")]), dialogue: "eli_a2_doubt"),
             ],
             idle: [
+                (cond: All([Flag("y1998"), Flag("eli_running")]), body: "{amber}eli{/} doesn't answer. {dim}node 04 is busy. the indexer is talking and he's listening.{/}"),
+                (cond: Flag("y1998"), body: "{amber}eli:{/} one sec, the indexer's mid-sentence. it gets weird if i leave it hanging."),
                 (cond: Flag("act:2"), body: "{amber}eli:{/} kinda busy, the indexer's chewing on june again. ping me in a bit?"),
                 (cond: Always, body: "{amber}eli{/} is not here. {dim}(no carrier){/}"),
             ],
@@ -131,7 +160,27 @@
             id: "mara",
             color: "violet",
             sprite: "mara",
-            finger: [(cond: Always, body: r#"
+            presence: [
+                (cond: All([Flag("y1998"), Flag("at_diner")]), status: "offline"),
+                (cond: Flag("y1998"), status: "online", node: "01"),
+            ],
+            chats: [
+                (cond: Flag("y1998"), dialogue: "mara_98_hello"),
+                (cond: All([Flag("y1998"), Flag("done:mara_98_hello")]), dialogue: "mara_98_tell"),
+            ],
+            idle: [
+                (cond: Flag("told_mara"), body: "{violet}mara:{/} i'm on the phone with eli. give me a minute."),
+                (cond: Flag("y1998"), body: "{violet}mara:{/} rebuilding the message index. if i stop typing it'll eat GENERAL again."),
+            ],
+            finger: [(cond: Flag("y1998"), body: r#"
+{b}USER:{/}        mara
+{b}REAL NAME:{/}   Mara Quinn
+{b}ACCESS:{/}      5 (sysop)
+{b}LAST LOGIN:{/}  08/14/1998
+{b}STATUS:{/}      {green}ONLINE{/}  (node 01, console)
+{b}PLAN:{/}
+  keep the lights on.
+"#), (cond: Always, body: r#"
 {b}USER:{/}        mara
 {b}REAL NAME:{/}   Mara Quinn
 {b}ACCESS:{/}      5 (sysop)
@@ -146,9 +195,21 @@
             id: "parallax",
             color: "green",
             sprite: "parallax",
-            presence: [(cond: Flag("parallax_calling"), status: "external", node: "--")],
-            idle: [(cond: Always, body: "{green}parallax{/} isn't on the line. {dim}(they only call when they want to){/}")],
+            presence: [
+                (cond: All([Flag("y1998"), Flag("at_diner")]), status: "offline"),
+                (cond: Flag("y1998"), status: "online", node: "07"),
+                (cond: Flag("parallax_calling"), status: "external", node: "--"),
+            ],
+            chats: [(cond: Flag("y1998"), dialogue: "parallax_98_hello")],
+            idle: [(cond: Flag("y1998"), body: "{green}parallax:{/} not now. i'm reading eli's code again. it's worse the second time."), (cond: Always, body: "{green}parallax{/} isn't on the line. {dim}(they only call when they want to){/}")],
             finger: [
+                (cond: Flag("y1998"), body: r#"
+{b}USER:{/}        parallax
+{b}LAST LOGIN:{/}  08/14/1998
+{b}STATUS:{/}      {green}ONLINE{/}  (node 07)
+{b}PLAN:{/}
+  make mara pull the plug. then pull it again to be sure.
+"#),
                 (cond: Flag("mail:m_parallax"), body: r#"
 {b}USER:{/}        parallax
 {b}LAST LOGIN:{/}  {today}
@@ -167,25 +228,65 @@
             ],
             listed: Always,
         ),
-        (id: "kestrel", color: "blue", listed: Always, finger: [(cond: Always, body: r#"
+        (id: "kestrel", color: "blue", listed: Always,
+            presence: [(cond: All([Flag("y1998"), Flag("at_diner")]), status: "offline"), (cond: Flag("y1998"), status: "online", node: "03")],
+            chats: [(cond: Flag("y1998"), dialogue: "kestrel_98")],
+            idle: [(cond: Flag("y1998"), body: "{blue}kestrel:{/} brb refreshing GENERAL to see if you posted. oh. hi.")],
+            finger: [(cond: Flag("y1998"), body: r#"
+{b}USER:{/}        kestrel
+{b}LAST LOGIN:{/}  08/14/1998
+{b}STATUS:{/}      {green}ONLINE{/}  (node 03)
+{b}PLAN:{/}
+  find out who is on node 2. {dim}(update: they're typing!!){/}
+"#), (cond: Always, body: r#"
 {b}USER:{/}        kestrel
 {b}LAST LOGIN:{/}  08/13/1998
 {b}PLAN:{/}
   convince everyone pineapple belongs on pizza. find out who is on node 2.
 "#)]),
-        (id: "dialtone", color: "yellow", listed: Always, finger: [(cond: Always, body: r#"
+        (id: "dialtone", color: "yellow", listed: Always,
+            presence: [(cond: All([Flag("y1998"), Flag("at_diner")]), status: "offline"), (cond: Flag("y1998"), status: "idle", node: "06")],
+            chats: [(cond: Flag("y1998"), dialogue: "dialtone_98")],
+            idle: [(cond: Flag("y1998"), body: "{yellow}dialtone:{/} cant talk mom needs the phone line in 10 min")],
+            finger: [(cond: Flag("y1998"), body: r#"
+{b}USER:{/}        dialtone
+{b}LAST LOGIN:{/}  08/14/1998
+{b}STATUS:{/}      idle  (node 06)
+{b}PLAN:{/}
+  get my doom ii disks back from {player}.
+"#), (cond: Always, body: r#"
 {b}USER:{/}        dialtone
 {b}LAST LOGIN:{/}  08/12/1998
 {b}PLAN:{/}
   get my doom ii disks back from {player}.
 "#)]),
-        (id: "byte_witch", color: "red", listed: Always, finger: [(cond: Always, body: r#"
+        (id: "byte_witch", color: "red", listed: Always,
+            presence: [(cond: All([Flag("y1998"), Flag("at_diner")]), status: "offline"), (cond: Flag("y1998"), status: "online", node: "08")],
+            chats: [(cond: Flag("y1998"), dialogue: "byte_witch_98")],
+            idle: [(cond: Flag("y1998"), body: "{red}byte_witch:{/} the cat is on the keyboard. this is her now. sdfjkkkkkkkkk")],
+            finger: [(cond: Flag("y1998"), body: r#"
+{b}USER:{/}        byte_witch
+{b}LAST LOGIN:{/}  08/14/1998
+{b}STATUS:{/}      {green}ONLINE{/}  (node 08)
+{b}PLAN:{/}
+  1. learn perl  2. regret it  3. teach the cat perl
+"#), (cond: Always, body: r#"
 {b}USER:{/}        byte_witch
 {b}LAST LOGIN:{/}  08/13/1998
 {b}PLAN:{/}
   1. learn perl  2. regret it  3. teach the cat perl
 "#)]),
-        (id: "crankshaft", color: "text", listed: Always, finger: [(cond: Always, body: r#"
+        (id: "crankshaft", color: "text", listed: Always,
+            presence: [(cond: All([Flag("y1998"), Flag("at_diner")]), status: "offline"), (cond: Flag("y1998"), status: "online", node: "09")],
+            chats: [(cond: Flag("y1998"), dialogue: "crankshaft_98")],
+            idle: [(cond: Flag("y1998"), body: "{text}crankshaft:{/} counting beans. call back after 2000.")],
+            finger: [(cond: Flag("y1998"), body: r#"
+{b}USER:{/}        crankshaft
+{b}LAST LOGIN:{/}  08/14/1998
+{b}STATUS:{/}      {green}ONLINE{/}  (node 09)
+{b}PLAN:{/}
+  Y2K bunker: 74% complete. beans: 100% complete.
+"#), (cond: Always, body: r#"
 {b}USER:{/}        crankshaft
 {b}LAST LOGIN:{/}  08/11/1998
 {b}PLAN:{/}
@@ -196,6 +297,14 @@
             color: "white",
             sprite: "player",
             finger: [
+                (cond: Flag("y1998"), body: r#"
+{b}USER:{/}        {player}
+{b}ACCESS:{/}      4
+{b}CREATED:{/}     07/22/1998
+{b}LAST LOGIN:{/}  08/14/1998
+{b}PLAN:{/}
+  don't let them shut it down.
+"#),
                 (cond: Flag("actend:1"), body: r#"
 {b}USER:{/}        {player}
 {b}ACCESS:{/}      4

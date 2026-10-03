@@ -89,6 +89,9 @@ impl Content {
         for e in p.events.iter_mut().filter(|e| e.act == 0) {
             e.act = p.act;
         }
+        for h in p.hooks.iter_mut().filter(|h| h.act == 0) {
+            h.act = p.act;
+        }
         self.boards.extend(p.boards);
         self.posts.extend(p.posts);
         self.files.extend(p.files);

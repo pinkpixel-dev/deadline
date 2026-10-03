@@ -1,0 +1,41 @@
+// Act III journal entries.
+(
+    journal: [
+        // ---- leads ---------------------------------------------------------
+        (id: "l3_night", section: "leads", when: Flag("a3_bulletin"), done: Flag("back_from_diner"), cmd: "users",
+            text: "it's 08/14/1998 and everyone is online. eli's going-away meetup is at the diner at 10.", alt: [
+                (cond: Flag("back_from_diner"), body: "everyone went to the diner. the board skipped from 22:00 to 23:41 like there was nothing to show."),
+            ]),
+        (id: "l3_eli_run", section: "leads", when: Flag("eli_plans_run"), done: Any([Flag("warned_eli"), Flag("stalled_eli"), Flag("sabotaged_node4"), Flag("eli_running")]), cmd: "chat eli",
+            text: "after the diner, eli is running the archiver one last time. all night. he hasn't slept since tuesday.", alt: [
+                (cond: Flag("stalled_eli"), body: "i kept eli talking until almost 4am. he went to bed instead of running the archiver."),
+                (cond: Flag("warned_eli"), body: "i told eli not to run the archiver tonight. he said he'd think about it."),
+                (cond: Flag("sabotaged_node4"), body: "i killed the indexer on node 04 before eli's last run."),
+                (cond: Flag("eli_running"), body: "eli is on node 04, running the archiver one last time."),
+            ]),
+        (id: "l3_wipe", section: "leads", when: Flag("heard_wipe"), done: Flag("told_mara"), cmd: "chat mara",
+            text: "mara is wiping node 4 tonight, after the diner. she isn't ok about it either.", alt: [
+                (cond: Flag("told_mara"), body: "i told mara something happens to eli tonight. she's calling him."),
+            ]),
+        (id: "l3_parallax", section: "leads", when: Flag("done:parallax_98_hello"), done: Flag("night_slips"),
+            text: "1998 parallax thinks i'm the archiver's model of node 2. they want eli home and asleep."),
+
+        // ---- keys & codes --------------------------------------------------
+        (id: "k3_door", section: "keys", when: Flag("knows_door"), cmd: "open 04 --node",
+            text: "eli's back door into node 04: {cyan}open 04 --node{/}."),
+
+        // ---- people ----------------------------------------------------------
+        (id: "p3_eli", section: "people", when: Flag("chat:eli_98_hello"), cmd: "finger eli",
+            text: "eli (1998): alive. moving at the end of the month. hasn't slept since tuesday."),
+        (id: "p3_ghost", section: "people", when: Flag("chat:ghost_98_hello"), cmd: "finger ghost_17",
+            text: "ghost_17 (1998): younger, funnier. owes kestrel five bucks because i typed something."),
+        (id: "p3_mara", section: "people", when: Flag("chat:mara_98_hello"), cmd: "finger mara",
+            text: "mara (1998): the sysop, alive and tired. pulling node 4 tonight.", alt: [
+                (cond: Flag("mara_denied_108"), body: "mara (1998): the sysop, alive and tired. says she didn't write DON'T SHUT IT DOWN."),
+            ]),
+        (id: "p3_parallax", section: "people", when: Flag("chat:parallax_98_hello"), cmd: "finger parallax",
+            text: "parallax (1998): angry, not bitter yet. the archiver wrote a post as them, word for word."),
+        (id: "p3_kestrel", section: "people", when: Flag("chat:kestrel_98"), cmd: "finger kestrel",
+            text: "kestrel: has watched my read counter go up every night since march."),
+    ],
+)

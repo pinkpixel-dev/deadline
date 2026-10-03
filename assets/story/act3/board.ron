@@ -1,0 +1,192 @@
+// ACT III: the board on 08/14/1998, live. Threads grow while you watch.
+(
+    act: 3,
+    events: [
+        (id: "a3_post_110", when: Flag("a3_bulletin"), after_cmds: 2, effects: [
+            Set("live_110"),
+            Notice("NEW MESSAGE IN [01] GENERAL from kestrel"),
+            Log("message base: [01] +1 msg"),
+        ]),
+        (id: "a3_post_110b", when: Flag("live_110"), after_secs: 200, effects: [Set("live_110b"), Log("message base: [01] 2 new replies")]),
+        (id: "a3_post_609", when: Flag("a3_bulletin"), after_secs: 120, effects: [
+            Set("live_609"),
+            Notice("NEW MESSAGE IN [06] OFF-TOPIC from kestrel"),
+            Log("message base: [06] +1 msg"),
+        ]),
+        (id: "a3_post_609b", when: Flag("live_609"), after_secs: 180, effects: [Set("live_609b"), Log("message base: [06] 3 new replies")]),
+        (id: "a3_post_609c", when: Flag("live_609b"), after_secs: 220, effects: [Set("live_609c"), Log("message base: [06] 4 new replies")]),
+        (id: "a3_post_611", when: Flag("live_611"), after_cmds: 1, effects: [Notice("NEW MESSAGE IN [06] OFF-TOPIC from kestrel")]),
+    ],
+
+    posts: [
+        (
+            id: 110,
+            board: "01",
+            subject: "NODE 2 IS ONLINE RIGHT NOW",
+            date: "08/14/1998",
+            author: "kestrel",
+            visible: All([Flag("y1998"), Flag("live_110")]),
+            body: r#"
+kestrel:
+NODE 2 IS ONLINE. RIGHT NOW. it's on the who list.
+it has a NAME. this is not a drill.
+"#,
+            alt: [(cond: Flag("live_110b"), body: r#"
+kestrel:
+NODE 2 IS ONLINE. RIGHT NOW. it's on the who list.
+it has a NAME. this is not a drill.
+
+byte_witch:
+say something node 2
+
+mara:
+leave them alone. they're allowed to read.
+
+ghost_17:
+hello, node 2.
+"#)],
+        ),
+        (
+            id: 210,
+            board: "02",
+            subject: "archiver: last run tonight",
+            date: "08/14/1998",
+            author: "eli",
+            visible: Flag("y1998"),
+            body: r#"
+eli:
+final run tonight after the diner. full index, every board,
+every user. if your posts start showing up in weird places,
+that's why. (they won't. probably.)
+
+parallax:
+You're running it AGAIN.
+
+eli:
+one more time. mara said.
+
+mara:
+one more time. then it's gone.
+"#,
+            alt: [(cond: Flag("eli_running"), body: r#"
+eli:
+final run tonight after the diner. full index, every board,
+every user. if your posts start showing up in weird places,
+that's why. (they won't. probably.)
+
+parallax:
+You're running it AGAIN.
+
+eli:
+one more time. mara said.
+
+mara:
+one more time. then it's gone.
+
+eli:
+starting it now. say hi to it if you want. it's listening.
+"#)],
+        ),
+        (
+            id: 609,
+            board: "06",
+            subject: "THE DINER HAS PIZZA NOW",
+            date: "08/14/1998",
+            author: "kestrel",
+            visible: All([Flag("y1998"), Flag("live_609")]),
+            body: r#"
+kestrel:
+the diner added pizza to the menu. you all know what this means.
+
+crankshaft:
+no pineapple. i will flip the table. i will flip the diner.
+"#,
+            alt: [
+                (cond: Flag("live_609c"), body: r#"
+kestrel:
+the diner added pizza to the menu. you all know what this means.
+
+crankshaft:
+no pineapple. i will flip the table. i will flip the diner.
+
+eli:
+pineapple AND jalapeno. i'm paying, so i'm ordering.
+
+ghost_17:
+eli you put ranch on everything, your opinion is void
+
+mara:
+i'm not banning anyone over pizza. i will ban someone over a table.
+
+dialtone:
+can somebody give me a ride
+
+mara:
+dialtone, you're 16. your mom is driving you. she called me.
+
+dialtone:
+she CALLED you??
+
+byte_witch:
+she called all of us. she's lovely. she's bringing a casserole.
+"#),
+                (cond: Flag("live_609b"), body: r#"
+kestrel:
+the diner added pizza to the menu. you all know what this means.
+
+crankshaft:
+no pineapple. i will flip the table. i will flip the diner.
+
+eli:
+pineapple AND jalapeno. i'm paying, so i'm ordering.
+
+ghost_17:
+eli you put ranch on everything, your opinion is void
+
+mara:
+i'm not banning anyone over pizza. i will ban someone over a table.
+"#),
+            ],
+        ),
+        (
+            id: 611,
+            board: "06",
+            subject: "diner recap",
+            date: "08/14/1998",
+            author: "kestrel",
+            visible: All([Flag("y1998"), Flag("live_611")]),
+            body: r#"
+kestrel:
+diner recap:
+  - pizza: had pineapple. crankshaft did not flip the table
+  - dialtone's mom brought a casserole to a diner
+  - eli gave a speech. i'm not crying, you're crying
+  - we saved a seat for node 2. nobody sat in it.
+    byte_witch swears the napkin moved.
+
+ghost_17:
+the napkin did move.
+
+eli:
+thanks everybody. really. ok. going to go babysit the indexer.
+"#,
+            on_read: [If(NoFlag("read_recap"), [Set("read_recap"), Add("paranoia", 1)], [])],
+        ),
+        (
+            id: 714,
+            board: "07",
+            subject: "node 4",
+            date: "08/14/1998",
+            author: "mara",
+            visible: Flag("y1998"),
+            body: r#"
+mara:
+node 4 comes down tonight, after the diner. for good.
+the archiver doesn't get a vote.
+
+eli:
+it should though.
+"#,
+        ),
+    ],
+)

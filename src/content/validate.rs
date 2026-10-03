@@ -11,7 +11,7 @@ use super::model::*;
 const ENGINE_PREFIXES: &[&str] = &[
     "ran:", "board:", "read:", "file:", "dl:", "deleted:", "inspected:", "recovered:", "changed:",
     "mail:", "mailread:", "page:", "chat:", "done:", "left:", "finger:", "overlay:", "seq:",
-    "actend:", "sum:", "act:",
+    "actend:", "sum:", "act:", "sent:",
 ];
 const ENGINE_FLAGS: &[&str] = &["restored"];
 
@@ -204,6 +204,9 @@ pub fn check(c: &Content) -> Vec<String> {
             Effect::Overlay(id) if !c.overlays.contains_key(id) => errs.push(format!("unknown overlay: {id}")),
             Effect::Sequence(id) if !c.sequences.contains_key(id) => errs.push(format!("unknown sequence: {id}")),
             Effect::Mail(id) if !c.mail.contains_key(id) => errs.push(format!("unknown mail: {id}")),
+            Effect::Clock(t) if crate::systems::clock::parse(t).is_none() => {
+                errs.push(format!("bad clock time: {t}"))
+            }
             _ => {}
         }
     }

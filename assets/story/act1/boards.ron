@@ -42,7 +42,7 @@
             id: "08",
             name: "ARCHIVE",
             count_label: "sealed",
-            visible: Flag("archive_revealed"),
+            visible: All([Flag("archive_revealed"), NoFlag("y1998")]),
             lock: (
                 open: Flag("archive_unlocked"),
                 denied: [Password(
@@ -69,7 +69,7 @@
             id: "09",
             name: "▒▒▒▒▒▒",
             count_label: "??? msgs",
-            visible: All([Flag("null_hint_09"), NoFlag("board09_gone")]),
+            visible: All([Flag("null_hint_09"), NoFlag("board09_gone"), NoFlag("y1998")]),
             header: r#"
 @art static
 "#,

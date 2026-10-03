@@ -203,6 +203,9 @@ pub struct Event {
 #[derive(Debug, Clone, Default, Deserialize)]
 #[serde(default)]
 pub struct Hook {
+    /// The act this hook belongs to (0 = any). Defaults to the file's `act`.
+    /// Hooks from the act in play are checked before everyone else's.
+    pub act: u8,
     /// Patterns compared against the normalized input. A trailing `*`
     /// matches any remainder.
     pub input: Vec<String>,

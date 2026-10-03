@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.4.0 - October 3, 2026
+
+### 📼 Act III: 1998 (first half)
+
+- Act III opens on the next login after Act II: the night of 08/14/1998, starting at 9:04 PM, with all nine users alive and online
+- Everyone has something to say: eli, mara, a younger ghost_17, a 1998 parallax, kestrel, dialtone, byte_witch and crankshaft
+- The board is live. New posts show up while you're online, and the pizza thread grows as the night goes on
+- Eli's going-away meetup happens at the diner. Everyone logs off, and the board does something strange with the time while they're gone
+- Four ways to try to change the night: warn eli, tell mara, keep eli talking until he goes to bed, or use his back door into node 04
+- Present-day content (the archive board, `/archive`, replies dated today) is hidden during 1998
+- The night stops at its first rebuild for now. The rest of Act III comes next
+
+### ⌨️ Commands
+
+- `reply <user>` answers or opens a channel with someone by name
+- `send <user> <file>` works for any file in local storage, not just the one parallax asks for
+
+### 🧹 Maintenance
+
+- Story hooks from the act you're playing now run before older acts' hooks
+- New `Clock` story effect sets the BBS time, and the header can show a `BUILD 1998.n` label
+
 ## 0.3.0 - October 3, 2026
 
 ### 📓 Journal

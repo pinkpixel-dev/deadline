@@ -14,3 +14,5 @@ pub mod text;
 mod tests;
 #[cfg(test)]
 mod tests_act2;
+#[cfg(test)]
+mod tests_act3;

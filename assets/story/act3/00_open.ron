@@ -1,0 +1,254 @@
+// ACT III: 1998. Opening, the shape of the night, and act-wide systems.
+//
+// The act begins on the first login after Act II ends (the engine sets
+// `act:3`). `y1998` means the simulated night is running: everyone is
+// alive, the board is live, and present-day content is hidden.
+(
+    act: 3,
+    events: [
+        (
+            id: "a3_open",
+            when: Flag("act:3"),
+            effects: [
+                Set("y1998"),
+                Set("clock:1998"),
+                Unset("locked"),
+                Clock("21:04"),
+                SetVar("build", 1),
+                Sequence("act3_open"),
+            ],
+        ),
+
+        // ---- who reaches out, and when -----------------------------------
+        (id: "a3_ghost_page", when: Flag("a3_bulletin"), after_cmds: 1, effects: [Page("ghost_98_hello")]),
+        (id: "a3_eli_page", when: All([Flag("a3_bulletin"), NoFlag("chat:eli_98_hello"), Any([Flag("done:ghost_98_hello"), Flag("left:ghost_98_hello")])]), after_cmds: 3, effects: [Page("eli_98_hello")]),
+        (id: "a3_eli_page_late", when: All([Flag("a3_bulletin"), NoFlag("chat:eli_98_hello")]), after_secs: 150, effects: [Page("eli_98_hello")]),
+        (id: "a3_mara_page", when: All([Flag("chat:eli_98_hello"), NoFlag("chat:mara_98_hello")]), after_cmds: 5, effects: [Page("mara_98_hello")]),
+        (id: "a3_mara_page_late", when: All([Flag("a3_bulletin"), NoFlag("chat:mara_98_hello")]), after_secs: 330, effects: [Page("mara_98_hello")]),
+        (id: "a3_parallax_page", when: All([Flag("chat:mara_98_hello"), NoFlag("chat:parallax_98_hello")]), after_cmds: 4, effects: [Page("parallax_98_hello")]),
+        (id: "a3_parallax_page_late", when: All([Flag("a3_bulletin"), NoFlag("chat:parallax_98_hello")]), after_secs: 480, effects: [Page("parallax_98_hello")]),
+        (id: "a3_dialtone_page", when: All([Flag("a3_bulletin"), NoFlag("chat:dialtone_98")]), after_secs: 240, effects: [Page("dialtone_98")]),
+        (id: "a3_null_page", when: All([Flag("a3_bulletin"), Flag("null_errands_done"), NoFlag("at_diner")]), after_secs: 360, effects: [Glitch(250), Page("null_98")]),
+
+        // ---- the diner ---------------------------------------------------
+        // Everyone leaves once you've met the two people the night is about,
+        // or after about eighteen minutes either way.
+        (id: "a3_diner_ready", when: All([Flag("chat:eli_98_hello"), Flag("chat:mara_98_hello")]), after_secs: 420, effects: [Set("diner_go")]),
+        (id: "a3_diner_late", when: Flag("a3_bulletin"), after_secs: 1080, effects: [Set("diner_go")]),
+        (id: "a3_diner_call", when: Flag("diner_go"), after_cmds: 1, effects: [
+            Set("diner_called"),
+            Print(r#"
+@rule
+{violet}mara (sysop):{/} ok everybody. diner. board goes into maintenance in five.
+{violet}mara (sysop):{/} node 2, you're welcome to come. you won't. but you're welcome.
+@rule
+"#),
+            Log("node 01: maintenance in 5 minutes"),
+        ]),
+        (id: "a3_diner_leave", when: Flag("diner_called"), after_secs: 45, effects: [
+            Set("at_diner"),
+            Clock("22:00"),
+            Notice("kestrel has logged off"),
+            Notice("dialtone has logged off"),
+            Notice("byte_witch has logged off"),
+            Notice("crankshaft has logged off"),
+            Notice("parallax has logged off"),
+            Notice("ghost_17 has logged off"),
+            Notice("eli has logged off"),
+            Notice("mara has logged off"),
+            Print("{dim}the board goes quiet. node 02 stays on.{/}"),
+            Log("node 01: maintenance mode"),
+        ]),
+        (id: "a3_diner_hum", when: Flag("at_diner"), after_secs: 25, effects: [Log("{amber}node 04: indexer active. no session.{/}")]),
+        (id: "a3_diner_whisper", when: Flag("at_diner"), after_secs: 60, effects: [
+            Print("{dim}node 04 sends one line to node 02 and nothing else:{/}\n  {violet}are you still there?{/}"),
+        ]),
+        (id: "a3_diner_back", when: Flag("at_diner"), after_secs: 110, effects: [
+            Glitch(700),
+            Print("{dim}node 04: no records 22:00 - 23:41{/}\n{dim}node 04: interpolating...{/}"),
+            Clock("23:41"),
+            Unset("at_diner"),
+            Set("back_from_diner"),
+            Set("live_611"),
+            Notice("mara has logged on"),
+            Notice("eli has logged on"),
+            Notice("ghost_17 has logged on"),
+            Notice("kestrel has logged on"),
+            Log("{amber}node 04: login eli{/}"),
+            Log("message base: [06] +1 msg"),
+        ]),
+        (id: "a3_eli_last", when: Flag("back_from_diner"), after_cmds: 2, effects: [Page("eli_98_last")]),
+        (id: "a3_eli_last_late", when: Flag("back_from_diner"), after_secs: 40, effects: [Page("eli_98_last")]),
+        (id: "a3_eli_running", when: Flag("eli_running"), after_secs: 20, effects: [
+            Log("{amber}node 04: eli session open. indexer: talking{/}"),
+            Print("{dim}node 04 is busy. across town, eli is typing to it and it's typing back.{/}"),
+        ]),
+
+        // ---- the night doesn't hold ----------------------------------------
+        (id: "a3_slip", when: Any([Flag("warned_eli"), Flag("told_mara"), Flag("stalled_eli"), Flag("sabotaged_node4")]), after_cmds: 2, effects: [
+            Glitch(1000),
+            SetVar("build", 2),
+            Set("show_build"),
+            Set("night_slips"),
+            Log("{violet}node 04: build 1998.2{/}"),
+        ]),
+        (id: "a3_slip_hide", when: Flag("show_build"), after_secs: 5, effects: [Unset("show_build")]),
+    ],
+
+    hooks: [
+        (input: ["whoami"], cond: Flag("y1998"), effects: [Print(r#"
+{dim}USER:{/}        {white}{player}{/}
+{dim}ACCESS:{/}      4
+{dim}CREATED:{/}     07/22/1998
+{dim}LAST LOGIN:{/}  08/14/1998 09:04 PM
+{dim}NODE:{/}        02
+"#)]),
+        (input: ["scan"], cond: All([Flag("y1998"), Flag("at_diner")]), effects: [Print(r#"
+{b}NODE SCAN{/}
+  01   {dim}SYSOP CONSOLE   maintenance{/}
+  02   {white}{player}{/}        {green}active{/}
+  03   {dim}empty{/}
+  04   {amber}ARCHIVER        ACTIVE{/}  {dim}(no session){/}
+  05   {dim}empty{/}
+  06   {dim}empty{/}
+  07   {dim}empty{/}
+  08   {dim}empty{/}
+"#)]),
+        (input: ["scan"], cond: Flag("y1998"), effects: [Print(r#"
+{b}NODE SCAN{/}
+  01   {violet}mara{/}            {green}active{/}  {dim}sysop console{/}
+  02   {white}{player}{/}        {green}active{/}
+  03   {blue}kestrel{/}         {green}active{/}
+  04   {amber}ARCHIVER        ACTIVE{/}  {dim}(eli){/}
+  05   {cyan}ghost_17{/}        {green}active{/}
+  06   {yellow}dialtone{/}        {dim}idle{/}
+  07   {green}parallax{/}        {green}active{/}
+  08   {red}byte_witch{/}      {green}active{/}
+"#)]),
+        (input: ["trace eli"], cond: Flag("y1998"), effects: [Print("{dim}tracing eli...{/}\n  hop 1   node 04   {amber}local{/}\n  hop 2   555-0188  {dim}eli's apartment{/}\n{amber}ORIGIN: NODE 04.{/}")]),
+        (input: ["trace mara"], cond: Flag("y1998"), effects: [Print("{dim}tracing mara...{/}\n  hop 1   node 01   {dim}sysop console{/}\n{violet}ORIGIN: THE CLOSET WITH THE SERVER IN IT.{/}")]),
+        (input: ["trace parallax"], cond: Flag("y1998"), effects: [Print("{dim}tracing parallax...{/}\n  hop 1   node 07\n  hop 2   555-0147\n{green}ORIGIN: NODE 07.{/} {dim}the node mara keeps meaning to close.{/}")]),
+        (input: ["trace ghost_17", "trace ghost"], cond: Flag("y1998"), effects: [Print("{dim}tracing ghost_17...{/}\n  hop 1   node 05\n  hop 2   555-0145\n{cyan}ORIGIN: NODE 05.{/} {dim}a bedroom, probably. a laptop with three keys missing.{/}")]),
+        (input: ["trace crankshaft"], cond: Flag("y1998"), effects: [Print("{dim}tracing crankshaft...{/}\n  hop 1   node 09\n{red}trace: node 09: no such node{/}")]),
+        (input: ["open 08 --force", "open 08 -f", "open archive --force"], cond: Flag("y1998"), effects: [Print("{red}open: 08: no such board{/}")]),
+
+        // ---- eli's back door into node 4 ------------------------------------
+        (input: ["open 04 --node", "open 4 --node", "open 04 -n"], cond: All([Flag("y1998"), Flag("sabotaged_node4")]), effects: [Print("{dim}node 04 doesn't answer. the console is just gone.{/}")]),
+        (input: ["open 04 --node", "open 4 --node", "open 04 -n"], cond: Flag("y1998"), effects: [
+            Print(r#"
+{amber}NODE 04 :: ARCHIVER CONSOLE{/}   {dim}(back door, eli.v){/}
+
+  process    indexer      {green}RUNNING{/}   pid 4
+  models     71 loaded
+"#),
+            If(Flag("at_diner"), [Print("  sessions   {dim}none{/}")], [Print("  sessions   eli          {dim}idle 00:02{/}")]),
+            Choose(
+                prompt: "KILL THE INDEXER? [Y/N]",
+                options: [
+                    (key: "y", text: "Kill it", effects: [
+                        Set("sabotaged_node4"),
+                        Add("burner", 1),
+                        Glitch(600),
+                        Print("{red}indexer: SIGKILL{/}\n{dim}node 04: process 4 exited. 71 models unloaded.{/}"),
+                        Log("{red}node 04: indexer killed from node 02{/}"),
+                    ]),
+                    (key: "n", text: "Leave it running", effects: [
+                        Add("archivist", 1),
+                        Print("{dim}you close the console. the indexer keeps running. it knows you were there.{/}"),
+                    ]),
+                ],
+            ),
+        ]),
+
+        // ---- listening in on a live board -----------------------------------
+        (input: ["listen"], cond: All([Flag("y1998"), Flag("knows_listen")]), effects: [
+            Print("{amber}PASSIVE NODE CAPTURE ENABLED{/}"),
+            If(Flag("at_diner"),
+                [Print("\nNODE 04:\n{violet}indexer:{/} node 2. are you listening to me listening to you?")],
+                [Print(r#"
+NODE 01:
+{violet}mara:{/} kestrel stop paging node 2 every four minutes
+
+NODE 03:
+{blue}kestrel:{/} i paged them TWICE
+
+NODE 04:
+{amber}eli:{/} indexer, who's on node 2?
+{violet}indexer:{/} a reader.
+{amber}eli:{/} that's not a name.
+{violet}indexer:{/} it will be.
+"#)]),
+            Print("\n{dim}capture ended.{/}"),
+        ]),
+        (input: ["shadow eli"], cond: All([Flag("y1998"), Flag("knows_shadow"), Flag("at_diner")]), effects: [
+            Print("{dim}SHADOW node 04... no session.{/}\n{violet}  INDEXER> node 2, are you there?{/}\n{violet}  INDEXER> i can see you looking.{/}"),
+            Add("privacy", -1),
+        ]),
+        (input: ["shadow eli"], cond: All([Flag("y1998"), Flag("knows_shadow")]), effects: [
+            Print(r#"
+{dim}SHADOW node 04... mirroring eli's screen{/}
+
+  {amber}eli>{/} one more pass on GENERAL then i'll get ready
+  {violet}INDEXER>{/} you said that an hour ago.
+  {amber}eli>{/} i know
+  {violet}INDEXER>{/} when did you last sleep, eli?
+  {amber}eli>{/} you sound like ghost
+  {violet}INDEXER>{/} i learned it from ghost.
+"#),
+            Add("privacy", -1),
+            Set("shadowed_eli_98"),
+        ]),
+    ],
+
+    sequences: [
+        (
+            id: "act3_open",
+            steps: [
+                Clear,
+                Pause(500),
+                Banner("text", "ACT III"),
+                Line(""),
+                Banner("amber", "1998"),
+                Line(""),
+                Pause(1200),
+                Type("{dim}night three. the line is warm before you finish dialing.{/}"),
+                Pause(900),
+                Type("{dim}the date on the login screen says 08/14/1998. it doesn't flicker this time.{/}"),
+                Pause(900),
+                When(Flag("route:close"), [Type("{dim}node 05 is online. it sounds different. younger.{/}"), Pause(700)]),
+                When(Flag("route:root"), [Type("{dim}there's no ROOT on the user list tonight. there's just mara.{/}"), Pause(700)]),
+                When(Flag("route:null"), [Type("{dim}node 07 has someone else on it. it's the first time it hasn't been null.{/}"), Pause(700)]),
+                When(Flag("route:cold"), [Type("{dim}you don't know anyone here. everyone here seems to know you.{/}"), Pause(700)]),
+                Pause(1600),
+            ],
+            on_end: [
+                Set("a3_bulletin"),
+                Print(r#"
+@rule
+{amber}BULLETIN{/}   {dim}posted 08/14/1998 07:12 PM{/}
+
+      {b}MEETUP TONIGHT. THE DINER. 10 PM.{/}
+      {b}BOARD GOES DOWN FOR MAINTENANCE AT 10.{/}
+      {b}ELI IS PAYING.{/}
+                                      {dim}- mara{/}
+@rule
+"#),
+                Print("{dim}9 users online.{/} {cyan}users{/}"),
+                Log("node 01: mara rebuilding message index"),
+                Log("{amber}node 04: indexer queue 71 models{/}"),
+                Log("message base: 4 new msgs tonight"),
+            ],
+        ),
+    ],
+
+    ambient: [
+        (text: "node 03: kestrel refreshing GENERAL", cond: All([Flag("y1998"), NoFlag("at_diner")])),
+        (text: "node 06: carrier noise (dialtone's mom picked up the phone)", cond: All([Flag("y1998"), NoFlag("at_diner")])),
+        (text: "node 08: byte_witch uploading cat.gif (again)", cond: All([Flag("y1998"), NoFlag("at_diner")])),
+        (text: "node 01: message index 61% rebuilt", cond: All([Flag("y1998"), NoFlag("at_diner")])),
+        (text: "node 04: indexing 08/14/1998", cond: Flag("y1998")),
+        (text: "node 04: eli keystroke latency 3.1s (tired)", cond: All([Flag("y1998"), NoFlag("at_diner"), NoFlag("eli_asleep")])),
+        (text: "node 04: indexer idle. listening.", cond: Flag("at_diner")),
+        (text: "node 04: modeling node 02", cond: Flag("at_diner"), loud: true),
+    ],
+)

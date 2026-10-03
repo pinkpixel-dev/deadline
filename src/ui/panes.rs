@@ -30,6 +30,11 @@ pub fn header(f: &mut Frame, app: &App, area: Rect) {
         Span::styled(name, theme::bold(theme::BG).bg(theme::AMBER)),
         Span::styled("  NODE 02", Style::default().fg(theme::TEXT)),
     ];
+    // JANUS shows its build number while a simulated night is rebuilding.
+    let build = app.st.var("build");
+    if build > 0 && app.st.has("show_build") {
+        left.push(Span::styled(format!("  BUILD 1998.{build}"), theme::bold(theme::VIOLET)));
+    }
     if wide {
         left.extend([
             Span::styled("  ·  ", Style::default().fg(theme::FAINT)),

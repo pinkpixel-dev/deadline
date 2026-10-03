@@ -2,8 +2,8 @@
 (
     act: 2,
     dirs: [
-        (path: "/janus", visible: Flag("janus_src_visible")),
-        (path: "/janus/src", visible: Flag("janus_src_visible")),
+        (path: "/janus", visible: All([Flag("janus_src_visible"), NoFlag("y1998")])),
+        (path: "/janus/src", visible: All([Flag("janus_src_visible"), NoFlag("y1998")])),
     ],
 
     files: [
