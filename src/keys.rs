@@ -90,6 +90,21 @@ impl App {
             }
         }
 
+        // Lists: ↓ on an empty prompt steps into the latest list.
+        // ↑ on an empty prompt still means history once you're out of it.
+        if self.input.is_empty() && self.password.is_none() && self.choice.is_none() {
+            let used = match key.code {
+                KeyCode::Down => self.menu_step(true),
+                KeyCode::Up => self.menu_step(false),
+                KeyCode::Enter => self.menu_activate(),
+                KeyCode::Esc => self.menu.as_mut().and_then(|m| m.sel.take()).is_some(),
+                _ => false,
+            };
+            if used {
+                return;
+            }
+        }
+
         match key.code {
             KeyCode::Char(c) => self.input.insert(c),
             KeyCode::Backspace => self.input.backspace(),
@@ -162,6 +177,29 @@ impl App {
                 let hit = self.hits.iter().find(|(r, _)| r.contains(pos)).map(|(_, i)| *i);
                 if let Some(i) = hit {
                     self.select_choice(i);
+                    return;
+                }
+                if self.modal() {
+                    return;
+                }
+                let link = self.link_hits.iter().find(|(r, ..)| r.contains(pos)).map(|(.., c)| c.clone());
+                if let Some(cmd) = link {
+                    self.input.take();
+                    self.submit(&cmd);
+                }
+            }
+            MouseEventKind::Moved => {
+                // Hovering a row of the current list selects it.
+                let pos = Position::new(m.column, m.row);
+                let hover = self
+                    .link_hits
+                    .iter()
+                    .find(|(r, ..)| r.contains(pos))
+                    .map(|(_, menu, item, _)| (*menu, *item));
+                if let (Some((menu, item)), Some(cur)) = (hover, self.menu.as_mut()) {
+                    if cur.id == menu {
+                        cur.sel = Some(item);
+                    }
                 }
             }
             _ => {}

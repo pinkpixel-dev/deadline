@@ -103,11 +103,23 @@ impl Content {
             .extend(p.sequences.into_iter().map(|s| (s.id.clone(), s)));
     }
 
+    /// Find a board by number (`01`, `1`), name (`general`) or a name
+    /// prefix of at least three letters (`trading`, `off`).
     pub fn board(&self, id: &str) -> Option<&Board> {
-        let id = id.trim_start_matches('0');
+        let num = id.trim_start_matches('0');
+        let norm = |s: &str| -> String {
+            s.chars().filter(|c| c.is_ascii_alphanumeric()).collect::<String>().to_lowercase()
+        };
+        let want = norm(id);
         self.boards
             .iter()
-            .find(|b| b.id.trim_start_matches('0') == id || b.name.eq_ignore_ascii_case(id))
+            .find(|b| b.id.trim_start_matches('0') == num)
+            .or_else(|| self.boards.iter().find(|b| !want.is_empty() && norm(&b.name) == want))
+            .or_else(|| {
+                (want.len() >= 3)
+                    .then(|| self.boards.iter().find(|b| norm(&b.name).starts_with(&want)))
+                    .flatten()
+            })
     }
 
     pub fn post(&self, id: u32) -> Option<&Post> {

@@ -5,6 +5,8 @@ pub const BG: Color = Color::Rgb(22, 23, 27);
 pub const PANEL: Color = Color::Rgb(27, 28, 33);
 pub const BORDER: Color = Color::Rgb(56, 58, 67);
 pub const BORDER_HI: Color = Color::Rgb(96, 99, 112);
+/// Background of the selected list row.
+pub const SELECT: Color = Color::Rgb(46, 49, 60);
 pub const TEXT: Color = Color::Rgb(233, 231, 226);
 pub const DIM: Color = Color::Rgb(128, 130, 142);
 pub const FAINT: Color = Color::Rgb(78, 80, 90);

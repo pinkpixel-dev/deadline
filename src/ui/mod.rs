@@ -45,10 +45,10 @@ pub fn draw(f: &mut Frame, app: &mut App) {
         let side_w = if area.width >= 130 { 36 } else { 30 };
         let [main, side] =
             Layout::horizontal([Constraint::Min(40), Constraint::Length(side_w)]).areas(body);
-        panes::terminal(f, app, main);
+        app.link_hits = panes::terminal(f, app, main);
         panes::sidebar(f, app, side);
     } else {
-        panes::terminal(f, app, body);
+        app.link_hits = panes::terminal(f, app, body);
     }
     prompt::choices(f, app, choice);
     prompt::input(f, app, input);

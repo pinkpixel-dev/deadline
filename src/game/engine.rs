@@ -55,7 +55,8 @@ impl App {
         let from = mail.from.clone();
         self.st.inbox.push(id.to_string());
         self.st.set(&format!("mail:{id}"));
-        self.notice(&format!("NEW MAIL FROM {from}  {{dim}}mail{{/}}"));
+        let n = self.st.inbox.len();
+        self.notice_link(&format!("NEW MAIL FROM {from}"), &format!("mail {n}"));
         self.log(&format!("mail queued from {from}"));
     }
 
@@ -68,7 +69,7 @@ impl App {
         self.st.pages.push(id.to_string());
         self.st.set(&format!("page:{id}"));
         self.blank();
-        self.notice(&format!("PRIVATE MESSAGE FROM {with}  {{dim}}reply{{/}}"));
+        self.notice_link(&format!("PRIVATE MESSAGE FROM {with}"), "reply");
         self.log(&format!("page from {with}"));
     }
 

@@ -21,6 +21,14 @@
 - ROOT overlays that sometimes ignore Esc, plus screen glitch effects
 - Responsive layout: the sidebar shows on wide terminals and the UI stays usable on narrow ones
 
+### 🖱️ Navigation
+
+- Board, post, mail, file, user and help lists are clickable, with hover and keyboard selection (↓ on an empty prompt)
+- Action rows under posts, mail and files: next, back, download, inspect, recover
+- New mail and private message notices can be tapped
+- Bare numbers and names from the current list work as input (`03`, `102`, `nodelist.txt`)
+- `read`, `view` and friends show the relevant list when you leave off the argument, and boards open by name or prefix
+
 ### 🛠️ Engine
 
 - Data-driven story in RON files, with conditions, effects, events and scripted command hooks

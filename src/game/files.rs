@@ -7,6 +7,7 @@ use crate::app::App;
 use crate::content::effect::{Choice, ChoiceOpt, Effect};
 use crate::content::model::{FileEntry, Lock};
 use crate::content::pick;
+use crate::game::menu::{Row, action};
 use crate::game::text;
 use crate::ui::theme;
 
@@ -139,35 +140,76 @@ impl App {
             }
         }
         let content = self.content.clone();
-        let mut lines = vec![Line::from(vec![
+        self.print_lines(vec![Line::from(vec![
             Span::styled("FILES ", theme::bold(theme::WHITE)),
             Span::styled(path.clone(), Style::default().fg(theme::CYAN)),
-        ])];
+        ])]);
+        let mut rows = Vec::new();
+        if path != "/" {
+            let up = parent(&path).to_string();
+            let line = Line::from(Span::styled(format!("  {:<24}", "../"), theme::bold(theme::BLUE)));
+            rows.push(Row::new(line, format!("cd {up}"), ".."));
+        }
         for d in content.dirs.iter().filter(|d| parent(&d.path) == path && d.path != path) {
             if !d.visible.eval(&self.st, &self.meta) {
                 continue;
             }
             let locked = !self.lock_open(&d.lock);
-            lines.push(Line::from(vec![
-                Span::styled(format!("  {:<24}", format!("{}/", basename(&d.path))), theme::bold(theme::BLUE)),
+            let name = basename(&d.path).to_string();
+            let line = Line::from(vec![
+                Span::styled(format!("  {:<24}", format!("{name}/")), theme::bold(theme::BLUE)),
                 Span::styled(if locked { "<LOCKED>" } else { "<DIR>" }, Style::default().fg(if locked { theme::RED } else { theme::DIM })),
-            ]));
+            ]);
+            rows.push(Row::new(line, format!("cd {}", d.path), name));
         }
+        let mut example = String::new();
         for f in content.files.iter().filter(|f| parent(&f.path) == path && self.file_present(f)) {
             let dl = self.st.has(&format!("dl:{}", f.path));
-            lines.push(Line::from(vec![
-                Span::styled(format!("  {:<24}", basename(&f.path)), Style::default().fg(if f.corrupt && !self.st.has(&format!("recovered:{}", f.path)) { theme::MAGENTA } else { theme::TEXT })),
+            let name = basename(&f.path).to_string();
+            let line = Line::from(vec![
+                Span::styled(format!("  {:<24}", name), Style::default().fg(if f.corrupt && !self.st.has(&format!("recovered:{}", f.path)) { theme::MAGENTA } else { theme::TEXT })),
                 Span::styled(format!("{:>8}  ", f.size), Style::default().fg(theme::DIM)),
                 Span::styled(format!("{:<11}", f.date), Style::default().fg(theme::FAINT)),
                 Span::styled(text::subst(&f.desc, &self.ctx()), theme::dim()),
                 Span::styled(if dl { "  ↓" } else { "" }, Style::default().fg(theme::GREEN)),
-            ]));
+            ]);
+            if example.is_empty() {
+                example = format!("view {name}");
+            }
+            rows.push(Row::new(line, format!("view {}", f.path), name));
         }
-        if lines.len() == 1 {
-            lines.push(Line::from(Span::styled("  (empty)", theme::dim())));
+        if rows.is_empty() {
+            self.dim("  (empty)");
+            return;
         }
-        lines.push(Line::from(Span::styled("  view <file>   inspect <file>   download <file>   cd <dir>", theme::dim())));
-        self.print_lines(lines);
+        if example.is_empty() {
+            example = rows.last().map(|r| r.cmd.clone()).unwrap_or_default();
+        }
+        self.show_menu(rows);
+        self.menu_hint(&example);
+    }
+
+    /// Things you can do with a file you're looking at.
+    fn file_actions(&mut self, f: &FileEntry, with_view: bool) {
+        let p = f.path.clone();
+        let mut rows = Vec::new();
+        if with_view {
+            rows.push(Row::new(action("›", "view", ""), format!("view {p}"), "v"));
+        }
+        if !self.st.has(&format!("dl:{p}")) {
+            rows.push(Row::new(action("↓", "download", &format!("{} bytes", f.size)), format!("download {p}"), "d"));
+        }
+        rows.push(Row::new(action("·", "inspect", ""), format!("inspect {p}"), "i"));
+        if f.corrupt && self.st.has("cmd:recover") && !self.st.has(&format!("recovered:{p}")) {
+            rows.push(Row::new(action("+", "recover", ""), format!("recover {p}"), "r"));
+        }
+        if f.can_delete {
+            rows.push(Row::new(action("×", "delete", ""), format!("delete {p}"), "x"));
+        }
+        let dir = parent(&p).to_string();
+        rows.push(Row::new(action("‹", &format!("back to {dir}"), ""), format!("cd {dir}"), "b"));
+        self.blank();
+        self.show_menu(rows);
     }
 
     pub fn cmd_cd(&mut self, arg: &str) {
@@ -188,11 +230,13 @@ impl App {
 
     fn need_file(&mut self, verb: &str, arg: &str) -> Option<FileEntry> {
         if arg.is_empty() {
-            self.dim(&format!("{verb} <file>"));
+            self.dim(&format!("{verb} which file?"));
+            self.cmd_files("");
             return None;
         }
         let Some(f) = self.resolve_file(arg) else {
             self.err(&format!("{verb}: {arg}: file not found"));
+            self.dim(&format!("  {{dim}}you're in{{/}} {}  {{dim}}type{{/}} files {{dim}}to look around{{/}}", self.st.cwd));
             return None;
         };
         if !self.path_open(&f.path) {
@@ -224,6 +268,7 @@ impl App {
             self.print(&body);
         }
         self.st.set(&format!("file:{}", f.path));
+        self.file_actions(&f, false);
         self.apply(&f.on_open);
     }
 
@@ -250,6 +295,7 @@ impl App {
         if changed {
             self.st.set(&format!("changed:{}", f.path));
         }
+        self.file_actions(&f, true);
         self.apply(&f.on_inspect);
     }
 
@@ -271,6 +317,7 @@ impl App {
         self.print_lines(lines);
         self.st.set(&key);
         self.log(&format!("dl {name}"));
+        self.file_actions(&f, true);
         self.apply(&f.on_download);
     }
 
@@ -323,6 +370,7 @@ impl App {
         ));
         self.st.set(&key);
         self.log(&format!("recovered {}", basename(&f.path)));
+        self.file_actions(&f, true);
     }
 }
 

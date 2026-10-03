@@ -45,10 +45,20 @@ impl Speed {
     }
 }
 
+/// A clickable line. `menu` 0 means click-only (no keyboard selection).
+#[derive(Debug, Clone, PartialEq)]
+pub struct Link {
+    pub menu: u32,
+    pub item: usize,
+    pub cmd: String,
+}
+
 #[derive(Default)]
 pub struct Output {
     pub lines: Vec<Line<'static>>,
-    pending: VecDeque<Line<'static>>,
+    /// Parallel to `lines`.
+    pub links: Vec<Option<Link>>,
+    pending: VecDeque<(Line<'static>, Option<Link>)>,
     wait: f64,
     /// Visual lines scrolled up from the bottom.
     pub scroll: usize,
@@ -57,17 +67,21 @@ pub struct Output {
 impl Output {
     /// Queue lines to be revealed one at a time.
     pub fn push(&mut self, lines: impl IntoIterator<Item = Line<'static>>) {
-        self.pending.extend(lines);
+        self.pending.extend(lines.into_iter().map(|l| (l, None)));
     }
 
     pub fn push_line(&mut self, line: Line<'static>) {
-        self.pending.push_back(line);
+        self.pending.push_back((line, None));
+    }
+
+    pub fn push_link(&mut self, line: Line<'static>, link: Link) {
+        self.pending.push_back((line, Some(link)));
     }
 
     /// Show everything that is still queued right now.
     pub fn flush(&mut self) {
-        while let Some(l) = self.pending.pop_front() {
-            self.commit(l);
+        while let Some((l, link)) = self.pending.pop_front() {
+            self.commit(l, link);
         }
     }
 
@@ -78,15 +92,18 @@ impl Output {
 
     pub fn clear(&mut self) {
         self.lines.clear();
+        self.links.clear();
         self.pending.clear();
         self.scroll = 0;
     }
 
-    fn commit(&mut self, l: Line<'static>) {
+    fn commit(&mut self, l: Line<'static>, link: Option<Link>) {
         self.lines.push(l);
+        self.links.push(link);
         if self.lines.len() > MAX_LINES {
             let extra = self.lines.len() - MAX_LINES;
             self.lines.drain(..extra);
+            self.links.drain(..extra);
         }
     }
 
@@ -99,10 +116,10 @@ impl Output {
         self.wait -= dt;
         while self.wait <= 0.0 {
             match self.pending.pop_front() {
-                Some(l) => {
+                Some((l, link)) => {
                     // Blank lines cost nothing so paragraphs feel snappy.
                     let blank = l.width() == 0;
-                    self.commit(l);
+                    self.commit(l, link);
                     if !blank {
                         self.wait += delay;
                     }

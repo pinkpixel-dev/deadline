@@ -1,4 +1,6 @@
-# DEADLINE
+<p align="center">
+<img src="./cover.png" alt="Deadline" width="800">
+</p>
 
 DEADLINE is a text adventure that plays like a late-90s BBS. You dial in, the board knows your name, and somebody called `ghost_17` has been waiting for you.
 
@@ -34,7 +36,11 @@ The game uses truecolor, so a modern terminal works best. I'd go for at least 96
 
 ## Playing
 
-Type `help` once you're logged in. The basics:
+You don't have to memorize anything. Every list the board prints (boards, posts, mail, files, users) is clickable. Tap or click a row to open it, or press **↓** on an empty prompt to step into the list, then **↑↓** and **Enter**. Posts and files get little action rows underneath, like `› next`, `‹ back to CODE` or `↓ download`, and notices like `*** PRIVATE MESSAGE` can be tapped too.
+
+You can also type just the number or name you see. `03` opens a board, `102` reads a post, and `nodelist.txt` opens a file from the list on screen. `read` or `view` with nothing after it shows you what's there. Boards open by name too (`open trading`).
+
+If you'd rather type everything, the commands are all still there. Type `help` once you're logged in. The basics:
 
 | Command | What it does |
 | --- | --- |
@@ -55,7 +61,7 @@ There are more commands than that. You'll find them.
 A few controls worth knowing:
 
 - **Tab** completes commands, board numbers, users and filenames
-- **Up/Down** browses your command history
+- **Down** on an empty prompt picks from the latest list. **Up** browses your command history
 - **PgUp/PgDn** or the mouse wheel scrolls back
 - **Enter** or a click skips a cinematic
 - In a conversation, press **1-9**, use the arrows, or click a reply. You can still type commands mid-conversation if you want to check something first.

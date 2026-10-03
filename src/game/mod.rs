@@ -5,6 +5,7 @@ pub mod complete;
 pub mod engine;
 pub mod files;
 pub mod flow;
+pub mod menu;
 pub mod state;
 pub mod text;
 

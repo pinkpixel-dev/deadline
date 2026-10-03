@@ -5,6 +5,7 @@ use ratatui::text::{Line, Span};
 
 use crate::app::App;
 use crate::content::{model::Board, pick};
+use crate::game::menu::{Row, action};
 use crate::game::text;
 use crate::ui::theme;
 
@@ -29,7 +30,8 @@ impl App {
 
     pub fn cmd_boards(&mut self) {
         let content = self.content.clone();
-        let mut lines = vec![Line::from(Span::styled("MESSAGE BOARDS", theme::bold(theme::WHITE)))];
+        self.print_lines(vec![Line::from(Span::styled("MESSAGE BOARDS", theme::bold(theme::WHITE)))]);
+        let mut rows = Vec::new();
         for b in content.boards.iter().filter(|b| b.visible.eval(&self.st, &self.meta)) {
             let posts: Vec<_> = content
                 .posts
@@ -49,10 +51,11 @@ impl App {
             } else if unread > 0 {
                 spans.push(Span::styled(format!("   {unread} new"), Style::default().fg(theme::AMBER)));
             }
-            lines.push(Line::from(spans));
+            rows.push(Row::new(Line::from(spans), format!("open {}", b.id), b.id.clone()));
         }
-        lines.push(Line::from(Span::styled("  open <#>", theme::dim())));
-        self.print_lines(lines);
+        let example = rows.first().map(|r| r.cmd.clone()).unwrap_or_default();
+        self.show_menu(rows);
+        self.menu_hint(&example);
     }
 
     pub fn cmd_open(&mut self, arg: &str) {
@@ -62,6 +65,7 @@ impl App {
         }
         let Some(b) = self.visible_board(arg) else {
             self.err("ERROR: BOARD DOES NOT EXIST");
+            self.dim("  {dim}type{/} boards {dim}to see them all{/}");
             return;
         };
         if !self.board_open(&b) {
@@ -86,20 +90,21 @@ impl App {
 
     fn list_posts(&mut self, b: &Board) {
         let content = self.content.clone();
-        let mut lines = Vec::new();
+        let mut rows = Vec::new();
         let posts: Vec<_> = content
             .posts
             .iter()
             .filter(|p| p.board == b.id && p.visible.eval(&self.st, &self.meta))
             .collect();
         if posts.is_empty() {
-            lines.push(Line::from(Span::styled("  (no messages)", theme::dim())));
+            self.dim("  (no messages)");
+            return;
         }
         for p in &posts {
             let read = self.st.has(&format!("read:{}", p.id));
             let author = text::subst(&p.author, &self.ctx());
             let color = text::user_color(&author, &self.ctx());
-            lines.push(Line::from(vec![
+            let line = Line::from(vec![
                 Span::styled(if read { "   " } else { " ● " }, Style::default().fg(theme::AMBER)),
                 Span::styled(format!("{:<5}", p.id), Style::default().fg(theme::DIM)),
                 Span::styled(format!("{:<12}", p.date), Style::default().fg(theme::FAINT)),
@@ -108,17 +113,20 @@ impl App {
                     text::subst(&p.subject, &self.ctx()),
                     Style::default().fg(if read { theme::DIM } else { theme::TEXT }),
                 ),
-            ]));
+            ]);
+            rows.push(Row::new(line, format!("read {}", p.id), p.id.to_string()));
         }
-        lines.push(Line::from(Span::styled("  read <#>   n = next unread", theme::dim())));
-        self.print_lines(lines);
+        let example = rows.first().map(|r| r.cmd.clone()).unwrap_or_default();
+        self.show_menu(rows);
+        self.menu_hint(&example);
     }
 
     pub fn cmd_read(&mut self, arg: &str) {
         let content = self.content.clone();
         let post = if arg.is_empty() {
             let Some(board) = self.st.board.clone() else {
-                self.dim("Open a board first. {dim}boards{/}");
+                self.dim("Pick a board first:");
+                self.cmd_boards();
                 return;
             };
             let next = content.posts.iter().find(|p| {
@@ -128,6 +136,9 @@ impl App {
                 Some(p) => p,
                 None => {
                     self.dim("No unread messages here.");
+                    if let Some(b) = self.visible_board(&board) {
+                        self.list_posts(&b);
+                    }
                     return;
                 }
             }
@@ -137,6 +148,10 @@ impl App {
                 Some(p) => p,
                 None => {
                     self.err(&format!("MESSAGE {arg} NOT FOUND"));
+                    match self.st.board.clone().and_then(|b| self.visible_board(&b)) {
+                        Some(b) => self.list_posts(&b),
+                        None => self.dim("  {dim}open a board first:{/} boards"),
+                    }
                     return;
                 }
             }
@@ -162,7 +177,26 @@ impl App {
         self.print_lines(lines);
         self.st.board = Some(post.board.clone());
         self.st.set(&format!("read:{}", post.id));
+        self.post_actions(post.id, &post.board, &board_name);
         self.apply(&post.on_read);
+    }
+
+    /// "next" and "back" rows under a post.
+    fn post_actions(&mut self, id: u32, board: &str, board_name: &str) {
+        let content = self.content.clone();
+        let next = content
+            .posts
+            .iter()
+            .filter(|p| p.board == board && p.id > id && self.post_visible(p))
+            .min_by_key(|p| p.id);
+        let mut rows = Vec::new();
+        if let Some(n) = next {
+            let subject = text::subst(&n.subject, &self.ctx());
+            rows.push(Row::new(action("›", "next", &format!("#{} {subject}", n.id)), format!("read {}", n.id), "n"));
+        }
+        rows.push(Row::new(action("‹", &format!("back to {board_name}"), ""), format!("open {board}"), "b"));
+        self.blank();
+        self.show_menu(rows);
     }
 
     pub fn cmd_mail(&mut self, args: &str) {
@@ -172,22 +206,24 @@ impl App {
                 self.dim("Your mailbox is empty.");
                 return;
             }
-            let mut lines = vec![Line::from(Span::styled("MAILBOX", theme::bold(theme::WHITE)))];
+            self.print_lines(vec![Line::from(Span::styled("MAILBOX", theme::bold(theme::WHITE)))]);
+            let mut rows = Vec::new();
             for (i, id) in self.st.inbox.clone().iter().enumerate() {
                 let Some(m) = content.mail.get(id) else { continue };
                 let read = self.st.has(&format!("mailread:{id}"));
                 let from = text::subst(&m.from, &self.ctx());
                 let color = text::user_color(&from, &self.ctx());
-                lines.push(Line::from(vec![
+                let line = Line::from(vec![
                     Span::styled(if read { "   " } else { " ● " }, Style::default().fg(theme::AMBER)),
                     Span::styled(format!("{:<4}", i + 1), Style::default().fg(theme::DIM)),
                     Span::styled(format!("{from:<12}"), Style::default().fg(color)),
                     Span::styled(format!("{:<12}", text::subst(&m.date, &self.ctx())), Style::default().fg(theme::FAINT)),
                     Span::styled(m.subject.clone(), Style::default().fg(if read { theme::DIM } else { theme::TEXT })),
-                ]));
+                ]);
+                rows.push(Row::new(line, format!("mail {}", i + 1), String::new()));
             }
-            lines.push(Line::from(Span::styled("  mail <#>", theme::dim())));
-            self.print_lines(lines);
+            self.show_menu(rows);
+            self.menu_hint("mail 1");
             return;
         }
         let Ok(n) = args.parse::<usize>() else {
@@ -196,6 +232,7 @@ impl App {
         };
         let Some(id) = self.st.inbox.get(n.wrapping_sub(1)).cloned() else {
             self.err(&format!("mail: no message {n}"));
+            self.cmd_mail("");
             return;
         };
         let Some(m) = content.mail.get(&id) else { return };
@@ -213,32 +250,45 @@ impl App {
         self.out.flush();
         self.print_lines(lines);
         self.st.set(&format!("mailread:{id}"));
+        let mut rows = Vec::new();
+        if n < self.st.inbox.len() {
+            rows.push(Row::new(action("›", "next message", ""), format!("mail {}", n + 1), "n"));
+        }
+        rows.push(Row::new(action("‹", "back to mailbox", ""), "mail", "b"));
+        self.blank();
+        self.show_menu(rows);
         self.apply(&m.on_read);
     }
 
     pub fn cmd_users(&mut self) {
         let content = self.content.clone();
-        let mut lines = vec![
-            Line::from(Span::styled("USERS ONLINE", theme::bold(theme::WHITE))),
+        self.print_lines(vec![Line::from(Span::styled("USERS ONLINE", theme::bold(theme::WHITE)))]);
+        let player = self.st.player.clone();
+        let mut rows = vec![Row::new(
             Line::from(vec![
                 Span::styled("  NODE 02  ", Style::default().fg(theme::DIM)),
-                Span::styled(format!("{:<14}", self.st.player), theme::bold(theme::WHITE)),
+                Span::styled(format!("{:<14}", player), theme::bold(theme::WHITE)),
                 Span::styled("you", theme::dim()),
             ]),
-        ];
+            "whoami",
+            player.clone(),
+        )];
         for u in &content.users {
             let Some(p) = self.presence(&u.id) else { continue };
             if p.status == "hidden" {
                 continue;
             }
             let node = if p.node.is_empty() { "??".to_string() } else { p.node.clone() };
-            lines.push(Line::from(vec![
+            let line = Line::from(vec![
                 Span::styled(format!("  NODE {node:<3} "), Style::default().fg(theme::DIM)),
                 Span::styled(format!("{:<14}", u.id), theme::bold(theme::color(&u.color))),
                 Span::styled(p.status.clone(), theme::dim()),
-            ]));
+            ]);
+            rows.push(Row::new(line, format!("chat {}", u.id), u.id.clone()));
         }
-        self.print_lines(lines);
+        let example = rows.get(1).map(|r| r.cmd.clone()).unwrap_or_else(|| "whoami".into());
+        self.show_menu(rows);
+        self.menu_hint(&example);
     }
 
     pub fn cmd_finger(&mut self, arg: &str) {

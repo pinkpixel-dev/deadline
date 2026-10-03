@@ -53,6 +53,14 @@ impl App {
             self.out.flush();
             return;
         }
+        // A bare row key or number picks from the list on screen.
+        if !trimmed.contains(' ') {
+            if let Some(cmd) = self.menu_match(trimmed) {
+                self.submit(&cmd);
+                return;
+            }
+        }
+        self.menu = None;
         self.echo(trimmed);
         if self.st.history.last().map(String::as_str) != Some(trimmed) {
             self.st.history.push(trimmed.to_string());
@@ -149,22 +157,45 @@ impl App {
             "status" | "stats" => self.cmd_status(),
             "trace" => self.err(&format!("trace: {args}: no route to host")),
             "logout" | "logoff" | "quit" | "exit" | "bye" | "g" | "goodbye" => self.logout(),
-            _ => self.err(&format!("BAD COMMAND OR FILE NAME: {verb}")),
+            _ if verb.parse::<u32>().is_ok() => self.bare_number(verb),
+            _ => {
+                self.err(&format!("BAD COMMAND OR FILE NAME: {verb}"));
+                self.dim("  {dim}type{/} help {dim}for commands{/}");
+            }
+        }
+    }
+
+    /// A number on its own: a post on this board, or a board.
+    fn bare_number(&mut self, n: &str) {
+        let id: u32 = n.parse().unwrap_or(0);
+        let on_board = self.st.board.as_ref().is_some_and(|b| {
+            self.content.post(id).is_some_and(|p| &p.board == b)
+        });
+        if on_board || self.content.post(id).is_some() {
+            self.cmd_read(n);
+        } else {
+            self.cmd_open(n);
         }
     }
 
     fn cmd_help(&mut self) {
         let content = self.content.clone();
         self.print("{b}COMMANDS{/}");
-        let mut lines = Vec::new();
+        let mut rows = Vec::new();
         for h in content.help.iter().filter(|h| h.cond.eval(&self.st, &self.meta)) {
             let cmd = crate::game::text::subst(&h.cmd, &self.ctx());
-            lines.push(Line::from(vec![
+            let line = Line::from(vec![
                 Span::styled(format!("  {cmd:<22}"), theme::bold(theme::CYAN)),
                 Span::styled(h.desc.clone(), theme::dim()),
-            ]));
+            ]);
+            // Rows that work without an argument run when tapped.
+            let first = cmd.split('/').next().unwrap_or("").trim();
+            let verb = first.split_whitespace().next().unwrap_or("");
+            let runnable = !first.contains('<') && !matches!(verb, "logout" | "restore" | "clear");
+            let cmd = if runnable { verb.to_string() } else { String::new() };
+            rows.push(crate::game::menu::Row::new(line, cmd, String::new()));
         }
-        self.print_lines(lines);
+        self.show_menu(rows);
     }
 
     fn cmd_history(&mut self) {

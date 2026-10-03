@@ -106,6 +106,10 @@ pub fn footer(f: &mut Frame, app: &App, area: Rect) {
         &[("1-9", "reply"), ("↑↓", "select"), ("TYPE", "command"), ("leave", "close")]
     } else if app.password.is_some() {
         &[("ENTER", "submit"), ("ESC", "cancel")]
+    } else if app.menu.as_ref().is_some_and(|m| m.sel.is_some()) {
+        &[("↑↓", "select"), ("ENTER", "open"), ("ESC", "back to typing"), ("CLICK", "open")]
+    } else if app.menu.is_some() {
+        &[("↓", "pick from list"), ("TAP", "open"), ("TAB", "complete"), ("↑", "history"), ("help", "commands")]
     } else {
         &[("TAB", "complete"), ("↑↓", "history"), ("PGUP/PGDN", "scroll"), ("ENTER", "skip"), ("help", "commands")]
     };

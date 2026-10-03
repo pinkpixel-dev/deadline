@@ -9,6 +9,7 @@ use crate::content::Content;
 use crate::content::effect::{ChoiceOpt, Effect, PasswordPrompt};
 use crate::game::chat::ChatRun;
 use crate::game::flow::{OverlayRun, SeqRun};
+use crate::game::menu::Menu;
 use crate::game::state::{GameState, MetaState};
 use crate::game::text::{self, Ctx};
 use crate::input::Input;
@@ -55,6 +56,11 @@ pub struct App {
     pub hits: Vec<(Rect, usize)>,
     /// Pane title for the main terminal.
     pub context: String,
+    /// The most recent list printed, for keyboard selection.
+    pub menu: Option<Menu>,
+    pub next_menu: u32,
+    /// Clickable terminal rows from the last frame: (row, menu, item, command).
+    pub link_hits: Vec<(Rect, u32, usize, String)>,
     next_event_check: f64,
 }
 
@@ -84,6 +90,9 @@ impl App {
             speed: Speed::Normal,
             hits: Vec::new(),
             context: "MAIN".into(),
+            menu: None,
+            next_menu: 1,
+            link_hits: Vec::new(),
             next_event_check: 0.0,
         }
     }
@@ -116,6 +125,15 @@ impl App {
         spans.extend(text::spans(&s, theme::bold(theme::AMBER)));
         self.out.push_line(Line::from(spans));
         self.out.scroll = 0;
+    }
+
+    /// A `***` notice you can tap to run `cmd`.
+    pub fn notice_link(&mut self, markup: &str, cmd: &str) {
+        let s = text::subst(markup, &self.ctx());
+        let mut spans = vec![Span::styled("*** ", theme::bold(theme::AMBER))];
+        spans.extend(text::spans(&s, theme::bold(theme::AMBER)));
+        spans.push(Span::styled(format!("  ›{cmd}"), theme::bold(theme::CYAN)));
+        self.print_link(Line::from(spans), cmd);
     }
 
     /// A dim error-style line.

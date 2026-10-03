@@ -267,3 +267,45 @@ fn restore_keeps_history_and_counts_in_meta() {
     assert_eq!(a.meta.total_restores, 1);
     assert!(a.st.has("restored"));
 }
+
+#[test]
+fn lists_are_selectable_by_keyboard_number_and_link() {
+    let mut a = app();
+    boot(&mut a);
+    cmd(&mut a, "boards");
+    assert!(a.menu.is_some(), "board list is a menu");
+    assert!(a.out.links.iter().flatten().any(|l| l.cmd == "open 03"), "rows carry commands");
+    // ↓ then Enter opens the first board
+    assert!(a.menu_step(true));
+    assert!(a.menu_activate());
+    run(&mut a, 0.3);
+    assert_eq!(a.st.board.as_deref(), Some("01"));
+    // a bare post number reads it, and the post offers next/back
+    cmd(&mut a, "102");
+    assert!(a.st.has("read:102"));
+    assert!(a.out.links.iter().flatten().any(|l| l.cmd == "read 103"), "next row");
+    cmd(&mut a, "b");
+    assert!(screen(&a).contains("GENERAL"));
+    // ↑ from the top of a list hands the arrow back to history
+    a.menu_step(true);
+    assert!(a.menu_step(false));
+    assert!(!a.menu_step(false));
+}
+
+#[test]
+fn commands_forgive_missing_arguments() {
+    let mut a = app();
+    boot(&mut a);
+    cmd(&mut a, "read");
+    assert!(screen(&a).contains("MESSAGE BOARDS"), "read with no board shows boards");
+    cmd(&mut a, "open trading");
+    assert_eq!(a.st.board.as_deref(), Some("05"));
+    cmd(&mut a, "open off");
+    assert_eq!(a.st.board.as_deref(), Some("06"));
+    cmd(&mut a, "view");
+    assert!(screen(&a).contains("FILES"), "view with no file lists files");
+    cmd(&mut a, "cd uploads");
+    cmd(&mut a, "nodelist.txt");
+    assert!(a.st.has("file:/uploads/nodelist.txt"), "a bare filename from the list opens it");
+    assert!(a.out.links.iter().flatten().any(|l| l.cmd == "download /uploads/nodelist.txt"));
+}

@@ -50,7 +50,10 @@ pub fn header(f: &mut Frame, app: &App, area: Rect) {
     f.render_widget(Paragraph::new(Line::styled(right, Style::default().fg(theme::DIM))).style(bg), r);
 }
 
-pub fn terminal(f: &mut Frame, app: &App, area: Rect) {
+/// Clickable rows drawn this frame: (row rect, menu, item, command).
+pub type LinkHits = Vec<(Rect, u32, usize, String)>;
+
+pub fn terminal(f: &mut Frame, app: &App, area: Rect) -> LinkHits {
     let scrolled = app.out.scroll > 0;
     let mut title = app.context.clone();
     if scrolled {
@@ -71,9 +74,10 @@ pub fn terminal(f: &mut Frame, app: &App, area: Rect) {
     }
 
     let width = inner.width.saturating_sub(1) as usize;
-    let mut visual: Vec<Line<'static>> = Vec::new();
-    for l in &app.out.lines {
-        visual.extend(wrap::wrap(l, width));
+    // Each visual row remembers which source line it came from.
+    let mut visual: Vec<(Line<'static>, usize)> = Vec::new();
+    for (i, l) in app.out.lines.iter().enumerate() {
+        visual.extend(wrap::wrap(l, width).into_iter().map(|w| (w, i)));
     }
     let h = inner.height as usize;
     let max_scroll = visual.len().saturating_sub(h);
@@ -81,7 +85,27 @@ pub fn terminal(f: &mut Frame, app: &App, area: Rect) {
     let end = visual.len() - scroll;
     let start = end.saturating_sub(h);
     let text_area = Rect { x: inner.x + 1, width: inner.width.saturating_sub(1), ..inner };
-    f.render_widget(Paragraph::new(visual[start..end].to_vec()), text_area);
+
+    let selected = app.menu.as_ref().and_then(|m| m.sel.map(|s| (m.id, s)));
+    let mut hits = Vec::new();
+    let mut rows = Vec::with_capacity(end - start);
+    for (row, (line, src)) in visual[start..end].iter().enumerate() {
+        let mut line = line.clone();
+        if let Some(Some(link)) = app.out.links.get(*src) {
+            let rect = Rect { x: inner.x, y: inner.y + row as u16, width: inner.width, height: 1 };
+            hits.push((rect, link.menu, link.item, link.cmd.clone()));
+            if selected == Some((link.menu, link.item)) {
+                line.style = line.style.bg(theme::SELECT);
+                let buf = f.buffer_mut();
+                for x in rect.left()..rect.right() {
+                    buf[(x, rect.y)].set_bg(theme::SELECT);
+                }
+            }
+        }
+        rows.push(line);
+    }
+    f.render_widget(Paragraph::new(rows), text_area);
+    hits
 }
 
 pub fn sidebar(f: &mut Frame, app: &App, area: Rect) {
