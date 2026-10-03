@@ -69,6 +69,8 @@ impl App {
                 self.notice_link("JOURNAL UPDATED (+1)", "journal");
             }
             Effect::EndAct(n) => self.end_act(*n),
+            Effect::Ending(id) => self.reach_ending(id),
+            Effect::Rebuild => self.rebuild(),
             Effect::Disconnect => {
                 if self.chat.is_some() {
                     self.end_chat(false);
@@ -139,6 +141,37 @@ impl App {
         if self.content.sequences.contains_key(&seq) {
             self.start_or_queue(Effect::Sequence(seq));
         }
+    }
+
+    fn reach_ending(&mut self, id: &str) {
+        self.st.set("ended");
+        if !self.meta.endings.iter().any(|e| e == id) {
+            self.meta.endings.push(id.to_string());
+        }
+        self.meta.discoveries.insert(format!("ending:{id}"));
+        self.save_meta();
+        self.save_session();
+        let seq = format!("ending_{id}");
+        if self.content.sequences.contains_key(&seq) {
+            self.start_or_queue(Effect::Sequence(seq));
+        }
+    }
+
+    /// A fresh timeline for the same player, starting from the boot screen.
+    fn rebuild(&mut self) {
+        self.st = GameState::new(&self.st.player);
+        self.chat = None;
+        self.choice = None;
+        self.overlay = None;
+        self.password = None;
+        self.menu = None;
+        self.queue.clear();
+        self.out.clear();
+        self.context = "MAIN".into();
+        if let Some(Err(e)) = self.store.as_ref().map(|s| s.clear_session()) {
+            self.log(&format!("{{red}}SESSION CLEAR FAILED: {e}{{/}}"));
+        }
+        self.start_sequence("boot");
     }
 
     /// Fire every event whose condition holds and whose delay has passed.

@@ -60,6 +60,11 @@ pub enum Effect {
     Note(String),
     /// Finish an act.
     EndAct(u8),
+    /// Reach an ending: record `ending:<id>` in meta and play `ending_<id>`.
+    /// The run is over, so saving from here on deletes the session.
+    Ending(String),
+    /// Throw this run away and boot a fresh one. Meta-state stays.
+    Rebuild,
     /// Save the session and hang up.
     Disconnect,
 }
