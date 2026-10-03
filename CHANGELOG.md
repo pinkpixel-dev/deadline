@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.1 - October 3, 2026
+
+### 🐛 Fixes
+
+- A wrong archive key now reminds you of the key you already learned, or points you at who knows it
+- ghost_17 nudges you if you know the key but haven't opened board 08, and again if you're in the archive but haven't read 804
+- If ghost_17 is too angry to help, the system log gives the hint instead
+
+
 ## 0.2.0 - October 3, 2026
 
 ### 🎮 Act II: ARCHIVES

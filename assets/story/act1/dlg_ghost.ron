@@ -326,5 +326,27 @@
             on_end: [EndAct(1)],
             on_leave: [EndAct(1)],
         ),
+        (
+            id: "ghost_nudge_key",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", lines: [
+                    "you still haven't opened 08?",
+                    "you have the key. {cyan}open 08{/}. it's {b}lantern{/}.",
+                    "i'm trying really hard not to be impatient here.",
+                ]),
+            ],
+        ),
+        (
+            id: "ghost_nudge_804",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", lines: [
+                    "you're in the archive.",
+                    "read 804.",
+                    "i've been avoiding it for a long time. somebody should read it.",
+                ]),
+            ],
+        ),
     ],
 )

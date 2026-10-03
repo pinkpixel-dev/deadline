@@ -336,3 +336,24 @@ fn commands_forgive_missing_arguments() {
     assert!(a.st.has("file:/uploads/nodelist.txt"), "a bare filename from the list opens it");
     assert!(a.out.links.iter().flatten().any(|l| l.cmd == "download /uploads/nodelist.txt"));
 }
+
+#[test]
+fn a_wrong_archive_key_reminds_you_and_ghost_nudges() {
+    let mut a = app();
+    boot(&mut a);
+    a.st.set("archive_revealed");
+    a.st.set("knows_lantern");
+    a.st.set_var("trust_ghost", 2);
+    cmd(&mut a, "open 08");
+    a.submit("lighthouse");
+    run(&mut a, 0.3);
+    assert!(screen(&a).contains("lantern"), "the prompt reminds you of the key you learned");
+    for _ in 0..16 {
+        cmd(&mut a, "boards");
+    }
+    assert!(a.st.has("page:ghost_nudge_key"), "ghost nudges if you stall");
+    cmd(&mut a, "open 08");
+    a.submit("lantern");
+    run(&mut a, 0.3);
+    assert!(a.st.has("archive_unlocked"));
+}

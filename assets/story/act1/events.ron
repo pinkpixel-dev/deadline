@@ -121,6 +121,20 @@
             )],
         ),
 
+        // ---- nudges so nobody gets stranded before the finale ----------------
+        (
+            id: "a1_nudge_key",
+            when: All([Flag("knows_lantern"), Flag("archive_revealed"), NoFlag("archive_unlocked")]),
+            after_cmds: 15,
+            effects: [If(Gte("trust_ghost", -1), [Page("ghost_nudge_key")], [Log("{violet}board 08: key prompt waiting (hint: lighthouses){/}")])],
+        ),
+        (
+            id: "a1_nudge_804",
+            when: All([Flag("archive_unlocked"), NoFlag("read_reveal")]),
+            after_cmds: 12,
+            effects: [If(Gte("trust_ghost", -1), [Page("ghost_nudge_804")], [Log("{violet}board 08: message 804 unread{/}")])],
+        ),
+
         // ---- after the act: five minutes, then ROOT hangs up on you --------
         (id: "a1_kick_warn", when: Flag("act1_complete"), after_secs: 240, effects: [
             Log("{white}ROOT: session limit approaching{/}"),
