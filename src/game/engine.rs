@@ -186,6 +186,7 @@ impl App {
         let pool: Vec<_> = content
             .ambient
             .iter()
+            .filter(|a| a.act == 0 || a.act == self.st.act_started)
             .filter(|a| a.cond.eval(&self.st, &self.meta))
             .collect();
         if pool.is_empty() {

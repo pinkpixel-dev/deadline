@@ -187,3 +187,18 @@ fn three_theories_then_janus_asks_and_the_act_ends() {
     run(&mut a, 305.0);
     assert!(a.seq.as_ref().is_some_and(|s| s.id == "kick_4"), "ROOT hangs up after the act");
 }
+
+#[test]
+fn act_two_ambient_lines_stay_in_act_two() {
+    let mut a = act4("ambient");
+    a.st.set("node07_open");
+    for _ in 0..300 {
+        a.next_ambient = 0.0;
+        a.ambient();
+    }
+    let log: Vec<String> = a.log.iter().map(crate::game::text::plain).collect();
+    assert!(log.iter().any(|l| l.contains("5 models loaded")), "act four's own lines still show up");
+    for stale in ["indexing 06/1998", "archive mount verified", "something is typing"] {
+        assert!(!log.iter().any(|l| l.contains(stale)), "act two line leaked into act four: {stale}");
+    }
+}

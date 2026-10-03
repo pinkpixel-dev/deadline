@@ -260,6 +260,8 @@ pub enum Step {
 #[derive(Debug, Clone, Default, Deserialize)]
 #[serde(default)]
 pub struct Ambient {
+    /// Only shown while this act is the one in play (0 = any). Defaults to the file's `act`.
+    pub act: u8,
     pub cond: Cond,
     pub text: String,
     /// Also print into the main terminal, not just the log.

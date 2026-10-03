@@ -21,6 +21,10 @@
 - New `{now}` markup for the player's real local time
 - Eli's age in post 503 now matches his portrait (20)
 
+### 🐛 Fixes
+
+- Act II's system log lines (like `node 04: indexing 06/1998` and `ROOT: archive mount verified`) no longer show up in Act III and Act IV. Ambient lines now only appear during their own act, the same way events work
+
 ## 0.5.0 - October 3, 2026
 
 ### 📼 Act III: 1998 (complete)
