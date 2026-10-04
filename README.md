@@ -8,6 +8,9 @@ It runs in your terminal and uses Rust and Ratatui. The art is half-block pixel 
 
 The board's last public post is from 08/14/1998. It says `DON'T SHUT IT DOWN.` Nobody did.
 
+![Deadline](./deadline.gif)
+
+
 ## What it's like
 
 There are no dialogue menus floating over the game. You type commands like you would on an actual BBS:
