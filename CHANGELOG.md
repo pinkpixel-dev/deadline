@@ -1,5 +1,71 @@
 # Changelog
 
+## 0.9.0 - October 3, 2026
+
+### 🗝️ Act V: the core
+
+- JANUS leaves `/var/janus/core` open on the last night. There are four files in it, and each one opens a different way: Mara's key, `recover`, tracing yourself, and `listen`
+- The files dig into how JANUS survived, what the test is, why node 02 reads exactly like a lurker from 1998, and what really happened at 03:17. None of them settle it. They're meant to be read more than one way
+- Each file ends with a key fragment. Put the four together and a fifth file opens, `janus.self`, and then JANUS pages you for one last conversation where you can ask it anything
+- Something on node 03 reads along behind you. `scan` and `trace 03` will tell you a little about it
+- `whoami`, `scan` and your command history get a bit stranger the deeper you go, and JANUS writes in your notes again
+- Everyone can use `recover` and `listen` on the last night, even if you never learned them earlier
+- None of this is required. Every ending command still works from the first minute, and reading the core only nudges a couple of gates by a point
+- Every ending picks up a line or two about what you found in the core, like drive 2 finally powering off, node 03 logging off, or the test spec loading in JANUS v2.0
+
+### 🐛 Fixes
+
+- Act III's `BUILD 1998.2` and `1998.3` label now stays in the header for the whole rebuilt night. It used to vanish after five seconds, so the journal mentioned something most people never saw
+- Once the night rebuilds, `date` shows which build it is, ghost_17 asks why your login says BUILD, and the journal points you at `scan`
+
+### ⏱️ Timing
+
+- ROOT now waits 60 minutes before hanging up on the last night (it was 40), so there's time to actually read the core
+
+## 0.8.0 - October 3, 2026
+
+### 🎬 Act V: last talks
+
+- Before you decide, everyone gets one last conversation: ghost_17, Parallax, null, ROOT, and Eli if he knows what he is
+- Each talk can nudge you over the line for one ending. Parallax can hand over the kill code, ghost can come to terms with their file, null asks one last time, ROOT tells you where the sysop commands are, and Eli can still learn the truth about the article you deleted
+- None of them are required. Every ending command still works from the first minute if you've earned it
+
+### 🎞️ Endings
+
+- Every ending scene now reflects your run: who you were close to, what you told people, your promise to ROOT on the first night, and how the last talks went
+
+### 🔁 Replay
+
+- On a later run, the characters notice. ghost says it feels like a rerun, Parallax thinks they've had this call before, and Eli asks if you've already said goodbye
+- Two posts on Act II's `[10] YOU` board read differently once you've seen an ending
+
+## 0.7.0 - October 3, 2026
+
+### 🎬 Act V: DECISION
+
+- The last night is playable. JANUS opens the act and frames it by whichever way you leaned all game: keeping things, burning them, or letting them out
+- `options` lists everything that can be done with JANUS. Each ending is a typed command (`burn`, `burn --keep-source`, `preserve`, `fork`, `prove`, `stay`, `override`, `isolate eli`), and they all work from the first minute if you've earned them
+- Locked endings still answer, and say who's in the way: Parallax won't give you the kill code, null isn't answering, ROOT refuses
+- Every ending asks you to confirm first, since it ends the run
+- Nine endings, including a secret one, each with its own closing scene and a credits screen that tracks which ones you've found
+- If you never decide, ROOT eventually hangs up, and JANUS picks it back up on your next login
+
+### 🔁 Replay
+
+- Finishing an ending ends the run. Your next launch starts a fresh game, and everything the game remembers across runs stays
+- The opening screen picks up a small detail for every ending you've seen
+
+### 🧹 Maintenance
+
+- New story effects `Ending(id)` and `Rebuild`, and conditions `More(a, b)` and `Endings(n)`
+- Nothing fires after the line has hung up
+
+## 0.6.3 - October 3, 2026
+
+### 🐛 Fixes
+
+- Logging in after the last finished act used to drop you on a quiet board with nothing left to happen. The game now says you've reached the end of the current build, and your save picks up from there once the next act is written
+
 ## 0.6.2 - October 3, 2026
 
 ### 🐛 Fixes

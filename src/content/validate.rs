@@ -13,7 +13,7 @@ const ENGINE_PREFIXES: &[&str] = &[
     "mail:", "mailread:", "page:", "chat:", "done:", "left:", "finger:", "overlay:", "seq:",
     "actend:", "sum:", "act:", "sent:",
 ];
-const ENGINE_FLAGS: &[&str] = &["restored", "planted"];
+const ENGINE_FLAGS: &[&str] = &["restored", "planted", "ended"];
 
 #[derive(Default)]
 struct Refs {
@@ -185,6 +185,10 @@ pub fn check(c: &Content) -> Vec<String> {
             Cond::Gte(v, _) | Cond::Lte(v, _) => {
                 out.insert(v.clone());
             }
+            Cond::More(a, b) => {
+                out.insert(a.clone());
+                out.insert(b.clone());
+            }
             Cond::All(cs) | Cond::Any(cs) => cs.iter().for_each(|c| vars(c, out)),
             Cond::Not(c) => vars(c, out),
             _ => {}
@@ -203,6 +207,9 @@ pub fn check(c: &Content) -> Vec<String> {
             }
             Effect::Overlay(id) if !c.overlays.contains_key(id) => errs.push(format!("unknown overlay: {id}")),
             Effect::Sequence(id) if !c.sequences.contains_key(id) => errs.push(format!("unknown sequence: {id}")),
+            Effect::Ending(id) if !c.sequences.contains_key(&format!("ending_{id}")) => {
+                errs.push(format!("ending {id} has no ending_{id} sequence"))
+            }
             Effect::Mail(id) if !c.mail.contains_key(id) => errs.push(format!("unknown mail: {id}")),
             Effect::Clock(t) if crate::systems::clock::parse(t).is_none() => {
                 errs.push(format!("bad clock time: {t}"))

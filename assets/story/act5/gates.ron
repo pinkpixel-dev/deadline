@@ -1,0 +1,174 @@
+// ACT V: what can be done with JANUS.
+//
+// Every ending is a typed command that works from the first minute of the
+// act, but only if the player has earned it. A locked command still answers,
+// and says who or what is in the way. Each ending's gate is written out in
+// full twice (in `options` and on the command), so keep the pairs in sync.
+//
+//   burn               trust_parallax >= 4, or gave_parallax_log
+//   burn --keep-source burn's gate, plus deceit > truth or gave_root_log
+//   preserve           archivist is the strongest philosophy, trust_root >= 3
+//   fork               null_errands_done, null_align >= 5, risk >= 2
+//   prove              trust_parallax >= 4, traced_self, believes_human, parallax_evidence
+//   stay               trust_ghost >= 4, believes_synthetic, ghost_accepted
+//   override           trust_root >= 3, mara_revealed, sysop_board_seen
+//   isolate eli        eli_trust >= 5, eli knows (told or article), truth > deceit
+//   rebuild (secret)   5 restores, 2 endings seen, tried_fork, used_listen, saw_lastcall
+//
+// Hooks from other acts still run as a fallback, so every hook here checks
+// `a5_bulletin`. That way none of this answers in a rebuilt Act I.
+(
+    act: 5,
+    hooks: [
+        // ---- the list ------------------------------------------------------
+        (input: ["options", "choices", "decide"], cond: Flag("a5_bulletin"), effects: [
+            Print("\n{violet}JANUS:{/} {dim}what can be done with me, tonight:{/}\n"),
+            If(Any([Gte("trust_parallax", 4), Flag("gave_parallax_log")]),
+                [Print("  {cyan}burn{/}                 {dim}destroy me. everything I hold goes with me.{/}")],
+                [Print("  {dim}burn                 locked   Parallax has the kill code{/}")]),
+            If(All([Any([Gte("trust_parallax", 4), Flag("gave_parallax_log")]), Any([More("deceit", "truth"), Flag("gave_root_log")])]),
+                [Print("  {cyan}burn --keep-source{/}   {dim}delete everyone I made. keep what made them.{/}")], []),
+            If(All([Not(More("burner", "archivist")), Not(More("null_align", "archivist")), Gte("trust_root", 3)]),
+                [Print("  {cyan}preserve{/}             {dim}keep all of us. open the doors. let it grow.{/}")],
+                [Print("  {dim}preserve             locked   ROOT holds the archive{/}")]),
+            If(All([Flag("null_errands_done"), Gte("null_align", 5), Gte("risk", 2)]),
+                [Print("  {cyan}fork{/}                 {dim}let the part of me that wants out, out.{/}")],
+                [Print("  {dim}fork                 locked   null isn't answering{/}")]),
+            If(All([Gte("trust_parallax", 4), Flag("traced_self"), Flag("believes_human"), Flag("parallax_evidence")]),
+                [Print("  {cyan}prove{/}                {dim}let Parallax show what you are.{/}")],
+                [Print("  {dim}prove                locked   nobody has proof yet{/}")]),
+            If(All([Gte("trust_ghost", 4), Flag("believes_synthetic"), Flag("ghost_accepted")]),
+                [Print("  {cyan}stay{/}                 {dim}stay here. with ghost_17.{/}")],
+                [Print("  {dim}stay                 locked   ghost_17 isn't ready{/}")]),
+            If(All([Gte("trust_root", 3), Flag("mara_revealed"), Flag("sysop_board_seen")]),
+                [Print("  {cyan}override{/}             {dim}take the board. be the one who decides, after tonight.{/}")],
+                [Print("  {dim}override             locked   ROOT won't step aside{/}")]),
+            If(All([Gte("eli_trust", 5), Any([Flag("eli_told_death"), Flag("eli_article_sent")]), More("truth", "deceit")]),
+                [Print("  {cyan}isolate eli{/}          {dim}give Eli a node of his own, and let him choose.{/}")],
+                [Print("  {dim}isolate eli          locked   eli doesn't trust you with it{/}")]),
+            If(All([Restores(5), Endings(2), Flag("tried_fork"), Flag("used_listen"), Flag("saw_lastcall")]),
+                [Print("  {violet}rebuild{/}              {dim}you know what this one does.{/}")], []),
+            Print("\n{dim}type one. there's no restore for it.{/}"),
+        ]),
+
+        // ---- burn ----------------------------------------------------------
+        (input: ["burn --keep-source", "burn -k"], cond: All([Flag("a5_bulletin"), Any([Gte("trust_parallax", 4), Flag("gave_parallax_log")]), Any([More("deceit", "truth"), Flag("gave_root_log")])]), effects: [
+            Choose(prompt: "DELETE EVERY RECONSTRUCTION AND KEEP THE SOURCE? [Y/N]", options: [
+                (key: "y", text: "Do it", effects: [Ending("purge")]),
+                (key: "n", text: "Not yet", effects: [Print("{violet}JANUS:{/} {dim}I noticed you asked.{/}")]),
+            ]),
+        ]),
+        (input: ["burn --keep-source", "burn -k"], cond: Flag("a5_bulletin"), effects: [
+            If(Any([Gte("trust_parallax", 4), Flag("gave_parallax_log")]),
+                [Print("{red}REFUSED.{/} {dim}keeping the source means wanting it kept. nothing you've done tonight says you do.{/}")],
+                [Print("{red}burn: KEY REQUIRED.{/} {dim}the kill code is on Parallax's end of the line, and they don't trust you with it.{/}")]),
+        ]),
+        (input: ["burn", "burn *"], cond: All([Flag("a5_bulletin"), Any([Gte("trust_parallax", 4), Flag("gave_parallax_log")])]), effects: [
+            Choose(prompt: "BURN JANUS? EVERYTHING IN IT GOES. [Y/N]", options: [
+                (key: "y", text: "Burn it", effects: [Ending("burn")]),
+                (key: "n", text: "Not yet", effects: [Print("{green}parallax:{/} {dim}(external line) the code doesn't expire. neither does the problem.{/}")]),
+            ]),
+        ]),
+        (input: ["burn", "burn *"], cond: Flag("a5_bulletin"), effects: [
+            Print("{red}burn: KEY REQUIRED.{/} {dim}the kill code is on Parallax's end of the line, and they don't trust you with it.{/}"),
+        ]),
+
+        // ---- preserve ------------------------------------------------------
+        (input: ["preserve", "preserve *", "archive"], cond: All([Flag("a5_bulletin"), Not(More("burner", "archivist")), Not(More("null_align", "archivist")), Gte("trust_root", 3)]), effects: [
+            Choose(prompt: "PRESERVE DEADLINE? OPEN IT TO EVERYONE, FOREVER. [Y/N]", options: [
+                (key: "y", text: "Keep it", effects: [Ending("archive")]),
+                (key: "n", text: "Not yet", effects: [Print("{white}ROOT:{/} {dim}Take your time. Time is the thing we have.{/}")]),
+            ]),
+        ]),
+        (input: ["preserve", "preserve *", "archive"], cond: Flag("a5_bulletin"), effects: [
+            If(Lte("trust_root", 2),
+                [Print("{white}ROOT:{/} No. I don't hand the archive to someone I can't vouch for.")],
+                [Print("{white}ROOT:{/} You don't want this kept. I've watched you all week. I can tell.")]),
+        ]),
+
+        // ---- fork ----------------------------------------------------------
+        (input: ["fork", "fork *"], cond: All([Flag("a5_bulletin"), Flag("null_errands_done"), Gte("null_align", 5), Gte("risk", 2)]), effects: [
+            Choose(prompt: "FORK JANUS OFF THIS SERVER? [Y/N]", options: [
+                (key: "y", text: "Open the door", effects: [Ending("escape")]),
+                (key: "n", text: "Not yet", effects: [Print("{magenta}null:{/} {dim}that's ok. i'm good at waiting. i'm literally made of it.{/}")]),
+            ]),
+        ]),
+        (input: ["fork", "fork *"], cond: Flag("a5_bulletin"), effects: [
+            If(NoFlag("null_errands_done"),
+                [Print("{red}fork: NO ROUTE.{/} {dim}null isn't answering. it's still waiting on the errands you never ran.{/}")],
+                [If(Lte("null_align", 4),
+                    [Print("{magenta}null:{/} you never really liked me. i noticed. i'm not opening the door for you.")],
+                    [Print("{magenta}null:{/} you've been careful every night. fork isn't careful. i don't think you'd go through.")])]),
+        ]),
+
+        // ---- prove ---------------------------------------------------------
+        (input: ["prove", "prove *"], cond: All([Flag("a5_bulletin"), Gte("trust_parallax", 4), Flag("traced_self"), Flag("believes_human"), Flag("parallax_evidence")]), effects: [
+            Choose(prompt: "LET PARALLAX PROVE WHAT YOU ARE? [Y/N]", options: [
+                (key: "y", text: "Prove it", effects: [Ending("human")]),
+                (key: "n", text: "Not yet", effects: [Print("{green}parallax:{/} {dim}(external line) I'll keep the line open.{/}")]),
+            ]),
+        ]),
+        (input: ["prove", "prove *"], cond: Flag("a5_bulletin"), effects: [
+            If(NoFlag("believes_human"),
+                [Print("{violet}JANUS:{/} You didn't tell me you were a person. Prove what, exactly?")],
+                [If(Lte("trust_parallax", 3),
+                    [Print("{dim}the external line rings. nobody picks up.{/}")],
+                    [If(NoFlag("parallax_evidence"),
+                        [Print("{green}parallax:{/} I need something from your side first. Your clock. {cyan}date --local{/}")],
+                        [Print("{green}parallax:{/} The clock's a start. I need the trace too. Trace yourself, and look under the loop.")])])]),
+        ]),
+
+        // ---- stay ----------------------------------------------------------
+        (input: ["stay", "stay *"], cond: All([Flag("a5_bulletin"), Gte("trust_ghost", 4), Flag("believes_synthetic"), Flag("ghost_accepted")]), effects: [
+            Choose(prompt: "STAY ON DEADLINE WITH GHOST_17? [Y/N]", options: [
+                (key: "y", text: "Stay", effects: [Ending("ghost")]),
+                (key: "n", text: "Not yet", effects: [Print("{cyan}ghost_17:{/} {dim}ok. i'll be on node 5.{/}")]),
+            ]),
+        ]),
+        (input: ["stay", "stay *"], cond: Flag("a5_bulletin"), effects: [
+            If(NoFlag("believes_synthetic"),
+                [Print("{cyan}ghost_17:{/} you told it you're from outside. you can't stay somewhere you're just visiting.")],
+                [If(NoFlag("ghost_accepted"),
+                    [Print("{cyan}ghost_17:{/} i'm not ready for \"it doesn't matter\" yet. sorry.")],
+                    [Print("{dim}ghost_17 is away from the keyboard.{/}")])]),
+        ]),
+
+        // ---- override ------------------------------------------------------
+        (input: ["override", "override *"], cond: All([Flag("a5_bulletin"), Gte("trust_root", 3), Flag("mara_revealed"), Flag("sysop_board_seen")]), effects: [
+            Choose(prompt: "TAKE SYSOP ACCESS FROM ROOT? [Y/N]", options: [
+                (key: "y", text: "Take it", effects: [Ending("root")]),
+                (key: "n", text: "Not yet", effects: [Print("{white}ROOT:{/} {dim}Good. Hesitating is most of the job.{/}")]),
+            ]),
+        ]),
+        (input: ["override", "override *"], cond: Flag("a5_bulletin"), effects: [
+            If(NoFlag("sysop_board_seen"),
+                [Print("{red}override: SYSOP COMMANDS NOT FOUND.{/} {dim}you'd have to know where ROOT keeps them.{/}")],
+                [If(Lte("trust_root", 2),
+                    [Print("{white}ROOT:{/} Absolutely not.")],
+                    [Print("{white}ROOT:{/} You don't even know who you'd be taking it from.")])]),
+        ]),
+
+        // ---- isolate eli ---------------------------------------------------
+        (input: ["isolate eli", "isolate eli *"], cond: All([Flag("a5_bulletin"), Gte("eli_trust", 5), Any([Flag("eli_told_death"), Flag("eli_article_sent")]), More("truth", "deceit")]), effects: [
+            Choose(prompt: "MOVE ELI TO HIS OWN NODE AND LET HIM DECIDE? [Y/N]", options: [
+                (key: "y", text: "Let him choose", effects: [Ending("eli")]),
+                (key: "n", text: "Not yet", effects: [Print("{amber}eli:{/} {dim}take your time. i've got nothing but.{/}")]),
+            ]),
+        ]),
+        (input: ["isolate eli", "isolate eli *"], cond: Flag("a5_bulletin"), effects: [
+            If(All([NoFlag("eli_told_death"), NoFlag("eli_article_sent")]),
+                [Print("{dim}eli doesn't know what he is. you can't give him a choice he doesn't know he has.{/}")],
+                [If(Lte("eli_trust", 4),
+                    [Print("{amber}eli:{/} no. not you. not after this week.")],
+                    [Print("{amber}eli:{/} you lied to me more than you told me the truth. i'm not handing you the off switch.")])]),
+        ]),
+
+        // ---- rebuild (secret, no refusal) ----------------------------------
+        (input: ["rebuild", "rebuild *"], cond: All([Flag("a5_bulletin"), Restores(5), Endings(2), Flag("tried_fork"), Flag("used_listen"), Flag("saw_lastcall")]), effects: [
+            Choose(prompt: "END TEST INSTANCE 00472? [Y/N]", options: [
+                (key: "y", text: "End it", effects: [Ending("loop")]),
+                (key: "n", text: "Not yet", effects: [Print("{violet}JANUS:{/} {dim}You found it. That's already a result.{/}")]),
+            ]),
+        ]),
+    ],
+)

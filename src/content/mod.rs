@@ -34,6 +34,8 @@ pub struct Content {
     pub journal: Vec<JournalRule>,
     pub sprites: HashMap<String, Sprite>,
     pub art: HashMap<String, String>,
+    /// The highest act any story file declares. Acts past it aren't written yet.
+    pub last_act: u8,
 }
 
 fn ron_options() -> ron::Options {
@@ -86,6 +88,7 @@ impl Content {
     }
 
     fn merge(&mut self, mut p: ContentFile) {
+        self.last_act = self.last_act.max(p.act);
         for e in p.events.iter_mut().filter(|e| e.act == 0) {
             e.act = p.act;
         }

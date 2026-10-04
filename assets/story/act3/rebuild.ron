@@ -44,6 +44,7 @@
                 (id: "start", lines: [
                     "hello, node 2.",
                     "...why does that feel like a rerun.",
+                    "also your login says BUILD 1998.2 up top. mine just says DEADLINE. did mara give you a beta or something?",
                 ], choices: [
                     (text: "because it is.", effects: [Add("truth", 1)], goto: "seat"),
                     (text: "deja vu.", goto: "seat"),

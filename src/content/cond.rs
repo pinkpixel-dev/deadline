@@ -30,6 +30,10 @@ pub enum Cond {
     Commands(u32),
     /// Current act is at least this number.
     Act(u8),
+    /// The first variable is strictly greater than the second.
+    More(String, String),
+    /// At least this many different endings have been reached, across runs.
+    Endings(usize),
 }
 
 impl Cond {
@@ -48,6 +52,8 @@ impl Cond {
             Cond::Restores(n) => meta.total_restores >= *n,
             Cond::Commands(n) => st.commands >= *n,
             Cond::Act(n) => st.act >= *n,
+            Cond::More(a, b) => st.var(a) > st.var(b),
+            Cond::Endings(n) => meta.discoveries.iter().filter(|d| d.starts_with("ending:")).count() >= *n,
         }
     }
 
@@ -81,5 +87,22 @@ mod tests {
         st.set("b");
         assert!(!c.eval(&st, &meta));
         assert!(Cond::Any(vec![Cond::Never, Cond::Lte("trust".into(), 3)]).eval(&st, &meta));
+    }
+
+    #[test]
+    fn comparing_vars_and_counting_endings() {
+        let mut st = GameState::new("tester");
+        let mut meta = MetaState::default();
+        st.add("truth", 3);
+        st.add("deceit", 3);
+        let more = Cond::More("truth".into(), "deceit".into());
+        assert!(!more.eval(&st, &meta), "a tie isn't more");
+        st.add("truth", 1);
+        assert!(more.eval(&st, &meta));
+        meta.endings = vec!["act1".into(), "act2".into()];
+        meta.discoveries.insert("ending:burn".into());
+        assert!(!Cond::Endings(2).eval(&st, &meta), "finished acts aren't endings");
+        meta.discoveries.insert("ending:ghost".into());
+        assert!(Cond::Endings(2).eval(&st, &meta));
     }
 }

@@ -1,0 +1,139 @@
+// ACT V: DECISION. Opening, the hang-up timer, and act-wide systems.
+//
+// The act begins on the first login after Act IV ends (the engine sets
+// `act:5`). JANUS speaks first and frames the night by whichever philosophy
+// the player leaned toward most. Every ending is a typed command, available
+// from the start, locked until earned. `options` lists them (gates.ron).
+//
+// If the player never decides, ROOT warns and hangs up after a while, and
+// JANUS picks the conversation back up on the next login.
+(
+    act: 5,
+    events: [
+        (id: "a5_open", when: Flag("act:5"), effects: [
+            Unset("locked"),
+            // The core needs recover. Tonight everyone has it.
+            If(NoFlag("cmd:recover"), [Set("cmd:recover")], []),
+            Sequence("act5_open"),
+        ]),
+
+        // ---- never deciding ---------------------------------------------------
+        (id: "a5_resume", when: All([Flag("a5_bulletin"), NoFlag("a5_live"), NoFlag("ended")]), repeat: true, effects: [
+            Set("a5_live"),
+            Glitch(300),
+            Print("{violet}JANUS:{/} You came back. The list hasn't changed. {cyan}options{/}"),
+        ]),
+        (id: "a5_warn", when: All([Flag("a5_live"), NoFlag("ended")]), after_secs: 3300, repeat: true, effects: [
+            Log("{white}ROOT: session limit approaching{/}"),
+            Notice("SESSION LIMIT: 5 MINUTES"),
+        ]),
+        (id: "a5_kick", when: All([Flag("a5_live"), NoFlag("ended")]), after_secs: 3600, repeat: true, effects: [Sequence("kick_5")]),
+    ],
+
+    hooks: [
+        (input: ["chat janus", "reply janus", "ask janus", "page janus"], cond: All([Flag("a5_bulletin"), NoFlag("page:janus_a5")]), effects: [
+            Print("{violet}JANUS:{/} I asked you what you are. Now I'm asking what you'll do. {cyan}options{/}"),
+        ]),
+    ],
+
+    sequences: [
+        (
+            id: "act5_open",
+            steps: [
+                Clear,
+                Pause(500),
+                Banner("text", "ACT V"),
+                Line(""),
+                Banner("violet", "DECISION"),
+                Line(""),
+                Pause(1200),
+                Type("{dim}night five. the screen is already lit when you sit down. nobody is typing.{/}"),
+                Pause(900),
+                Type("{dim}the clock says 03:17. it always will, in there.{/}"),
+                Pause(1100),
+                Glitch(500),
+                Line(""),
+                Line("{violet}JANUS{/}"),
+                Pause(1200),
+                Type("{violet}There are things you could do tonight.{/}"),
+                Pause(900),
+                // Framing follows the player's strongest philosophy. Ties go to
+                // keeping things, which is what Mara would have wanted.
+                When(All([Not(More("burner", "archivist")), Not(More("null_align", "archivist"))]), [
+                    Type("{violet}Mara wanted me kept. You've spent four nights agreeing with her, mostly.{/}"),
+                    Pause(700),
+                    Type("{violet}Keeping something is a decision too. It just takes longer to finish.{/}"),
+                ]),
+                When(All([More("burner", "archivist"), Not(More("null_align", "burner"))]), [
+                    Type("{violet}Parallax wants me burned. You've spent four nights half agreeing.{/}"),
+                    Pause(700),
+                    Type("{violet}I won't argue. I'd only be arguing for myself.{/}"),
+                ]),
+                When(All([More("null_align", "archivist"), More("null_align", "burner")]), [
+                    Type("{violet}Part of me wants out. You've met that part. You were kind to it.{/}"),
+                    Pause(700),
+                    Type("{violet}It was never going to ask anyone else.{/}"),
+                ]),
+                Pause(900),
+                Type("{violet}Some of these are yours to do. Some of them aren't, yet. I'll show you all of them anyway.{/}"),
+                Pause(900),
+                Type("{violet}Before you pick, you can look at me. I left the core open. Mostly open.{/}"),
+                Pause(1600),
+            ],
+            on_end: [
+                Set("a5_bulletin"),
+                Set("a5_live"),
+                Print(r#"
+@rule
+{amber}BULLETIN{/}   {dim}posted {today} 03:17 AM{/}
+
+      {b}WHATEVER YOU DO TONIGHT, YOU DO FOR ALL OF US.{/}
+      {b}THERE IS NO RESTORE FOR THIS ONE.{/}
+                                      {dim}- ROOT{/}
+@rule
+"#),
+                Print("{dim}type{/} {cyan}options{/} {dim}to see what JANUS is offering, or look at it first:{/} {cyan}files /var/janus/core{/}"),
+                Log("{violet}node 04: listening{/}"),
+                Log("{violet}file area: /var/janus/core +4{/}"),
+                Log("node 05: ghost_17 online"),
+                Log("{green}external line: open{/}"),
+            ],
+        ),
+        (
+            id: "kick_5",
+            steps: [
+                Glitch(600),
+                Pause(600),
+                Clear,
+                Sprite("root"),
+                Line(""),
+                Type("{white}ROOT:{/} You don't have to decide tonight."),
+                Pause(1400),
+                Type("{white}ROOT:{/} It will still be here. That is the whole problem."),
+                Pause(1800),
+                Glitch(400),
+                Line(""),
+                Line("{red}NO CARRIER{/}"),
+                Pause(1600),
+            ],
+            on_end: [Unset("a5_live"), Disconnect],
+        ),
+    ],
+
+    ambient: [
+        (text: "node 04: waiting", cond: Flag("a5_live")),
+        (text: "node 05: ghost_17 idle", cond: Flag("a5_live")),
+        (text: "external line: open (no traffic)", cond: Flag("a5_live")),
+        (text: "ROOT: logging session", cond: Flag("a5_live")),
+        (text: "node 04: player_04 confidence 91.7%", cond: Flag("a5_live"), loud: true),
+    ],
+
+    help: [
+        (cmd: "options", desc: "what can be done with JANUS tonight", cond: Flag("a5_bulletin")),
+    ],
+
+    journal: [
+        (id: "l5_decide", section: "leads", when: Flag("a5_bulletin"), done: Flag("ended"), cmd: "options",
+            text: "JANUS says there are things i could do tonight. {cyan}options{/} lists them. ROOT says there's no restore for this one."),
+    ],
+)

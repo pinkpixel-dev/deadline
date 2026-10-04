@@ -62,6 +62,8 @@ pub struct App {
     /// Clickable terminal rows from the last frame: (row, menu, item, command).
     pub link_hits: Vec<(Rect, u32, usize, String)>,
     next_event_check: f64,
+    /// Whether this launch has said the open act isn't written yet.
+    pub(crate) build_end_shown: bool,
 }
 
 impl App {
@@ -94,6 +96,7 @@ impl App {
             next_menu: 1,
             link_hits: Vec::new(),
             next_event_check: 0.0,
+            build_end_shown: false,
         }
     }
 
@@ -248,10 +251,12 @@ impl App {
         self.t < self.glitch_until
     }
 
-    /// Persist the live timeline. Errors are logged, never fatal.
+    /// Persist the live timeline. Errors are logged, never fatal. After an
+    /// ending the run is over, so the session is deleted instead.
     pub fn save_session(&mut self) {
         if let Some(store) = &self.store {
-            if let Err(e) = store.save_session(&self.st) {
+            let res = if self.st.has("ended") { store.clear_session() } else { store.save_session(&self.st) };
+            if let Err(e) = res {
                 let msg = format!("{{red}}SESSION WRITE FAILED: {e}{{/}}");
                 self.log(&msg);
             }

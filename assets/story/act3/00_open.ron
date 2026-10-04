@@ -96,7 +96,6 @@
             Log("{violet}node 04: build rejected{/}"),
             Sequence("a3_rebuild"),
         ]),
-        (id: "a3_slip_hide", when: Flag("show_build"), after_secs: 5, effects: [Unset("show_build")]),
     ],
 
     hooks: [
@@ -118,6 +117,10 @@
   07   {dim}empty{/}
   08   {dim}empty{/}
 "#)]),
+        // Once the night has rebuilt, the clock admits which build it is.
+        (input: ["date", "time"], cond: All([Flag("y1998"), Gte("build", 2)]), effects: [
+            Print("{dim}SYSTEM CLOCK:{/} {date}  {time}  {violet}(build 1998.{var:build}){/}"),
+        ]),
         (input: ["scan"], cond: All([Flag("y1998"), Gte("build", 2)]), effects: [Print(r#"
 {b}NODE SCAN{/}
   01   {violet}mara{/}            {green}active{/}  {dim}sysop console{/}
