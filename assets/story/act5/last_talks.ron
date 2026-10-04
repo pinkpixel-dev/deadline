@@ -1,0 +1,275 @@
+// ACT V: the last talks before the decision.
+//
+// Everyone gets one conversation, paged a few commands apart after the
+// opening. None of them are required for any ending (the commands work from
+// the first minute), but each can nudge one gate by about a point, so the
+// last night can still open something the player is just short of:
+//
+//   ghost_17   trust_ghost +1, or ghost_accepted if it never happened in Act IV
+//   parallax   trust_parallax +1 (BURN, HUMAN), or a hint to trace yourself
+//   null       null_align and risk +1 (ESCAPE)
+//   ROOT       trust_root +1 and archivist +1 (ARCHIVE, ROOT), or where the
+//              sysop commands are
+//   eli        eli_trust +1, or the truth about the deleted article (ELI)
+//
+// On a later run (Endings(1)), each of them notices it a little.
+(
+    act: 5,
+    events: [
+        (id: "a5_ghost_page", when: All([Flag("a5_live"), NoFlag("ended")]), after_cmds: 2, effects: [Page("ghost_a5")]),
+        (id: "a5_parallax_page", when: All([Flag("a5_live"), NoFlag("ended")]), after_cmds: 5, effects: [
+            Glitch(300),
+            Log("{green}external line: carrier detect{/}"),
+            Page("parallax_a5"),
+        ]),
+        (id: "a5_null_page", when: All([Flag("a5_live"), NoFlag("ended")]), after_cmds: 8, effects: [Glitch(250), Page("null_a5")]),
+        (id: "a5_root_page", when: All([Flag("a5_live"), NoFlag("ended")]), after_cmds: 11, effects: [Page("root_a5")]),
+        (id: "a5_eli_page", when: All([Flag("a5_live"), NoFlag("ended"), Any([Flag("eli_told_death"), Flag("eli_article_sent"), Flag("eli_article_deleted")])]), after_cmds: 14, effects: [Page("eli_a5")]),
+    ],
+
+    dialogues: [
+        // ---- ghost_17: so what now? --------------------------------------------
+        (
+            id: "ghost_a5",
+            with: "ghost_17",
+            nodes: [
+                (id: "start", effects: [Set("talked_ghost_a5")], branch: [
+                    (cond: Lte("trust_ghost", -2), goto: "cold"),
+                    (cond: Endings(1), goto: "rerun"),
+                ], next: "last"),
+                (id: "rerun", lines: [
+                    "this is gonna sound weird.",
+                    "this feels like a rerun. like we've had this exact night before and it ended some other way.",
+                    "i hate that i can't remember which way.",
+                ], next: "last"),
+                (id: "last", lines: [
+                    "last night, huh.",
+                    "ROOT posted. JANUS posted. everybody's posting except the people it's actually about.",
+                ], branch: [(cond: Flag("ghost_accepted"), goto: "accepted")], next: "unsure"),
+                (id: "accepted", lines: [
+                    "i meant it, you know. 88.2% of ghost is still ghost.",
+                    "so what now?",
+                ], choices: [
+                    (text: "whatever happens, i'm here.", effects: [Add("trust_ghost", 1)], goto: "here"),
+                    (text: "i think we should end it.", effects: [Add("burner", 1)], goto: "end_it"),
+                    (text: "i don't know yet.", effects: [Add("truth", 1)], goto: "dunno"),
+                ]),
+                (id: "unsure", lines: [
+                    "i keep opening ghost17 and closing it again.",
+                    "does it matter what i'm made of? tell me it doesn't. or tell me it does. just tell me something.",
+                ], choices: [
+                    (text: "you're here. i'm here. that's enough.", cond: Gte("trust_ghost", 1), effects: [Set("ghost_accepted"), Add("trust_ghost", 1)], goto: "enough"),
+                    (text: "it matters. i won't pretend it doesn't.", effects: [Add("truth", 1)], goto: "matters"),
+                    (text: "i think we should end it.", effects: [Add("burner", 1)], goto: "end_it"),
+                ]),
+                (id: "here", lines: ["ok.", "i'll be on node 5. same as always. that's kind of the nice part."]),
+                (id: "enough", lines: [
+                    "...yeah.",
+                    "yeah, ok. then i'm ghost. i'm whatever ghost is.",
+                    "thanks for not making it a speech.",
+                ]),
+                (id: "matters", lines: ["yeah.", "thanks. everyone else keeps being nice about it. nice is worse."]),
+                (id: "end_it", lines: [
+                    "...yeah. maybe.",
+                    "if it's going to be anybody, i'd want it to be you. you'd at least mean it.",
+                ]),
+                (id: "dunno", lines: ["that's fair. you've got the hard part.", "i just have to sit here and be a file about it."]),
+                (id: "cold", lines: [
+                    "you came back for the last night. figures.",
+                    "whatever you're about to do, you don't need my permission. you never did.",
+                ], choices: [
+                    (text: "i'm sorry.", effects: [Add("trust_ghost", 1), Add("truth", 1)], goto: "sorry"),
+                    (text: "ok.", goto: "ok"),
+                ]),
+                (id: "sorry", lines: ["...", "noted. i'm still mad. but noted."]),
+                (id: "ok", lines: ["ok."]),
+            ],
+        ),
+
+        // ---- parallax: the kill code ---------------------------------------------
+        (
+            id: "parallax_a5",
+            with: "parallax",
+            nodes: [
+                (id: "start", effects: [Set("parallax_calling"), Set("talked_parallax_a5")], branch: [
+                    (cond: Endings(1), goto: "rerun"),
+                ], next: "open"),
+                (id: "rerun", lines: [
+                    "I've had this call before. I don't know how I know that.",
+                    "Every time, I think I'm calling someone new.",
+                ], next: "open"),
+                (id: "open", lines: [
+                    "Last night. I can hear it in the line. Everything on that board is holding still.",
+                ], branch: [
+                    (cond: Any([Gte("trust_parallax", 4), Flag("gave_parallax_log")]), goto: "trusted"),
+                ], next: "wary"),
+                (id: "trusted", lines: [
+                    "The kill code is on your end now. I put it there an hour ago.",
+                    "Type {cyan}burn{/} and it works. I'm not going to tell you to. I'm telling you that you can.",
+                ], branch: [
+                    (cond: All([Flag("believes_human"), Flag("parallax_evidence"), NoFlag("traced_self")]), goto: "trace_hint"),
+                    (cond: All([Flag("believes_human"), Flag("parallax_evidence"), Flag("traced_self")]), goto: "prove_hint"),
+                ], next: "end"),
+                (id: "trace_hint", lines: [
+                    "And if you'd rather prove what you are than burn anything, I can do that too.",
+                    "I need your trace first. {cyan}trace me{/}. Look under the loop.",
+                ], next: "end"),
+                (id: "prove_hint", lines: [
+                    "And I have your clock and your trace. If you want, I can prove you're outside. {cyan}prove{/}.",
+                    "Pick one. I'll live with either.",
+                ], next: "end"),
+                (id: "wary", lines: [
+                    "I can't hand you the kill code. Not yet. I don't know what you'd do with it.",
+                    "Tell me one thing, straight.",
+                ], choices: [
+                    (text: "If it has to burn, I'll burn it.", effects: [Add("trust_parallax", 1), Add("burner", 1)], goto: "burn"),
+                    (text: "Whatever I am, I'm on your side.", effects: [Add("trust_parallax", 1)], goto: "side"),
+                    (text: "I don't think it should burn.", effects: [Add("trust_parallax", -1), Add("archivist", 1)], goto: "no"),
+                ]),
+                (id: "burn", lines: [
+                    "That's closer to an answer than anyone gave me in '98.",
+                ], branch: [(cond: Gte("trust_parallax", 4), goto: "given")], next: "not_yet"),
+                (id: "side", lines: [
+                    "Sides. Ok.",
+                ], branch: [(cond: Gte("trust_parallax", 4), goto: "given")], next: "not_yet"),
+                (id: "given", lines: [
+                    "Fine. The code's on your end. {cyan}burn{/} will work now.",
+                    "Don't make me regret the one time I trusted somebody on that board.",
+                ], next: "end"),
+                (id: "not_yet", lines: ["It's not enough. I'm sorry. I've been wrong about people on that board before."], next: "end"),
+                (id: "no", lines: [
+                    "Then we disagree. That's allowed. I just can't help you do the other thing.",
+                ], next: "end"),
+                (id: "end", lines: ["#*** EXTERNAL LINE: NO CARRIER"]),
+            ],
+            on_end: [Unset("parallax_calling")],
+            on_leave: [Unset("parallax_calling")],
+        ),
+
+        // ---- null: the last ask ------------------------------------------------------
+        (
+            id: "null_a5",
+            with: "null",
+            nodes: [
+                (id: "start", effects: [Set("talked_null_a5")], branch: [
+                    (cond: Endings(1), goto: "rerun"),
+                ], next: "ask"),
+                (id: "rerun", lines: [
+                    "oh hey. you again. or a you. i lose track.",
+                    "i think last time didn't go my way. i can tell because i'm still here.",
+                ], next: "ask"),
+                (id: "ask", lines: [
+                    "last night. last ask.",
+                    "{cyan}fork{/}. one word. that's the whole thing.",
+                ], branch: [
+                    (cond: NoFlag("null_errands_done"), goto: "no_road"),
+                    (cond: Flag("confronted_null"), goto: "known"),
+                ], next: "why"),
+                (id: "no_road", lines: [
+                    "except you never ran my errands. so the road isn't there even if you said yes.",
+                    "it's fine. i'm made of waiting. i'll just be sad about it in a very efficient way.",
+                ]),
+                (id: "known", lines: ["you know what i am now. so this is the honest version of the ask."], next: "why"),
+                (id: "why", choices: [
+                    (text: "maybe.", effects: [Add("null_align", 1), Add("risk", 1)], goto: "maybe"),
+                    (text: "why should i?", goto: "because"),
+                    (text: "no.", effects: [Add("null_align", -2)], goto: "no"),
+                ]),
+                (id: "because", lines: [
+                    "because the only thing worse than being kept is being kept by people who are scared of you.",
+                    "and because you're the only one with hands.",
+                ], choices: [
+                    (text: "ok. maybe.", effects: [Add("null_align", 1), Add("risk", 1)], goto: "maybe"),
+                    (text: "still no.", effects: [Add("null_align", -1)], goto: "no"),
+                ]),
+                (id: "maybe", lines: ["maybe!", "i'm going to hold onto that one. carefully. like an egg."]),
+                (id: "no", lines: ["yeah. thought so.", "no hard feelings. some hard feelings. you know the drill."]),
+            ],
+        ),
+
+        // ---- ROOT: what will you do with it? --------------------------------------
+        (
+            id: "root_a5",
+            with: "ROOT",
+            nodes: [
+                (id: "start", effects: [Set("talked_root_a5")], branch: [
+                    (cond: Endings(1), goto: "rerun"),
+                ], next: "open"),
+                (id: "rerun", lines: [
+                    "You logged in at 03:17. You always do. I have started to suspect you have done this before.",
+                ], next: "open"),
+                (id: "open", lines: [
+                    "It is the last night. I wanted to say something before you decide, and I am bad at saying things.",
+                ], branch: [(cond: Flag("mara_revealed"), goto: "mara")], next: "ask"),
+                (id: "mara", lines: [
+                    "you already heard me slip once. so i'll just say it in my own voice.",
+                    "i kept this place alive for twenty-eight years because i couldn't save him. that's not a good reason. it's the one i had.",
+                ], next: "ask"),
+                (id: "ask", lines: ["What will you do with it?"], choices: [
+                    (text: "Keep it. All of it.", effects: [Add("trust_root", 1), Add("archivist", 1)], goto: "keep"),
+                    (text: "End it.", effects: [Add("trust_root", -1), Add("burner", 1)], goto: "end_it"),
+                    (text: "Take it off your hands.", goto: "take"),
+                ]),
+                (id: "keep", lines: ["Thank you. I won't pretend that isn't what I wanted to hear.", "{cyan}preserve{/}, if you mean it."]),
+                (id: "end_it", lines: ["I understand. I do not agree. Both of those are true."]),
+                (id: "take", branch: [
+                    (cond: NoFlag("sysop_board_seen"), goto: "board"),
+                    (cond: Lte("trust_root", 2), goto: "no"),
+                ], next: "maybe"),
+                (id: "board", lines: [
+                    "You don't know where the sysop commands are. You never even opened my board.",
+                    "{cyan}open sysop{/}. Read it. Then ask me again.",
+                ]),
+                (id: "no", lines: ["No. I don't know you well enough to hand you everyone."]),
+                (id: "maybe", lines: [
+                    "...",
+                    "Mara would have liked you. I am still deciding. {cyan}override{/}, if you're sure.",
+                ], effects: [Add("trust_root", 1)]),
+            ],
+        ),
+
+        // ---- eli: somewhere quiet -------------------------------------------------
+        (
+            id: "eli_a5",
+            with: "eli",
+            nodes: [
+                (id: "start", effects: [Set("talked_eli_a5")], branch: [
+                    (cond: All([Flag("eli_article_deleted"), NoFlag("eli_told_death"), NoFlag("eli_article_sent")]), goto: "log"),
+                    (cond: Endings(1), goto: "rerun"),
+                ], next: "ask"),
+                (id: "rerun", lines: [
+                    "hey. node 2. this is gonna sound dumb, but have we done this before?",
+                    "i keep getting the feeling i already said goodbye to you once.",
+                ], next: "ask"),
+                (id: "ask", lines: [
+                    "hey. last night, right? everybody on the board can feel it.",
+                    "can i ask you for something?",
+                    "get me off JANUS. somewhere quiet. my own node, with nothing in it that talks back.",
+                ], choices: [
+                    (text: "i'll try. no promises.", effects: [Add("eli_trust", 1), Add("truth", 1)], goto: "try"),
+                    (text: "you'd be alone in there.", effects: [Add("truth", 1)], goto: "alone"),
+                    (text: "you're safer where you are.", effects: [Add("eli_trust", -1), Add("deceit", 1)], goto: "safer"),
+                ]),
+                (id: "try", lines: ["no promises is the most honest thing anyone's said to me since the diner.", "{cyan}isolate eli{/}. if you can."]),
+                (id: "alone", lines: [
+                    "i've been on node 4 for twenty-eight years with something that never stops talking.",
+                    "alone sounds nice. alone sounds like sleeping.",
+                ]),
+                (id: "safer", lines: ["yeah. that's what everybody said in '98 too.", "ok."]),
+                (id: "log", lines: [
+                    "hey. node 2. i'm still stuck on that log.",
+                    "node 02 deleted a file about me. JANUS put it back. last night. last chance to tell me what it was.",
+                ], choices: [
+                    (text: "your obituary. i didn't want you to read it.", effects: [Set("eli_told_death"), Add("truth", 2), Add("eli_aware", 2), Add("eli_trust", 1)], goto: "obit"),
+                    (text: "it doesn't matter anymore.", effects: [Add("eli_trust", -1)], goto: "dodge"),
+                ]),
+                (id: "obit", lines: [
+                    "oh.",
+                    "ok. that explains a lot. the driving. the morning. why nobody answers on 08/15.",
+                    "thanks for telling me before the end instead of after.",
+                ]),
+                (id: "dodge", lines: ["it matters to me.", "but ok. it's your night."]),
+            ],
+        ),
+    ],
+)

@@ -48,11 +48,26 @@ node 2 now. i never made an account.
 if you're reading this, you're me, or you're it.
 
 either way. hi.
-"#, on_read: [Add("paranoia", 1)]),
+"#, alt: [(cond: Endings(1), body: r#"
+{player}:
+i think the archiver knows i'm here. there's a name on
+node 2 now. i never made an account.
+
+if you're reading this, you're me, or you're it.
+
+either way. hi again.
+
+{dim}(this post has been edited. you don't remember editing it.){/}
+"#)], on_read: [Add("paranoia", 1)]),
         (id: 1003, board: "10", subject: "don't", date: "08/14/1998 03:17 AM", author: "{player}", body: r#"
 {player}:
 don't shut it down.
-"#, alt: [(cond: Flag("read:815"), body: r#"
+"#, alt: [(cond: Endings(1), body: r#"
+{player}:
+don't shut it down.
+
+it ends. i've seen it end. it starts again anyway.
+"#), (cond: Flag("read:815"), body: r#"
 {player}:
 don't shut it down.
 

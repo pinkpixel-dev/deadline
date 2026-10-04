@@ -1,7 +1,7 @@
 //! Act V: endings and rebuilding a run.
 
-use super::tests::{app, cmd, pick, run, screen};
-use super::tests_act2::{next_login, skip};
+use super::tests::{app, cmd, finish_chat, pick, run, screen};
+use super::tests_act2::{answer, next_login, skip};
 use crate::app::App;
 use crate::content::effect::Effect;
 use crate::systems::save::Store;
@@ -202,4 +202,64 @@ fn never_deciding_gets_you_hung_up_and_picked_back_up() {
     run(&mut a, 1.0);
     assert!(a.st.has("a5_live"));
     assert!(screen(&a).contains("You came back"), "{}", screen(&a));
+}
+
+#[test]
+fn parallax_can_hand_over_the_kill_code_on_the_last_night() {
+    let (mut a, _) = act5("parallax", &[]);
+    a.st.set_var("trust_parallax", 3);
+    cmd(&mut a, "burn");
+    assert!(screen(&a).contains("KEY REQUIRED"));
+    answer(&mut a, "parallax_a5");
+    pick(&mut a, "If it has to burn");
+    finish_chat(&mut a);
+    assert!(screen(&a).contains("burn{/}") || screen(&a).contains("will work now"), "{}", screen(&a));
+    cmd(&mut a, "burn");
+    assert!(a.choice.is_some(), "the code is on your end now");
+}
+
+#[test]
+fn ghost_can_accept_their_file_on_the_last_night() {
+    let (mut a, _) = act5("ghost", &["believes_synthetic"]);
+    a.st.set_var("trust_ghost", 3);
+    cmd(&mut a, "stay");
+    assert!(screen(&a).contains("not ready"));
+    answer(&mut a, "ghost_a5");
+    pick(&mut a, "that's enough");
+    finish_chat(&mut a);
+    assert!(a.st.has("ghost_accepted") && a.st.var("trust_ghost") >= 4);
+    cmd(&mut a, "stay");
+    assert!(a.choice.is_some());
+}
+
+#[test]
+fn root_points_you_at_the_sysop_board() {
+    let (mut a, _) = act5("root-talk", &["mara_revealed"]);
+    a.st.set_var("trust_root", 3);
+    answer(&mut a, "root_a5");
+    pick(&mut a, "Take it off your hands");
+    finish_chat(&mut a);
+    assert!(screen(&a).contains("open sysop"), "{}", screen(&a));
+}
+
+#[test]
+fn eli_can_still_learn_the_truth_on_the_last_night() {
+    let (mut a, _) = act5("eli", &["eli_article_deleted"]);
+    a.st.set_var("eli_trust", 4);
+    a.st.set_var("truth", 5);
+    answer(&mut a, "eli_a5");
+    pick(&mut a, "your obituary");
+    finish_chat(&mut a);
+    assert!(a.st.has("eli_told_death"));
+    cmd(&mut a, "isolate eli");
+    assert!(a.choice.is_some(), "telling him the truth opens his ending");
+}
+
+#[test]
+fn later_runs_feel_like_a_rerun() {
+    let (mut a, _) = act5("rerun", &["ghost_accepted"]);
+    a.meta.discoveries.insert("ending:burn".into());
+    a.st.set_var("trust_ghost", 3);
+    answer(&mut a, "ghost_a5");
+    assert!(screen(&a).contains("this feels like a rerun"), "{}", screen(&a));
 }

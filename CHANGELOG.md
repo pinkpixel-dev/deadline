@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.8.0 - October 3, 2026
+
+### 🎬 Act V: last talks
+
+- Before you decide, everyone gets one last conversation: ghost_17, Parallax, null, ROOT, and Eli if he knows what he is
+- Each talk can nudge you over the line for one ending. Parallax can hand over the kill code, ghost can come to terms with their file, null asks one last time, ROOT tells you where the sysop commands are, and Eli can still learn the truth about the article you deleted
+- None of them are required. Every ending command still works from the first minute if you've earned it
+
+### 🎞️ Endings
+
+- Every ending scene now reflects your run: who you were close to, what you told people, your promise to ROOT on the first night, and how the last talks went
+
+### 🔁 Replay
+
+- On a later run, the characters notice. ghost says it feels like a rerun, Parallax thinks they've had this call before, and Eli asks if you've already said goodbye
+- Two posts on Act II's `[10] YOU` board read differently once you've seen an ending
+
 ## 0.7.0 - October 3, 2026
 
 ### 🎬 Act V: DECISION
