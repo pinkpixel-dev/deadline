@@ -4,7 +4,7 @@
 
 DEADLINE is a text adventure that plays like a late-90s BBS. You dial in, the board knows your name, and somebody called `ghost_17` has been waiting for you.
 
-It runs in your terminal and uses Rust and Ratatui. The art is half-block pixel sprites and CP437 block art, so it looks like a real board instead of a menu with a story painted on top.
+It runs in your terminal and uses Rust and Ratatui. The art is half-block pixel sprites and CP437 block art, so it looks like a real board instead of a menu with a story painted on top. It opens on a short animated title, and any key or click skips it.
 
 The board's last public post is from 08/14/1998. It says `DON'T SHUT IT DOWN.` Nobody did.
 

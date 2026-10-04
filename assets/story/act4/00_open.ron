@@ -105,6 +105,8 @@
             steps: [
                 Clear,
                 Pause(500),
+                Sprite("render"),
+                Line(""),
                 Banner("text", "ACT IV"),
                 Line(""),
                 Banner("cyan", "IDENTITY"),
@@ -116,7 +118,7 @@
                 Pause(900),
                 When(Any([Flag("eli_told_death"), Flag("eli_article_sent")]), [Type("{dim}node 04 is lit. eli is on it. he knows what year it is now.{/}"), Pause(700)]),
                 When(Flag("eli_article_deleted"), [Type("{dim}node 04 is lit. eli is on it, reading something over and over.{/}"), Pause(700)]),
-                When(Any([Flag("eli_lied_death"), Flag("fled_eli")]), [Type("{dim}node 04 is busy. the header on it says BUILD 1998.4.{/}"), Pause(700)]),
+                When(Any([Flag("eli_lied_death"), Flag("fled_eli")]), [Type("{dim}node 04 is busy. the header on it says BUILD {build:4}.{/}"), Pause(700)]),
                 Pause(1600),
             ],
             on_end: [

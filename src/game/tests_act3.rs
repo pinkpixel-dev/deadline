@@ -81,6 +81,27 @@ fn warning_eli_makes_the_night_slip() {
     assert!(screen(&a).contains("(build 1998.2)"), "the clock admits it too");
 }
 
+#[test]
+fn later_runs_start_the_builds_higher() {
+    let mut a = app();
+    a.meta.runs = 1;
+    act3(&mut a);
+    a.st.set("heard_wipe");
+    cmd(&mut a, "open 04 --node");
+    cmd(&mut a, "y");
+    rebuilt(&mut a);
+    assert_eq!(a.st.var("build"), 2, "the night still counts its own builds");
+    cmd(&mut a, "date");
+    assert!(screen(&a).contains("(build 1998.5)"), "{}", screen(&a));
+    cmd(&mut a, "journal");
+    assert!(screen(&a).contains("BUILD 1998.5"), "the journal agrees with the header");
+    a.st.set("var_janus");
+    cmd(&mut a, "view /var/janus/builds.log");
+    let s = screen(&a);
+    assert!(s.contains("1998.4     21:04:00") && s.contains("1998.5     21:04:00"), "{s}");
+    assert!(!s.contains("1998.1 "), "the first run's builds aren't listed");
+}
+
 /// Keep typing until the night rebuilds, then let the cinematic play out.
 fn rebuilt(a: &mut App) {
     for _ in 0..5 {

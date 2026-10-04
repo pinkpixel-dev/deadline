@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.10.0 - October 3, 2026
+
+### 📺 Title screen
+
+- The game opens on a short animated title now. A CRT warms up, the modem handshake plays as carrier waves on a scope, the waves lock into one line, and that line breaks apart into a big DEADLINE. It takes about five seconds, and any key or click skips it
+
+### 🎨 Art
+
+- Every act's title card has its own animated piece: the modem for Act I, turning tape reels for Act II, a 21:04 clock that sometimes reads 03:17 for Act III, you rendering a scanline at a time for Act IV, and a half-violet face for Act V
+- The cutaway scenes animate too. Rebuilds and the `before_you` replay get a clock running backwards, BURN and PURGE watch the nodes go dark, ESCAPE and ARCHIVE watch them light up, HUMAN shows the trace running back to your machine, and ROOT's new caller gets a modem
+- JANUS shows its face the first time it talks to you
+- The credits open with the modem's lights going out one at a time
+- Boards GENERAL, CODE, OFF-TOPIC, SYSOP, ARCHIVE and YOU have header art now
+
+### 🔁 Later runs
+
+- Act III's 1998 builds start three higher for every run you've finished. On a second run the night opens at BUILD 1998.4, and everything that mentions a build number (the header, `date`, the journal, the build log, ghost's line, Eli's finger and Act IV's opening) agrees with it
+
+### 🧪 Tests
+
+- Every ending is now played from a saved end-of-Act-IV session, launched the way the game launches, through the ending and credits to the hang-up, and then launched again to check the next run starts fresh. Each one is also checked one step short of its gate
+
+### 🏷️ Versioning
+
+- Bumped to 0.10.0
+
 ## 0.9.0 - October 3, 2026
 
 ### 🗝️ Act V: the core

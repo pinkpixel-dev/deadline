@@ -56,23 +56,23 @@ the end of the month.
 {b}JANUS BUILD LOG{/}                          {dim}subject: 08/14/1998{/}
 
 BUILD      STARTED     RESULT
-1998.1     21:04:00    completed
+{build:1}     21:04:00    completed
 "#,
             alt: [
                 (cond: Gte("build", 3), body: r#"
 {b}JANUS BUILD LOG{/}                          {dim}subject: 08/14/1998{/}
 
 BUILD      STARTED     RESULT
-1998.1     21:04:00    {red}rejected{/}
-1998.2     21:04:00    {red}rejected{/}
-1998.3     21:04:00    completed
+{build:1}     21:04:00    {red}rejected{/}
+{build:2}     21:04:00    {red}rejected{/}
+{build:3}     21:04:00    completed
 "#),
                 (cond: Gte("build", 2), body: r#"
 {b}JANUS BUILD LOG{/}                          {dim}subject: 08/14/1998{/}
 
 BUILD      STARTED     RESULT
-1998.1     21:04:00    {red}rejected{/}
-1998.2     21:04:00    completed
+{build:1}     21:04:00    {red}rejected{/}
+{build:2}     21:04:00    completed
 "#),
             ],
             on_open: [
@@ -334,6 +334,8 @@ BUILD      STARTED     RESULT
             steps: [
                 Pause(900),
                 Clear,
+                Sprite("clock_1998"),
+                Line(""),
                 Banner("text", "ACT III"),
                 Line(""),
                 Banner("amber", "1998"),

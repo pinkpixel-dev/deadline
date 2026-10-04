@@ -2,10 +2,12 @@
 (
     boards: [
         (id: "01", name: "GENERAL", count_label: "382 msgs", header: r#"
+@sprite mug
 @banner cyan GENERAL
 {dim}the front porch. be nice. 382 messages, most purged in the crash.{/}
 "#),
         (id: "02", name: "CODE", count_label: "219 msgs", header: r#"
+@sprite terminal
 @banner green CODE
 {dim}C, pascal, asm, qbasic, and one guy who writes everything in perl.{/}
 "#),
@@ -25,6 +27,7 @@
 {dim}[05] TRADING POST :: TOTALLY LEGAL SOFTWARE{/}
 "#),
         (id: "06", name: "OFF-TOPIC", count_label: "487 msgs", header: r#"
+@sprite tv
 @banner magenta OFFTOPIC
 {dim}anything goes. this is where the board actually lives.{/}
 "#),
@@ -33,6 +36,7 @@
             name: "SYSOP",
             count_label: "13 msgs",
             header: r#"
+@sprite key
 @banner white SYSOP
 {dim}announcements from the sysop. read-only for users.{/}
 "#,
@@ -61,6 +65,7 @@
                 )],
             ),
             header: r#"
+@sprite lighthouse
 @banner violet ARCHIVE
 {dim}conversation logs recovered from node 04. read-only. do not redistribute.{/}
 "#,
