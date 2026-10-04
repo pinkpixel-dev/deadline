@@ -20,3 +20,5 @@ mod tests_act3;
 mod tests_act4;
 #[cfg(test)]
 mod tests_act5;
+#[cfg(test)]
+mod tests_endings;

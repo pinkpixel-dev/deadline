@@ -54,6 +54,8 @@
                 Glitch(800),
                 Clear,
                 Pause(900),
+                Sprite("janus"),
+                Line(""),
                 Line("{violet}JANUS{/}"),
                 Pause(1400),
                 When(Restores(1), [Type("{violet}You have restored {restores} times. I remember every one. You remember none of them.{/}"), Pause(900)]),
@@ -74,6 +76,8 @@
             steps: [
                 Pause(900),
                 Clear,
+                Sprite("render"),
+                Line(""),
                 Banner("text", "ACT IV"),
                 Line(""),
                 Banner("cyan", "IDENTITY"),

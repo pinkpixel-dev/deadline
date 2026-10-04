@@ -84,6 +84,8 @@
             steps: [
                 Clear,
                 Pause(500),
+                Sprite("reels"),
+                Line(""),
                 Banner("text", "ACT II"),
                 Line(""),
                 Banner("violet", "ARCHIVES"),
@@ -146,6 +148,8 @@
                 Pause(4000),
                 Clear,
                 Pause(600),
+                Sprite("reels"),
+                Line(""),
                 Banner("text", "ACT II"),
                 Line(""),
                 Banner("violet", "ARCHIVES"),

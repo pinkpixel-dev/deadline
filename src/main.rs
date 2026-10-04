@@ -84,7 +84,7 @@ fn main() -> Result<()> {
 
     let mut terminal = ratatui::init();
     execute!(stdout(), EnableMouseCapture)?;
-    let result = run(&mut terminal, &mut app);
+    let result = ui::splash::play(&mut terminal).and_then(|_| run(&mut terminal, &mut app));
     let _ = execute!(stdout(), DisableMouseCapture);
     ratatui::restore();
     app.save_session();

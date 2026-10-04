@@ -171,7 +171,7 @@
 {b}USER:{/}        eli
 {b}REAL NAME:{/}   Eli Voss
 {b}LAST LOGIN:{/}  08/14/1998  {dim}(rebuilding){/}
-{b}STATUS:{/}      node 04 busy  {violet}BUILD 1998.4{/}
+{b}STATUS:{/}      node 04 busy  {violet}BUILD {build:4}{/}
 {b}PLAN:{/}
   finish the archiver. move. sell the comics. in that order.
 "#),

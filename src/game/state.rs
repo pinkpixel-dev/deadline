@@ -130,6 +130,16 @@ pub struct MetaState {
     pub sessions: u32,
     pub endings: Vec<String>,
     pub discoveries: BTreeSet<String>,
+    /// Runs that reached an ending, counting repeats.
+    pub runs: u32,
+}
+
+impl MetaState {
+    /// Finished runs. Saves from before `runs` existed count their endings.
+    pub fn runs_done(&self) -> u32 {
+        let endings = self.endings.iter().filter(|e| !e.starts_with("act")).count() as u32;
+        self.runs.max(endings)
+    }
 }
 
 #[cfg(test)]

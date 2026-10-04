@@ -1,0 +1,79 @@
+// Act II title card: tape reels turning.
+fps 6
+palette
+. none
+h 6b6f7b
+k 15161a
+n 5a4128
+N 3a2a1c
+w e9e7e2
+c 4a4d57
+a ffb852
+frame
+..................................
+.....hhhNnhhh.........hhhnNhhh....
+....hnnNnnNnnh.......hNnnNnnNnh...
+...hnnNnnNnnNnh.....hNnnNnnNnnNh..
+..hnnNnnkwnNnnNh...hNnnNnkwnnNnnh.
+..hnNnkkkwwwnNnh...hnnNkkkwwwnnNh.
+..hNnnwkwwwwNnnh...hnNnwkwwwwnNnh.
+..NnnwwwccwkknNaaaanNnwwwccwkknnN.
+..nnNwwwccwkkNnaaaaNnnwwwccwkknNn.
+..hNnnwkwwwwNnnh...hnNnwkwwwwnNnh.
+..hnnNkkkwwwnnNh...hNnnkkkwwwNnnh.
+..hnNnnNkwNnnNnh...hnnNnnkwnNnnNh.
+...hnnNnnNnnNnh.....hNnnNnnNnnNh..
+....hNnnNnnNnh.......hnNnnNnnNh...
+.....hhhnnhhh.........hhhNnhhh....
+........hnnnnnnnnnnnnnnnnnh.......
+frame
+..................................
+.....hhhNnhhh.........hhhnNhhh....
+....hnnNnnNnnh.......hNnnNnnNnh...
+...hnnNnnNnnNnh.....hNnnNnnNnnNh..
+..hnnNnnkknNnnNh...hNnnNnkknnNnnh.
+..hnNnwwkkwwnNnh...hnnNwwkkwwnnNh.
+..hNnnwwwwwwNnnh...hnNnwwwwwwnNnh.
+..NnnwwwccwwwnNaaaanNnwwwccwwwnnN.
+..nnNkkwccwkkNnaaaaNnnkkwccwkknNn.
+..hNnnkkwwkkNnnh...hnNnkkwwkknNnh.
+..hnnNkwwwwknnNh...hNnnkwwwwkNnnh.
+..hnNnnNwwNnnNnh...hnnNnnwwnNnnNh.
+...hnnNnnNnnNnh.....hNnnNnnNnnNh..
+....hNnnNnnNnh.......hnNnnNnnNh...
+.....hhhnnhhh.........hhhNnhhh....
+........hnnnnnnnnnnnnnnnnnh.......
+frame
+..................................
+.....hhhNnhhh.........hhhnNhhh....
+....hnnNnnNnnh.......hNnnNnnNnh...
+...hnnNnnNnnNnh.....hNnnNnnNnnNh..
+..hnnNnnwknNnnNh...hNnnNnwknnNnnh.
+..hnNnwwwkkknNnh...hnnNwwwkkknnNh.
+..hNnnwwwwkwNnnh...hnNnwwwwkwnNnh.
+..NnnkkwccwwwnNaaaanNnkkwccwwwnnN.
+..nnNkkwccwwwNnaaaaNnnkkwccwwwnNn.
+..hNnnwwwwkwNnnh...hnNnwwwwkwnNnh.
+..hnnNwwwkkknnNh...hNnnwwwkkkNnnh.
+..hnNnnNwkNnnNnh...hnnNnnwknNnnNh.
+...hnnNnnNnnNnh.....hNnnNnnNnnNh..
+....hNnnNnnNnh.......hnNnnNnnNh...
+.....hhhnnhhh.........hhhNnhhh....
+........hnnnnnnnnnnnnnnnnnh.......
+frame
+..................................
+.....hhhNnhhh.........hhhnNhhh....
+....hnnNnnNnnh.......hNnnNnnNnh...
+...hnnNnnNnnNnh.....hNnnNnnNnnNh..
+..hnnNnnwwnNnnNh...hNnnNnwwnnNnnh.
+..hnNnkwwwwknNnh...hnnNkwwwwknnNh.
+..hNnnkkwwkkNnnh...hnNnkkwwkknNnh.
+..NnnkkwccwkknNaaaanNnkkwccwkknnN.
+..nnNwwwccwwwNnaaaaNnnwwwccwwwnNn.
+..hNnnwwwwwwNnnh...hnNnwwwwwwnNnh.
+..hnnNwwkkwwnnNh...hNnnwwkkwwNnnh.
+..hnNnnNkkNnnNnh...hnnNnnkknNnnNh.
+...hnnNnnNnnNnh.....hNnnNnnNnnNh..
+....hNnnNnnNnh.......hnNnnNnnNh...
+.....hhhnnhhh.........hhhNnhhh....
+........hnnnnnnnnnnnnnnnnnh.......

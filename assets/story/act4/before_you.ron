@@ -81,6 +81,8 @@
                 Glitch(900),
                 Clear,
                 Pause(500),
+                Sprite("rewind"),
+                Line(""),
                 Line("{violet}SNAPSHOT{/}   before_you"),
                 Line("{dim}AUTHOR     JANUS{/}"),
                 Line("{dim}SUBJECT    player_04{/}"),

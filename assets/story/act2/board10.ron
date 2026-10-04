@@ -9,6 +9,7 @@
             count_label: "3 msgs",
             visible: All([Flag("board10_open"), NoFlag("board10_gone"), NoFlag("y1998")]),
             header: r#"
+@sprite player mono
 @banner white YOU
 {dim}posts by {player}. 1998.{/}
 "#,

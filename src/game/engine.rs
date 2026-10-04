@@ -144,7 +144,9 @@ impl App {
     }
 
     fn reach_ending(&mut self, id: &str) {
-        self.st.set("ended");
+        if self.st.set("ended") {
+            self.meta.runs = self.meta.runs_done() + 1;
+        }
         if !self.meta.endings.iter().any(|e| e == id) {
             self.meta.endings.push(id.to_string());
         }

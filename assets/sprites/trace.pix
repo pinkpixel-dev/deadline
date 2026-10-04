@@ -1,0 +1,156 @@
+// HUMAN: the trace runs back out of the board to your machine.
+fps 8
+palette
+. none
+h 6b6f7b
+c 4a4d57
+s 1c1d22
+g 84d680
+G 2a3a2b
+v aa8ef0
+V 4a3f6b
+f 4e505a
+k 15161a
+frame
+....................................
+hhhhhhhhhh..........................
+hssssssssh.................cccccccc.
+hssssssssh.................cssssssc.
+hssssssssh.................csvvVVsc.
+hsssssssshfffffffffffffffggcssssssc.
+hssssssssh.................csvvVVsc.
+hhhhhhhhhh.................cssssssc.
+...cccc....................csvvVVsc.
+.cccccccc..................cccccccc.
+....................................
+....................................
+frame
+....................................
+hhhhhhhhhh..........................
+hssssssssh.................cccccccc.
+hssssssssh.................cssssssc.
+hssssssssh.................csvvVVsc.
+hsssssssshfffffffffffffgggfcssssssc.
+hssssssssh.................csvvVVsc.
+hhhhhhhhhh.................cssssssc.
+...cccc....................csvvVVsc.
+.cccccccc..................cccccccc.
+....................................
+....................................
+frame
+....................................
+hhhhhhhhhh..........................
+hssssssssh.................cccccccc.
+hssssssssh.................cssssssc.
+hssssssssh.................csvvVVsc.
+hsssssssshfffffffffffgggfffcssssssc.
+hssssssssh.................csvvVVsc.
+hhhhhhhhhh.................cssssssc.
+...cccc....................csvvVVsc.
+.cccccccc..................cccccccc.
+....................................
+....................................
+frame
+....................................
+hhhhhhhhhh..........................
+hssssssssh.................cccccccc.
+hssssssssh.................cssssssc.
+hssssssssh.................csvvVVsc.
+hsssssssshfffffffffgggfffffcssssssc.
+hssssssssh.................csvvVVsc.
+hhhhhhhhhh.................cssssssc.
+...cccc....................csvvVVsc.
+.cccccccc..................cccccccc.
+....................................
+....................................
+frame
+....................................
+hhhhhhhhhh..........................
+hssssssssh.................cccccccc.
+hssssssssh.................cssssssc.
+hssssssssh.................csvvVVsc.
+hsssssssshfffffffgggfffffffcssssssc.
+hssssssssh.................csvvVVsc.
+hhhhhhhhhh.................cssssssc.
+...cccc....................csvvVVsc.
+.cccccccc..................cccccccc.
+....................................
+....................................
+frame
+....................................
+hhhhhhhhhh..........................
+hssssssssh.................cccccccc.
+hssssssssh.................cssssssc.
+hssssssssh.................csvvVVsc.
+hsssssssshfffffgggfffffffffcssssssc.
+hssssssssh.................csvvVVsc.
+hhhhhhhhhh.................cssssssc.
+...cccc....................csvvVVsc.
+.cccccccc..................cccccccc.
+....................................
+....................................
+frame
+....................................
+hhhhhhhhhh..........................
+hssssssssh.................cccccccc.
+hssssssssh.................cssssssc.
+hssssssssh.................csvvVVsc.
+hsssssssshfffgggfffffffffffcssssssc.
+hssssssssh.................csvvVVsc.
+hhhhhhhhhh.................cssssssc.
+...cccc....................csvvVVsc.
+.cccccccc..................cccccccc.
+....................................
+....................................
+frame
+....................................
+hhhhhhhhhh..........................
+hssssssssh.................cccccccc.
+hssssssssh.................cssssssc.
+hssssssssh.................csvvVVsc.
+hsssssssshfgggfffffffffffffcssssssc.
+hssssssssh.................csvvVVsc.
+hhhhhhhhhh.................cssssssc.
+...cccc....................csvvVVsc.
+.cccccccc..................cccccccc.
+....................................
+....................................
+frame 6
+....................................
+hhhhhhhhhh..........................
+hssssssssh.................cccccccc.
+hsggggggsh.................cssssssc.
+hssssssssh.................csvvVVsc.
+hsggggssshfffffffffffffffffcssssssc.
+hssssssssh.................csvvVVsc.
+hhhhhhhhhh.................cssssssc.
+...cccc....................csvvVVsc.
+.cccccccc..................cccccccc.
+....................................
+....................................
+frame
+....................................
+hhhhhhhhhh..........................
+hssssssssh.................cccccccc.
+hssssssssh.................cssssssc.
+hssssssssh.................csvvVVsc.
+hsssssssshfffffffffffffffffcssssssc.
+hssssssssh.................csvvVVsc.
+hhhhhhhhhh.................cssssssc.
+...cccc....................csvvVVsc.
+.cccccccc..................cccccccc.
+....................................
+....................................
+frame 4
+....................................
+hhhhhhhhhh..........................
+hssssssssh.................cccccccc.
+hsggggggsh.................cssssssc.
+hssssssssh.................csvvVVsc.
+hsggggssshfffffffffffffffffcssssssc.
+hssssssssh.................csvvVVsc.
+hhhhhhhhhh.................cssssssc.
+...cccc....................csvvVVsc.
+.cccccccc..................cccccccc.
+....................................
+....................................

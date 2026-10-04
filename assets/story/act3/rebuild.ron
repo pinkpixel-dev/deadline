@@ -1,6 +1,7 @@
 // ACT III: the night rebuilds. Changing something sends you back to 9:04 PM
-// (BUILD 1998.2, then 1998.3). What you did carries over. The night half
-// remembers it too, and that's how the cracks start to show.
+// (BUILD 1998.2, then 1998.3, three higher per finished run). What you did
+// carries over. The night half remembers it too, and that's how the cracks
+// start to show.
 (
     act: 3,
     events: [
@@ -44,7 +45,7 @@
                 (id: "start", lines: [
                     "hello, node 2.",
                     "...why does that feel like a rerun.",
-                    "also your login says BUILD 1998.2 up top. mine just says DEADLINE. did mara give you a beta or something?",
+                    "also your login says BUILD {build} up top. mine just says DEADLINE. did mara give you a beta or something?",
                 ], choices: [
                     (text: "because it is.", effects: [Add("truth", 1)], goto: "seat"),
                     (text: "deja vu.", goto: "seat"),
@@ -147,11 +148,12 @@
                 Pause(700),
                 Clear,
                 Line("{violet}node 04: build rejected{/}"),
+                Sprite("rewind"),
                 Pause(700),
                 Type("{violet}REBUILDING 08/14/1998{/}"),
                 Pause(900),
-                When(Lte("build", 1), [Type("{violet}BUILD 1998.2{/}")]),
-                When(Gte("build", 2), [Type("{violet}BUILD 1998.3{/}")]),
+                When(Lte("build", 1), [Type("{violet}BUILD {build:2}{/}")]),
+                When(Gte("build", 2), [Type("{violet}BUILD {build:3}{/}")]),
                 Pause(1200),
                 Glitch(500),
                 Clear,
@@ -186,7 +188,7 @@
 @rule
 "#)]),
                 Print("{dim}9 users online.{/} {cyan}users{/}"),
-                Log("{violet}node 04: build 1998.{var:build}{/}"),
+                Log("{violet}node 04: build {build}{/}"),
             ],
         ),
     ],

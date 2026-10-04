@@ -1,0 +1,20 @@
+// Board 02, CODE.
+palette
+. none
+h 6b6f7b
+s 1c1d22
+g 84d680
+G 2a3a2b
+c 4a4d57
+frame
+.hhhhhhhhhhhhhh.
+.hssssssssssssh.
+.hsgggsggggsssh.
+.hsssggsgggggsh.
+.hsssggggsggssh.
+.hsGGsssssssssh.
+.hsgggggsggsssh.
+.hsggsssssssssh.
+.hhhhhhhhhhhhhh.
+......cccc......
+....cccccccc....

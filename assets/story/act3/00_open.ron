@@ -119,7 +119,7 @@
 "#)]),
         // Once the night has rebuilt, the clock admits which build it is.
         (input: ["date", "time"], cond: All([Flag("y1998"), Gte("build", 2)]), effects: [
-            Print("{dim}SYSTEM CLOCK:{/} {date}  {time}  {violet}(build 1998.{var:build}){/}"),
+            Print("{dim}SYSTEM CLOCK:{/} {date}  {time}  {violet}(build {build}){/}"),
         ]),
         (input: ["scan"], cond: All([Flag("y1998"), Gte("build", 2)]), effects: [Print(r#"
 {b}NODE SCAN{/}
@@ -225,6 +225,8 @@ NODE 04:
             steps: [
                 Clear,
                 Pause(500),
+                Sprite("clock_1998"),
+                Line(""),
                 Banner("text", "ACT III"),
                 Line(""),
                 Banner("amber", "1998"),

@@ -3,6 +3,7 @@ pub mod panes;
 pub mod pixel;
 pub mod prompt;
 pub mod screens;
+pub mod splash;
 pub mod theme;
 pub mod wrap;
 

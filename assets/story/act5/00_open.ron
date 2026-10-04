@@ -42,6 +42,8 @@
             steps: [
                 Clear,
                 Pause(500),
+                Sprite("janus"),
+                Line(""),
                 Banner("text", "ACT V"),
                 Line(""),
                 Banner("violet", "DECISION"),

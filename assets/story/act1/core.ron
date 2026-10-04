@@ -235,6 +235,8 @@
                 Pause(4400),
                 Clear,
                 Pause(800),
+                Sprite("modem"),
+                Line(""),
                 Banner("text", "ACT I"),
                 Line(""),
                 Banner("amber", "CONNECTION"),

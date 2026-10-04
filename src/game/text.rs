@@ -1,7 +1,8 @@
 //! Story markup.
 //!
 //! Inline: `{cyan}text{/}`, `{b}`, `{dim}`, `{rev}`, `{u}`, `{player}`,
-//! `{date}`, `{today}`, `{now}`, `{time}`, `{var:name}`, `{word:name}`.
+//! `{date}`, `{today}`, `{now}`, `{time}`, `{var:name}`, `{word:name}`,
+//! `{build}` (the night being rendered now) and `{build:n}` (the nth one).
 //!
 //! Line directives: `@sprite name [dim|mono|glitch]`, `@banner color TEXT`,
 //! `@art name`, `@rule`. A line like `ghost_17:` becomes a colored speaker
@@ -28,6 +29,12 @@ const WORDS: [&str; 21] = [
     "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen",
     "nineteen", "twenty",
 ];
+
+/// JANUS's label for the nth build of 08/14/1998. Every finished run moves
+/// the count on by three, the most rebuilds one night gets.
+pub fn build_label(n: i32, meta: &MetaState) -> String {
+    format!("1998.{}", n + 3 * meta.runs_done() as i32)
+}
 
 pub fn number_word(n: i32) -> String {
     if (0..=20).contains(&n) {
@@ -62,9 +69,12 @@ pub fn subst(s: &str, cx: &Ctx) -> String {
             "now" => Some(chrono::Local::now().format("%I:%M %p").to_string()),
             "time" => Some(clock::time_string(cx.st)),
             "restores" => Some(cx.meta.total_restores.to_string()),
+            "build" => Some(build_label(cx.st.var("build"), cx.meta)),
             _ => {
                 if let Some(v) = key.strip_prefix("var:") {
                     Some(cx.st.var(v).to_string())
+                } else if let Some(n) = key.strip_prefix("build:") {
+                    n.parse().ok().map(|n| build_label(n, cx.meta))
                 } else {
                     key.strip_prefix("word:").map(|v| number_word(cx.st.var(v)))
                 }
@@ -247,5 +257,23 @@ mod tests {
         let meta = MetaState::default();
         let cx = Ctx { content: &content, st: &st, meta: &meta };
         assert_eq!(subst("hi {player}, {word:doors} {red}", &cx), "hi neo, three {red}");
+    }
+
+    #[test]
+    fn build_numbers_climb_on_later_runs() {
+        let content = Content::default();
+        let mut st = GameState::new("neo");
+        st.set_var("build", 2);
+        let mut meta = MetaState::default();
+        let line = "BUILD {build}, next {build:3}";
+        let cx = Ctx { content: &content, st: &st, meta: &meta };
+        assert_eq!(subst(line, &cx), "BUILD 1998.2, next 1998.3");
+        meta.runs = 1;
+        let cx = Ctx { content: &content, st: &st, meta: &meta };
+        assert_eq!(subst(line, &cx), "BUILD 1998.5, next 1998.6");
+        meta.runs = 0;
+        meta.endings = vec!["act1".into(), "eli".into()];
+        let cx = Ctx { content: &content, st: &st, meta: &meta };
+        assert_eq!(subst(line, &cx), "BUILD 1998.5, next 1998.6", "older saves count their endings");
     }
 }

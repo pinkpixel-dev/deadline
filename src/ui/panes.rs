@@ -33,7 +33,8 @@ pub fn header(f: &mut Frame, app: &App, area: Rect) {
     // JANUS shows its build number while a simulated night is rebuilding.
     let build = app.st.var("build");
     if build > 0 && app.st.has("show_build") {
-        left.push(Span::styled(format!("  BUILD 1998.{build}"), theme::bold(theme::VIOLET)));
+        let label = crate::game::text::build_label(build, &app.meta);
+        left.push(Span::styled(format!("  BUILD {label}"), theme::bold(theme::VIOLET)));
     }
     if wide {
         left.extend([

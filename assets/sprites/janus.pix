@@ -1,0 +1,113 @@
+// JANUS: your face, and the half it kept.
+fps 6
+palette
+. none
+k 101114
+d 2c2e35
+D 4a4d57
+w e9e7e2
+x 1d1830
+y 4a3f6b
+z aa8ef0
+frame 6
+.....kkkxxx.....
+...kkDDDyyyxx...
+..kDDdddyyyyyx..
+..kDddddyyyyyx..
+.kDdddwwzzyyyyx.
+.kDddwwdyzzyyyx.
+.kDdddddyzzyyyx.
+.kDddddwzzyyyyx.
+.kDddddwzyyyyyx.
+..kDddddyyyyyx..
+..kDdddwzyyyyx..
+...kDDddyyyyx...
+....kkDDyyxx....
+..kkDDDDyyyyxx..
+.kDDDDDDyyyyyyx.
+kDDDDDDDyyyyyyyx
+frame
+.....kkkxxx.....
+...kkDDDyyyxx...
+..kDDdddyyyyyx..
+..kDddddyyyyyx..
+.kDdddww.zzyyyyx
+.kDddwwd.yzzyyyx
+.kDddddd.yzzyyyx
+.kDddddwzzyyyyx.
+.kDddddwzyyyyyx.
+..kDddddyyyyyx..
+..kDdddwzyyyyx..
+...kDDddyyyyx...
+....kkDDyyxx....
+..kkDDDDyyyyxx..
+.kDDDDDDyyyyyyx.
+kDDDDDDDyyyyyyyx
+frame 3
+.....kkkxxx.....
+...kkDDDyyyxx...
+..kDDdddyyyyyx..
+..kDddddyyyyyx..
+.kDdddwwzzyyyyx.
+.kDddwwdyzzyyyx.
+.kDdddddyzzyyyx.
+.kDddddwzzyyyyx.
+.kDddddwzyyyyyx.
+..kDddddyyyyyx..
+..kDdddwzyyyyx..
+...kDDddyyyyx...
+....kkDDyyxx....
+..kkDDDDyyyyxx..
+.kDDDDDDyyyyyyx.
+kDDDDDDDyyyyyyyx
+frame
+.....kkkxxx.....
+...kkDDDyyyxx...
+..kDDdddyyyyyx..
+..kDddddyyyyyx..
+.kDdddwwzzyyyyx.
+.kDddwwdyzzyyyx.
+.kDdddddyzzyyyx.
+.kDddddwzzyyyyx.
+.kDddddwzyyyyyx.
+..kDddddyyyyx...
+..kDdddwyyyyx...
+...kDDddyyyx....
+....kkDDyyxx....
+..kkDDDDyyyyxx..
+.kDDDDDDyyyyyyx.
+kDDDDDDDyyyyyyyx
+frame
+.....kkkxxx.....
+...kkDDDyyyxx...
+..kDDdddyyyyyx..
+..kDddddyyyyyx..
+.kDdddwwzzyyyyx.
+.kDddwwdyzzyyyx.
+.kDdddddyzzyyyx.
+.kDddddwzzyyyyx.
+.kDddddwzyyyyyx.
+..kDdddd.yyyyyx.
+..kDdddw.zyyyyx.
+...kDDdd.yyyyx..
+....kkDDyyxx....
+..kkDDDDyyyyxx..
+.kDDDDDDyyyyyyx.
+kDDDDDDDyyyyyyyx
+frame 5
+.....kkkxxx.....
+...kkDDDyyyxx...
+..kDDdddyyyyyx..
+..kDddddyyyyyx..
+.kDdddwwzzyyyyx.
+.kDddwwdyzzyyyx.
+.kDdddddyzzyyyx.
+.kDddddwzzyyyyx.
+.kDddddwzyyyyyx.
+..kDddddyyyyyx..
+..kDdddwzyyyyx..
+...kDDddyyyyx...
+....kkDDyyxx....
+..kkDDDDyyyyxx..
+.kDDDDDDyyyyyyx.
+kDDDDDDDyyyyyyyx
