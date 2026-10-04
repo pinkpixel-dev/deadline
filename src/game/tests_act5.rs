@@ -189,7 +189,7 @@ fn loop_rebuilds_the_subject() {
 #[test]
 fn never_deciding_gets_you_hung_up_and_picked_back_up() {
     let (mut a, _) = act5("kick", &[]);
-    a.st.elapsed += 2401.0;
+    a.st.elapsed += 3601.0;
     run(&mut a, 1.0);
     a.st.elapsed += 1.0;
     run(&mut a, 1.0);
@@ -262,4 +262,78 @@ fn later_runs_feel_like_a_rerun() {
     a.st.set_var("trust_ghost", 3);
     answer(&mut a, "ghost_a5");
     assert!(screen(&a).contains("this feels like a rerun"), "{}", screen(&a));
+}
+
+#[test]
+fn the_core_opens_one_file_at_a_time_and_janus_answers() {
+    let (mut a, _) = act5("core", &[]);
+    assert!(a.st.has("cmd:recover"), "everyone can recover on the last night");
+    cmd(&mut a, "files /var/janus/core");
+    let s = screen(&a);
+    for f in ["origin.log", "test.spec", "node02.idx", "0317"] {
+        assert!(s.contains(f), "{f}\n{s}");
+    }
+    assert!(!s.contains("janus.self"), "the fifth file waits for the other four");
+
+    cmd(&mut a, "view /var/janus/core/origin.log");
+    cmd(&mut a, "lantern");
+    cmd(&mut a, "view /var/janus/core/origin.log");
+    assert!(a.st.has("read_origin") && screen(&a).contains("attached by"));
+
+    cmd(&mut a, "recover /var/janus/core/test.spec");
+    cmd(&mut a, "view /var/janus/core/test.spec");
+    assert!(a.st.has("read_test") && screen(&a).contains("OBSERVER"));
+
+    cmd(&mut a, "view /var/janus/core/node02.idx");
+    assert!(screen(&a).contains("ORIGIN UNVERIFIED"));
+    cmd(&mut a, "trace me");
+    assert!(a.st.has("traced_self"), "tracing yourself still counts for HUMAN");
+    cmd(&mut a, "view /var/janus/core/node02.idx");
+    assert!(a.st.has("read_idx"));
+    assert!(a.st.history.iter().any(|h| h == "listen"), "a command you never typed");
+
+    cmd(&mut a, "listen");
+    cmd(&mut a, "view /var/janus/core/0317");
+    assert!(a.st.has("read_0317") && screen(&a).contains("keystroke timing"));
+
+    run(&mut a, 0.5);
+    assert!(a.st.has("core_four"));
+    assert!(!a.st.notes.is_empty(), "JANUS writes in your notes");
+    cmd(&mut a, "scan");
+    assert!(screen(&a).contains("reading /var/janus/core"));
+    cmd(&mut a, "trace 03");
+    assert!(a.st.has("saw_node03"));
+
+    cmd(&mut a, "view /var/janus/core/janus.self");
+    cmd(&mut a, "What are you?");
+    cmd(&mut a, "view /var/janus/core/janus.self");
+    assert!(a.st.has("janus_self_read") && a.meta.discoveries.contains("read_janus_self"));
+
+    a.st.elapsed += 5.0;
+    run(&mut a, 1.0);
+    answer(&mut a, "janus_a5");
+    pick(&mut a, "why 03:17");
+    pick(&mut a, "who posted");
+    pick(&mut a, "that's enough");
+    pick(&mut a, "both");
+    finish_chat(&mut a);
+    assert!(a.st.has("done:janus_a5"));
+    cmd(&mut a, "reply janus");
+    assert!(screen(&a).contains("Some of it might even be true"), "{}", screen(&a));
+    assert!(!a.st.has("ended"), "reading the core never ends the run");
+}
+
+#[test]
+fn locked_core_files_say_how_to_open_them() {
+    let (mut a, _) = act5("core-locks", &[]);
+    cmd(&mut a, "view /var/janus/core/origin.log");
+    cmd(&mut a, "lighthouse");
+    cmd(&mut a, "view /var/janus/core/origin.log");
+    cmd(&mut a, "keeper");
+    assert!(screen(&a).contains("lantern"), "two misses spell out the key\n{}", screen(&a));
+    cmd(&mut a, "view /var/janus/core/0317");
+    assert!(screen(&a).contains("it was recorded"));
+    cmd(&mut a, "journal");
+    let s = screen(&a);
+    assert!(s.contains("MAINTAINER KEY") && s.contains("listen"), "{s}");
 }

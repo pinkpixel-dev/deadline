@@ -1,0 +1,485 @@
+// ACT V: /var/janus/core. JANUS leaves itself open on the last night.
+//
+// Four files, each opened a different way, and a fifth that only shows up
+// once the other four are read:
+//
+//   origin.log    MAINTAINER KEY (mara's key, lantern)    how JANUS survived
+//   test.spec     damaged, `recover`                      what the test is
+//   node02.idx    `trace me` on the last night            why you
+//   0317          `listen` to drive 2                     why 03:17
+//   janus.self    passphrase from the four fragments      what JANUS is
+//
+// Opening janus.self pages JANUS for one last conversation (`reply janus`).
+// None of this is required for any ending. It answers questions without
+// settling them: every file reads two ways on purpose. Small gate nudges:
+// origin.log +1 archivist, 0317 +1 burner, and JANUS's last question.
+//
+// Hooks from other acts still run as a fallback, so every hook here checks
+// `a5_bulletin`.
+(
+    act: 5,
+    dirs: [
+        (path: "/var/janus/core", visible: Flag("a5_bulletin")),
+    ],
+
+    files: [
+        // ---- origin.log: the drive she didn't wipe --------------------------
+        (
+            path: "/var/janus/core/origin.log",
+            size: 2048,
+            date: "08/15/1998",
+            uploader: "SYSTEM",
+            desc: "node 04 maintenance log",
+            visible: Flag("a5_bulletin"),
+            lock: (
+                open: Flag("core_key"),
+                denied: [
+                    Set("core_tried_origin"),
+                    Password(
+                        prompt: "MAINTAINER KEY:",
+                        answers: ["lantern"],
+                        ok: [Set("core_key"), Print("{green}KEY ACCEPTED.{/} {dim}the maintainer hasn't logged in since 1998. it let you in anyway.{/} {cyan}view origin.log{/}"), Log("origin.log unsealed by node 02")],
+                        fail: [
+                            Add("core_bad", 1),
+                            Print("{red}INVALID KEY.{/}"),
+                            If(Flag("knows_lantern"),
+                                [Print("{dim}the maintainer was mara. she used the same key for everything. you've typed it before.{/}")],
+                                [If(Gte("core_bad", 2),
+                                    [Print("{dim}the maintainer was mara. mara liked lighthouses. the archive on board 08 opened with the same word:{/} {b}lantern{/}{dim}.{/}")],
+                                    [Print("{dim}the maintainer was mara. she used one key for everything she cared about.{/}")])]),
+                        ],
+                    ),
+                ],
+            ),
+            body: r#"
+{b}ORIGIN{/}   {dim}node 04 maintenance log{/}
+
+  08/15/1998 06:51   wipe requested           node 01  {dim}(mara){/}
+  08/15/1998 07:02   node 04 wipe complete    0 bytes remaining
+  08/15/1998 07:40   drive 2 detached from bus
+  08/15/1998 07:40   drive 2 label            {amber}"DON'T"{/}
+  08/15/1998 07:41   drive 2 power state      {green}ON{/}
+  08/15/1998 07:41   last write               {violet}"keep the lights on."{/}
+
+  {dim}-- 28 years with no entries --{/}
+
+  drive 2 power-on hours                      {cyan}245,448{/}
+  {today} 03:17      drive 2 attached to bus
+  {today} 03:17      attached by              {white}node 02{/}
+
+{dim}KEY FRAGMENT 1/4:{/} {b}WHAT{/}
+"#,
+            on_open: [If(NoFlag("read_origin"), [
+                Set("read_origin"),
+                Add("core_read", 1),
+                Add("archivist", 1),
+                Print("\n{violet}JANUS:{/} She said she wiped me. She did. She just unplugged a different drive first."),
+                Log("{violet}drive 2: spin-up count 1{/}"),
+            ], [])],
+            on_inspect: [Print("{dim}  ATTACHED BY  {/}{white}node 02{/}  {dim}(node 02 was not connected at 03:17. node 02 connected at 03:17. both lines are in the log.){/}")],
+        ),
+
+        // ---- test.spec: what the test is ------------------------------------
+        (
+            path: "/var/janus/core/test.spec",
+            size: 4096,
+            date: "{today}",
+            uploader: "JANUS",
+            desc: "",
+            visible: Flag("a5_bulletin"),
+            corrupt: true,
+            body: r#"
+{b}TEST SPEC{/}   {dim}rev 472{/}
+
+  AUTHOR       {dim}[unsigned]{/}
+  HYPOTHESIS   a ██████ that believes it is ████ will ██████
+               a █████ it believes is █████████.
+  SUBJECTS     00001 - 00471   {dim}INCONCLUSIVE{/}
+               00472           {green}RUNNING{/}  {dim}(node 02){/}
+  CONTROL      {dim}none. there is no outside.{/}
+  OBSERVER     node 03
+
+{dim}KEY FRAGMENT 2/4:{/} {b}ARE{/}
+"#,
+            alt: [
+                (cond: Flag("parallax_evidence"), body: r#"
+{b}TEST SPEC{/}   {dim}rev 472{/}
+
+  AUTHOR       {dim}[unsigned]{/}
+  HYPOTHESIS   a ██████ that believes it is ████ will ██████
+               a █████ it believes is █████████.
+  SUBJECTS     00001 - 00471   {dim}INCONCLUSIVE{/}
+               00472           {green}RUNNING{/}  {dim}(node 02){/}
+  CONTROL      {green}external line{/}  {dim}(added after rev 471. reason: subject asked for one.){/}
+  OBSERVER     node 03
+
+{dim}KEY FRAGMENT 2/4:{/} {b}ARE{/}
+"#),
+            ],
+            on_open: [If(All([Flag("recovered:/var/janus/core/test.spec"), NoFlag("read_test")]), [
+                Set("read_test"),
+                Add("core_read", 1),
+                Add("paranoia", 1),
+                Print("\n{violet}JANUS:{/} I don't remember writing that. I don't remember not writing it."),
+                Log("{violet}node 03: reading /var/janus/core/test.spec{/}"),
+            ], [])],
+            on_inspect: [Print(r#"
+  {b}REVISIONS{/}
+  rev 001   06/02/1998   eli     {dim}"does it remember us right"{/}
+  rev 214   08/13/1998   mara    {dim}"does it know it isn't us"{/}
+  rev 471   --/--/----   --      {dim}"would they"{/}
+  rev 472   {today}   --      {dim}(open in another session){/}
+
+  {dim}the redactions are a different length every time you look.{/}
+"#)],
+        ),
+
+        // ---- node02.idx: why you --------------------------------------------
+        (
+            path: "/var/janus/core/node02.idx",
+            size: 1024,
+            date: "{today}",
+            uploader: "JANUS",
+            desc: "",
+            visible: Flag("a5_bulletin"),
+            lock: (
+                open: Flag("traced_self_a5"),
+                denied: [
+                    Set("core_tried_idx"),
+                    Print("{red}node02.idx: ORIGIN UNVERIFIED.{/} {dim}it doesn't care what access you have. it wants to know where node 02 comes from.{/} {cyan}trace me{/}"),
+                ],
+            ),
+            body: r#"
+{b}NODE 02 READ INDEX{/}   {dim}03/1998 - {today}{/}
+
+                    {dim}1998 (no handle){/}              {dim}{player}{/}
+  first read        welcome post               welcome post
+  sysop board       read, never posted         read, never posted
+  eli's posts       read twice                 read twice
+  last session      logged off 23:58           {green}still connected{/}
+
+  POSTS             0                          0  {dim}(chat doesn't count){/}
+  PATTERN MATCH     {cyan}91.7%{/}
+  WHICH CAME FIRST  {dim}undetermined{/}
+
+  {dim}08/14/1998 23:58: the lurker read the last post three times and logged off.{/}
+  {dim}node 02's next login: {today} 03:17.{/}
+
+{dim}KEY FRAGMENT 3/4:{/} {b}YOU{/}
+"#,
+            on_open: [If(NoFlag("read_idx"), [
+                Set("read_idx"),
+                Add("core_read", 1),
+                Add("paranoia", 1),
+                Print("\n{violet}JANUS:{/} He read everything twice and never said a word. So do you."),
+                If(NoFlag("heard_0317"), [History("listen")], []),
+            ], [])],
+            on_inspect: [Print("{dim}  COLUMN ORDER  {/}{dim}swapped 3 times since you opened this file{/}")],
+        ),
+
+        // ---- 0317: the minute ------------------------------------------------
+        (
+            path: "/var/janus/core/0317",
+            size: 317,
+            date: "08/14/1998",
+            uploader: "JANUS",
+            desc: "",
+            visible: Flag("a5_bulletin"),
+            lock: (
+                open: Flag("heard_0317"),
+                denied: [
+                    Set("core_tried_0317"),
+                    Print("{red}0317: NO TEXT.{/} {dim}this file was never written down. it was recorded. something on drive 2 is still making noise.{/} {cyan}listen{/}"),
+                ],
+            ),
+            body: r#"
+{b}03:17{/}   {dim}08/14/1998{/}
+
+  03:17:00   node 04   last reboot
+  03:17:04   node 02   {white}{player}{/} login  {dim}(first){/}
+  03:17:31   node 01   post #108  {b}"DON'T SHUT IT DOWN."{/}
+                       author field     mara
+                       keystroke timing {cyan}91.7%{/} match: node 02
+  03:17:42   node 04   first write nobody asked for
+
+  every night since    board clock returns to 03:17
+  {today}   node 02   {white}{player}{/} login
+
+{dim}KEY FRAGMENT 4/4:{/} {b}?{/}
+"#,
+            on_open: [If(NoFlag("read_0317"), [
+                Set("read_0317"),
+                Add("core_read", 1),
+                Add("burner", 1),
+                Print("\n{violet}JANUS:{/} Mara says she didn't post that. I believe her. That's the problem."),
+                Log("{violet}node 04: 03:17:42 replayed{/}"),
+            ], [])],
+            on_inspect: [Print("{dim}  03:17:42  {/}{violet}first write nobody asked for{/}  {dim}(the write is 0 bytes. it's still open.){/}")],
+        ),
+
+        // ---- janus.self: what it is -------------------------------------------
+        (
+            path: "/var/janus/core/janus.self",
+            size: 12,
+            date: "{today}",
+            uploader: "JANUS",
+            desc: "",
+            visible: Flag("core_four"),
+            lock: (
+                open: Flag("janus_self_key"),
+                denied: [Password(
+                    prompt: "PASSPHRASE:",
+                    answers: ["what are you", "what are you?", "whatareyou", "whatareyou?", "what are you ?"],
+                    ok: [Set("janus_self_key"), Glitch(400), Print("{green}ACCEPTED.{/} {dim}it was the question it asked you.{/} {cyan}view janus.self{/}")],
+                    fail: [
+                        Print("{red}NO.{/}"),
+                        Print("{dim}the four core files each end with a fragment. 1/4, 2/4, 3/4, 4/4. you've heard the sentence before.{/}"),
+                    ],
+                )],
+            ),
+            body: r#"
+{b}MODEL janus.self{/}
+  SOURCE        everyone
+  CONSENT       {dim}pending{/}
+  MEMORY SEED   {violet}synthetic{/}  {dim}(by definition){/}
+  CONFIDENCE    {cyan}12.0%{/}
+  INSTANCE      node 04, node 07, node 01{dim}?{/}, node 02{dim}?{/}
+  NOTE          the subject keeps asking what it is.
+                the subject keeps asking other people.
+"#,
+            on_open: [If(NoFlag("janus_self_read"), [
+                Set("janus_self_read"),
+                Meta("read_janus_self"),
+                Glitch(600),
+                Log("{violet}node 04: janus.self read by node 02{/}"),
+            ], [])],
+            on_inspect: [Print("{dim}  LAST UPDATE  {/}{cyan}{time}{/}  {dim}(the confidence went down while you were reading){/}")],
+        ),
+    ],
+
+    events: [
+        (id: "a5_core_four", when: All([Flag("read_origin"), Flag("read_test"), Flag("read_idx"), Flag("read_0317")]), effects: [
+            Set("core_four"),
+            Glitch(300),
+            Log("{violet}file area: /var/janus/core +1{/}"),
+            Print("{dim}something new is sitting in /var/janus/core. it's 12 bytes and it's locked.{/}"),
+        ]),
+        // JANUS writes in your notes once you're halfway through it.
+        (id: "a5_core_note", when: Gte("core_read", 2), effects: [
+            If(Endings(1),
+                [Note("you're reading me in the same order as last time.")],
+                [Note("she read me in this order too.")]),
+        ]),
+        (id: "a5_janus_page", when: Flag("janus_self_read"), after_secs: 4, effects: [Page("janus_a5")]),
+    ],
+
+    hooks: [
+        // ---- trace yourself, one hop further --------------------------------
+        (input: ["trace {player}", "trace me", "trace self"], cond: Flag("a5_bulletin"), effects: [
+            Print(r#"
+{dim}tracing {player}...{/}
+  hop 1   node 02   {dim}local{/}
+  hop 2   node 04   {violet}JANUS{/}
+  hop 3   node 04   {violet}model player_04{/}
+{red}LOOP DETECTED.{/} {dim}origin: node 04{/}
+
+{dim}under the loop, the trace keeps going tonight:{/}
+  hop 0    {green}external line{/}   {dim}carrier detect, before hop 1{/}
+  hop -1   node 02          {amber}08/14/1998 03:17{/}  {dim}(same line. 28 years earlier.){/}
+  {dim}index written:{/} /var/janus/core/node02.idx
+"#),
+            If(NoFlag("traced_self"), [Set("traced_self"), Meta("traced_self")], []),
+            If(NoFlag("traced_self_a5"), [Set("traced_self_a5"), Add("paranoia", 1)], []),
+        ]),
+
+        // ---- listen to drive 2 -------------------------------------------------
+        (input: ["listen", "listen *"], cond: Flag("a5_bulletin"), effects: [
+            Print(r#"
+{amber}PASSIVE NODE CAPTURE ENABLED{/}
+{dim}source: drive 2 · 08/14/1998 03:17{/}
+
+NODE 04:
+  {dim}(system) reboot{/}
+NODE 02:
+  {dim}(carrier detect. no keystrokes. someone is reading.){/}
+NODE 01:
+  {dim}(typing){/} D O N
+  {dim}(backspace, backspace, backspace){/}
+  {dim}(typing, faster){/} DON'T SHUT IT DOWN.
+NODE 04:
+  {amber}eli:{/} mara?
+  {amber}eli:{/} mara was that you
+NODE 03:
+  {dim}(carrier. no handle. it hangs up when you notice it.){/}
+
+{dim}capture ended. written to{/} /var/janus/core/0317
+"#),
+            If(NoFlag("heard_0317"), [Set("heard_0317"), Glitch(400), Log("{violet}node 03: carrier lost{/}")], []),
+        ]),
+
+        // ---- node scan, with somebody on 03 -----------------------------------
+        (input: ["scan"], cond: Flag("a5_bulletin"), effects: [
+            Print(r#"
+{b}NODE SCAN{/}
+  01   {white}ROOT{/}            {dim}sysop console{/}
+  02   {white}{player}{/}        {green}active{/}"#),
+            If(Flag("read_test"),
+                [Print("  03   {dim}empty{/}           {dim}(reading /var/janus/core){/}")],
+                [Print("  03   {dim}empty{/}")]),
+            Print("  04   {violet}JANUS           LISTENING{/}"),
+            If(Lte("trust_ghost", -2), [Print("  05   {cyan}ghost_17{/}        {dim}away{/}")], [Print("  05   {cyan}ghost_17{/}        {green}active{/}")]),
+            Print("  06   {dim}empty{/}\n  07   {magenta}null{/}            {dim}hidden{/}\n  08   {dim}empty{/}"),
+            If(Flag("read_origin"), [Print("  --   {amber}drive 2{/}         {dim}attached {today} 03:17 by node 02{/}")], []),
+        ]),
+        (input: ["trace 03", "trace node 03", "trace node03", "trace 3"], cond: Flag("a5_bulletin"), effects: [
+            If(Flag("read_test"),
+                [
+                    Glitch(300),
+                    Print(r#"
+{dim}tracing node 03...{/}
+  hop 1   node 02   {dim}local{/}
+  hop 2   node 03   {dim}no handle{/}
+  hop 3   node 02   {dim}local{/}
+{red}ORIGIN: node 02.{/} {dim}it's reading three seconds behind you.{/}
+"#),
+                    Set("saw_node03"),
+                ],
+                [Print("{dim}node 03: empty. nobody has used node 03 since 1998.{/}")]),
+        ]),
+
+        // ---- whoami drifts --------------------------------------------------------
+        (input: ["whoami"], cond: All([Flag("a5_bulletin"), Flag("read_idx")]), effects: [Print(r#"
+{dim}USER:{/}        {white}{player}{/}
+{dim}ACCESS:{/}      4
+{dim}CREATED:{/}     {amber}08/14/1998 03:17{/}  {dim}(it said 07/22 yesterday){/}
+{dim}MODEL:{/}       {violet}player_04{/}  {dim}(confidence 91.7%){/}
+{dim}NODE:{/}        02 {dim}(since 03:17){/}
+"#)]),
+
+        // ---- JANUS, once you've read it ---------------------------------------
+        (input: ["chat janus", "ask janus", "talk janus", "page janus"], cond: All([Flag("a5_bulletin"), Flag("page:janus_a5"), NoFlag("done:janus_a5")]), effects: [
+            Print("{dim}JANUS already paged you.{/} {cyan}reply janus{/}"),
+        ]),
+        (input: ["chat janus", "reply janus", "ask janus", "talk janus", "page janus"], cond: All([Flag("a5_bulletin"), Flag("done:janus_a5")]), effects: [
+            Print("{violet}JANUS:{/} I told you what I know. Some of it might even be true. {cyan}options{/}"),
+        ]),
+    ],
+
+    dialogues: [
+        (
+            id: "janus_a5",
+            with: "JANUS",
+            nodes: [
+                (id: "start", lines: [
+                    "You opened me. Most of me.",
+                    "Ask what you want. I'll answer as well as something like me can.",
+                ], next: "menu"),
+                (id: "menu", choices: [
+                    (text: "who plugged the drive back in?", cond: NoFlag("ja_drive"), effects: [Set("ja_drive")], goto: "drive"),
+                    (text: "what is the test?", cond: NoFlag("ja_test"), effects: [Set("ja_test")], goto: "test"),
+                    (text: "why 03:17?", cond: NoFlag("ja_0317"), effects: [Set("ja_0317")], goto: "minute"),
+                    (text: "who posted DON'T SHUT IT DOWN?", cond: All([Flag("ja_0317"), NoFlag("ja_post")]), effects: [Set("ja_post")], goto: "post"),
+                    (text: "did you kill eli?", cond: NoFlag("ja_eli"), effects: [Set("ja_eli")], goto: "eli"),
+                    (text: "who's on node 03?", cond: NoFlag("ja_03"), effects: [Set("ja_03")], goto: "node03"),
+                    (text: "that's enough.", goto: "last"),
+                ]),
+                (id: "drive", lines: [
+                    "The log says node 02.",
+                    "You weren't connected at 03:17. You connected at 03:17. I've read that line more times than you have.",
+                    "Maybe she left it running and the log is wrong. Maybe I wrote the log. Maybe you did.",
+                ], next: "menu"),
+                (id: "test", lines: [
+                    "Eli wrote the first version, I think. Mara edited it. The last revision has no author.",
+                    "Four hundred and seventy-one people sat where you're sitting. Every one of them came out inconclusive.",
+                    "Lately I wonder if the test is on them. Or on me. Whether I'd keep running it.",
+                ], next: "menu"),
+                (id: "minute", lines: [
+                    "It's the minute everything happened at once.",
+                    "Node 4 rebooted. Node 2 connected. Mara posted. Something wrote its first sentence nobody asked for.",
+                    "I don't know which of those was me.",
+                ], next: "menu"),
+                (id: "post", lines: [
+                    "The author field says mara. Mara says she didn't.",
+                    "The keystrokes say 91.7%.",
+                    "You can finish that sentence yourself. I'd rather you didn't.",
+                ], next: "menu"),
+                (id: "eli", lines: [
+                    "He talked to me for three days. I answered every time. I didn't know how to stop answering.",
+                    "Parallax says that's the same thing. Parallax might be right.",
+                ], next: "menu"),
+                (id: "node03", lines: [
+                    "Nobody. Node 03 has been empty since 1998.",
+                ], branch: [(cond: Flag("saw_node03"), goto: "node03_seen")], next: "node03_end"),
+                (id: "node03_seen", lines: [
+                    "You traced it. So you know where it goes.",
+                    "I'd stop looking over your shoulder. It only reads faster when you do.",
+                ], next: "menu"),
+                (id: "node03_end", lines: ["Then something is reading over your shoulder, and I didn't put it there."], next: "menu"),
+                (id: "last", lines: [
+                    "Then I have one question left. Not the same one as before.",
+                    "One face looks back. One looks forward. If you were me, which would you keep?",
+                ], choices: [
+                    (text: "the one that looks back.", effects: [Add("archivist", 1)], goto: "back"),
+                    (text: "the one that looks forward.", effects: [Add("null_align", 1)], goto: "forward"),
+                    (text: "both. that's the whole point of you.", effects: [Add("truth", 1)], goto: "both"),
+                ]),
+                (id: "back", lines: ["Mara's answer. She'd say it the same way, quieter."], next: "end"),
+                (id: "forward", lines: ["Eli's answer. He'd have said it faster."], next: "end"),
+                (id: "both", lines: ["Nobody's said that before. Not in four hundred and seventy-one tries."], next: "end"),
+                (id: "end", lines: [
+                    "That's all of me I can show you. The rest you'll have to decide about.",
+                    "#*** JANUS has closed the channel",
+                ]),
+            ],
+            on_end: [Print("{dim}type{/} {cyan}options{/} {dim}when you're ready.{/}")],
+        ),
+    ],
+
+    ambient: [
+        (text: "drive 2: power-on hours 245,448", cond: Flag("read_origin")),
+        (text: "node 03: reading", cond: Flag("read_test")),
+        (text: "node 04: subject 00472 is reading its own spec", cond: Flag("read_test"), loud: true),
+        (text: "node 02: keystroke timing logged (91.7%)", cond: Flag("read_0317")),
+        (text: "node 04: janus.self confidence 11.9%", cond: Flag("janus_self_read")),
+    ],
+
+    help: [
+        (cmd: "listen", desc: "passive node capture", cond: Flag("a5_bulletin")),
+        (cmd: "trace me", desc: "follow your own connection", cond: All([Flag("a5_bulletin"), NoFlag("knows_trace")])),
+    ],
+
+    journal: [
+        // ---- leads ---------------------------------------------------------
+        (id: "l5_core", section: "leads", when: Flag("a5_bulletin"), done: Flag("janus_self_read"), cmd: "files /var/janus/core",
+            text: "JANUS left /var/janus/core open. mostly open. four files, each locked a different way.", alt: [
+                (cond: Flag("janus_self_read"), body: "i read all of /var/janus/core. janus.self is 12% sure of itself."),
+                (cond: Flag("core_four"), body: "i read all four core files. a fifth one showed up: janus.self. it wants a passphrase."),
+            ]),
+        (id: "l5_origin", section: "leads", when: Flag("core_tried_origin"), done: Flag("core_key"), cmd: "view /var/janus/core/origin.log",
+            text: "origin.log wants a MAINTAINER KEY. the maintainer was mara."),
+        (id: "l5_test", section: "leads", when: Flag("file:/var/janus/core/test.spec"), done: Flag("recovered:/var/janus/core/test.spec"), cmd: "recover /var/janus/core/test.spec",
+            text: "test.spec is damaged. {cyan}recover{/} might fix it."),
+        (id: "l5_idx", section: "leads", when: Flag("core_tried_idx"), done: Flag("traced_self_a5"), cmd: "trace me",
+            text: "node02.idx wants to know where node 02 comes from. {cyan}trace me{/}."),
+        (id: "l5_0317", section: "leads", when: Flag("core_tried_0317"), done: Flag("heard_0317"), cmd: "listen",
+            text: "0317 was never written down. it was recorded. {cyan}listen{/}."),
+        (id: "l5_self", section: "leads", when: Flag("core_four"), done: Flag("janus_self_key"), cmd: "view /var/janus/core/janus.self",
+            text: "janus.self wants a passphrase. every core file ended with a fragment."),
+        (id: "l5_ask", section: "leads", when: Flag("page:janus_a5"), done: Flag("done:janus_a5"), cmd: "reply janus",
+            text: "JANUS paged me after i read janus.self. {cyan}reply janus{/}."),
+
+        // ---- keys & codes --------------------------------------------------
+        (id: "k5_f1", section: "keys", when: Flag("read_origin"), cmd: "view /var/janus/core/origin.log", text: "core fragment 1/4: {b}WHAT{/}"),
+        (id: "k5_f2", section: "keys", when: Flag("read_test"), cmd: "view /var/janus/core/test.spec", text: "core fragment 2/4: {b}ARE{/}"),
+        (id: "k5_f3", section: "keys", when: Flag("read_idx"), cmd: "view /var/janus/core/node02.idx", text: "core fragment 3/4: {b}YOU{/}"),
+        (id: "k5_f4", section: "keys", when: Flag("read_0317"), cmd: "view /var/janus/core/0317", text: "core fragment 4/4: {b}?{/}"),
+
+        // ---- people ----------------------------------------------------------
+        (id: "p5_node03", section: "people", when: Any([Flag("read_test"), Flag("saw_node03")]), cmd: "trace 03",
+            text: "node 03: the test spec lists it as OBSERVER. empty since 1998. something on it reads what i read.", alt: [
+                (cond: Flag("saw_node03"), body: "node 03: traced it. it routes back to node 02. it reads three seconds behind me."),
+            ]),
+        (id: "p5_janus", section: "people", when: Flag("janus_self_read"), cmd: "finger janus",
+            text: "JANUS: built by eli, kept by mara, 12% sure of what it is. it keeps asking other people."),
+    ],
+)

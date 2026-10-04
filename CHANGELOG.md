@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.9.0 - October 3, 2026
+
+### 🗝️ Act V: the core
+
+- JANUS leaves `/var/janus/core` open on the last night. There are four files in it, and each one opens a different way: Mara's key, `recover`, tracing yourself, and `listen`
+- The files dig into how JANUS survived, what the test is, why node 02 reads exactly like a lurker from 1998, and what really happened at 03:17. None of them settle it. They're meant to be read more than one way
+- Each file ends with a key fragment. Put the four together and a fifth file opens, `janus.self`, and then JANUS pages you for one last conversation where you can ask it anything
+- Something on node 03 reads along behind you. `scan` and `trace 03` will tell you a little about it
+- `whoami`, `scan` and your command history get a bit stranger the deeper you go, and JANUS writes in your notes again
+- Everyone can use `recover` and `listen` on the last night, even if you never learned them earlier
+- None of this is required. Every ending command still works from the first minute, and reading the core only nudges a couple of gates by a point
+
+### ⏱️ Timing
+
+- ROOT now waits 60 minutes before hanging up on the last night (it was 40), so there's time to actually read the core
+
 ## 0.8.0 - October 3, 2026
 
 ### 🎬 Act V: last talks

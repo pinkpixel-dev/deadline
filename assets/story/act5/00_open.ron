@@ -10,7 +10,12 @@
 (
     act: 5,
     events: [
-        (id: "a5_open", when: Flag("act:5"), effects: [Unset("locked"), Sequence("act5_open")]),
+        (id: "a5_open", when: Flag("act:5"), effects: [
+            Unset("locked"),
+            // The core needs recover. Tonight everyone has it.
+            If(NoFlag("cmd:recover"), [Set("cmd:recover")], []),
+            Sequence("act5_open"),
+        ]),
 
         // ---- never deciding ---------------------------------------------------
         (id: "a5_resume", when: All([Flag("a5_bulletin"), NoFlag("a5_live"), NoFlag("ended")]), repeat: true, effects: [
@@ -18,15 +23,15 @@
             Glitch(300),
             Print("{violet}JANUS:{/} You came back. The list hasn't changed. {cyan}options{/}"),
         ]),
-        (id: "a5_warn", when: All([Flag("a5_live"), NoFlag("ended")]), after_secs: 2100, repeat: true, effects: [
+        (id: "a5_warn", when: All([Flag("a5_live"), NoFlag("ended")]), after_secs: 3300, repeat: true, effects: [
             Log("{white}ROOT: session limit approaching{/}"),
             Notice("SESSION LIMIT: 5 MINUTES"),
         ]),
-        (id: "a5_kick", when: All([Flag("a5_live"), NoFlag("ended")]), after_secs: 2400, repeat: true, effects: [Sequence("kick_5")]),
+        (id: "a5_kick", when: All([Flag("a5_live"), NoFlag("ended")]), after_secs: 3600, repeat: true, effects: [Sequence("kick_5")]),
     ],
 
     hooks: [
-        (input: ["chat janus", "reply janus", "finger janus", "page janus"], cond: Flag("a5_bulletin"), effects: [
+        (input: ["chat janus", "reply janus", "ask janus", "page janus"], cond: All([Flag("a5_bulletin"), NoFlag("page:janus_a5")]), effects: [
             Print("{violet}JANUS:{/} I asked you what you are. Now I'm asking what you'll do. {cyan}options{/}"),
         ]),
     ],
@@ -71,6 +76,8 @@
                 ]),
                 Pause(900),
                 Type("{violet}Some of these are yours to do. Some of them aren't, yet. I'll show you all of them anyway.{/}"),
+                Pause(900),
+                Type("{violet}Before you pick, you can look at me. I left the core open. Mostly open.{/}"),
                 Pause(1600),
             ],
             on_end: [
@@ -85,8 +92,9 @@
                                       {dim}- ROOT{/}
 @rule
 "#),
-                Print("{dim}type{/} {cyan}options{/} {dim}to see what JANUS is offering.{/}"),
+                Print("{dim}type{/} {cyan}options{/} {dim}to see what JANUS is offering, or look at it first:{/} {cyan}files /var/janus/core{/}"),
                 Log("{violet}node 04: listening{/}"),
+                Log("{violet}file area: /var/janus/core +4{/}"),
                 Log("node 05: ghost_17 online"),
                 Log("{green}external line: open{/}"),
             ],
