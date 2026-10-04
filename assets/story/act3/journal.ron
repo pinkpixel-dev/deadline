@@ -20,10 +20,10 @@
         (id: "l3_parallax", section: "leads", when: Flag("done:parallax_98_hello"), done: Any([Flag("night_slips"), Flag("dawn")]),
             text: "1998 parallax thinks i'm the archiver's model of node 2. they want eli home and asleep."),
 
-        (id: "l3_builds", section: "leads", when: Gte("build", 2), done: Flag("dawn"),
-            text: "the night started over. 9:04 PM again, and the header said BUILD 1998.2. people half remember the last one.", alt: [
+        (id: "l3_builds", section: "leads", when: Gte("build", 2), done: Flag("dawn"), cmd: "scan",
+            text: "the night started over at 9:04 PM. the header says BUILD 1998.2 now. it didn't the first time. people half remember the last one, and {cyan}scan{/} says node 04 is \"rendering\".", alt: [
                 (cond: Flag("dawn"), body: "the night rebuilt itself {var:build} times. whatever i changed, it went back to 9:04 PM."),
-                (cond: Gte("build", 3), body: "BUILD 1998.3. the third time through 08/14/1998. ghost could feel the other two."),
+                (cond: Gte("build", 3), body: "the header says BUILD 1998.3 now. the third time through 08/14/1998. ghost could feel the other two."),
             ]),
         (id: "l3_news", section: "leads", when: Flag("news_scene"), done: Flag("eli_decided"), cmd: "reply eli",
             text: "eli found /archive/news/eli_voss.txt and asked if i know what happened to him. i could {cyan}reply eli{/}, {cyan}send eli eli_voss.txt{/} and let him read it, {cyan}delete{/} it first, or {cyan}logout{/}.", alt: [

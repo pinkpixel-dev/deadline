@@ -76,7 +76,9 @@ fn warning_eli_makes_the_night_slip() {
     assert!(a.st.has("night_slips") && a.st.has("warned_eli"), "what you did carries into the next build");
     assert!(a.st.has("show_build"), "the header shows the build number");
     run(&mut a, 6.0);
-    assert!(!a.st.has("show_build"), "only for a moment");
+    assert!(a.st.has("show_build"), "and keeps showing it for the whole build");
+    cmd(&mut a, "date");
+    assert!(screen(&a).contains("(build 1998.2)"), "the clock admits it too");
 }
 
 /// Keep typing until the night rebuilds, then let the cinematic play out.

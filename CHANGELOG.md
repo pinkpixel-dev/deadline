@@ -13,6 +13,11 @@
 - None of this is required. Every ending command still works from the first minute, and reading the core only nudges a couple of gates by a point
 - Every ending picks up a line or two about what you found in the core, like drive 2 finally powering off, node 03 logging off, or the test spec loading in JANUS v2.0
 
+### 🐛 Fixes
+
+- Act III's `BUILD 1998.2` and `1998.3` label now stays in the header for the whole rebuilt night. It used to vanish after five seconds, so the journal mentioned something most people never saw
+- Once the night rebuilds, `date` shows which build it is, ghost_17 asks why your login says BUILD, and the journal points you at `scan`
+
 ### ⏱️ Timing
 
 - ROOT now waits 60 minutes before hanging up on the last night (it was 40), so there's time to actually read the core
