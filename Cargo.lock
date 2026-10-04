@@ -289,8 +289,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "deadline"
-version = "0.10.0"
+name = "deadline-bbs"
+version = "1.0.0"
 dependencies = [
  "anyhow",
  "chrono",

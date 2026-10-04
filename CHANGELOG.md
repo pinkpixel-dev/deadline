@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.0.0 - October 3, 2026
+
+### 📦 Install
+
+- DEADLINE is on crates.io as `deadline-bbs`. Install it with `cargo install deadline-bbs` and run `deadline`. The crate needed a different name because `deadline` was already taken, but the command is still `deadline`
+- The published crate only ships the source, story assets, README, changelog and license, so the demo GIF and cover image stay on GitHub
+
+### 📝 Docs
+
+- The README leads with installing from crates.io, has a list of what's in the game, and loads its images from GitHub so they also show up on crates.io
+
+### 🏷️ Versioning
+
+- Bumped to 1.0.0. All five acts and all nine endings are in
+
 ## 0.10.0 - October 3, 2026
 
 ### 📺 Title screen

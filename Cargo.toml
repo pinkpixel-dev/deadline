@@ -1,10 +1,20 @@
 [package]
-name = "deadline"
-version = "0.10.0"
+name = "deadline-bbs"
+version = "1.0.0"
 edition = "2024"
 description = "A haunted late-90s BBS text adventure for your terminal"
 license = "Apache-2.0"
 authors = ["Pink Pixel <admin@pinkpixel.dev>"]
+repository = "https://github.com/pinkpixel-dev/deadline"
+homepage = "https://github.com/pinkpixel-dev/deadline"
+readme = "README.md"
+keywords = ["game", "bbs", "text-adventure", "terminal", "ratatui"]
+categories = ["games", "command-line-utilities"]
+include = ["src/**", "assets/**", "Cargo.toml", "Cargo.lock", "README.md", "CHANGELOG.md", "LICENSE"]
+
+[[bin]]
+name = "deadline"
+path = "src/main.rs"
 
 [dependencies]
 anyhow = "1.0.104"

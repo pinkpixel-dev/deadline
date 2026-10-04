@@ -1,5 +1,5 @@
 <p align="center">
-<img src="./cover.png" alt="Deadline" width="800">
+<img src="https://raw.githubusercontent.com/pinkpixel-dev/deadline/main/cover.png" alt="Deadline" width="800">
 </p>
 
 DEADLINE is a text adventure that plays like a late-90s BBS. You dial in, the board knows your name, and somebody called `ghost_17` has been waiting for you.
@@ -8,8 +8,48 @@ It runs in your terminal and uses Rust and Ratatui. The art is half-block pixel 
 
 The board's last public post is from 08/14/1998. It says `DON'T SHUT IT DOWN.` Nobody did.
 
-![Deadline](./deadline.gif)
+![Deadline](https://raw.githubusercontent.com/pinkpixel-dev/deadline/main/deadline.gif)
 
+## Installation
+
+You need a Rust toolchain. If you don't have one, [rustup](https://rustup.rs) is the quickest way to get it. I've been building with Rust 1.96.
+
+```bash
+cargo install deadline-bbs
+```
+
+Then dial in:
+
+```bash
+deadline
+```
+
+The crate is called `deadline-bbs` because `deadline` was already taken on crates.io, but the command you run is just `deadline`. All the story content and art is compiled into the binary, so there's nothing else to download.
+
+The game uses truecolor, so a modern terminal works best. I'd go for at least 96 columns wide so the sidebar shows up, but it still plays fine in a narrow window (the sidebar just hides).
+
+### Building from source
+
+If you'd rather run it straight from the repo:
+
+```bash
+git clone https://github.com/pinkpixel-dev/deadline.git
+cd deadline
+cargo run --release
+```
+
+## What's in it
+
+- Five acts across five nights: **CONNECTION**, **ARCHIVES**, **1998**, **IDENTITY** and **DECISION**
+- Nine endings, and which ones you can reach depends on everything you did before the last night
+- Message boards, mail, `.plan` files, private chats and a file area with fake ZMODEM downloads
+- A 1998 night with everyone still alive, which rebuilds itself every time you try to change it
+- A journal that keeps track of leads, keys, people and files, plus your own notes
+- Hidden commands nobody tells you about
+- Every list is tappable and clickable, and everything also works from the keyboard
+- Animated pixel art on the title screen, act cards, cutaway scenes and credits
+- Save slots that work like normal save slots. Mostly
+- Later runs remember what you've already seen
 
 ## What it's like
 
@@ -23,21 +63,9 @@ There are no dialogue menus floating over the game. You type commands like you w
 
 The story keeps track of what you do without showing you a single number. Who you trust, what you read, who you lied to, and which doors you opened all change what people will tell you later. Some choices look tiny. A few of them really aren't.
 
-Right now the game contains **Act I: CONNECTION**, **Act II: ARCHIVES**, **Act III: 1998**, **Act IV: IDENTITY** and **Act V: DECISION**. Acts I and II each have several routes and four ways to end, depending on who you've trusted and who you've been honest with, and how Act I ends changes how Act II begins. Act III drops you into the night of 08/14/1998 with everyone still alive, and the night keeps rebuilding itself every time you try to change it. Act IV brings you back to the present and turns the mystery toward you. Act V is the last night. JANUS leaves its own core open for you to dig through, and then you decide what happens to DEADLINE by typing it. There are nine endings, and the ones you can reach depend on everything you did before. Finishing one starts a fresh run, and the game remembers what you've seen.
+Acts I and II each have several routes and four ways to end, depending on who you've trusted and who you've been honest with, and how Act I ends changes how Act II begins. Act III drops you into the night of 08/14/1998, and the night keeps rebuilding itself every time you try to change it. Act IV brings you back to the present and turns the mystery toward you. Act V is the last night. JANUS leaves its own core open for you to dig through, and then you decide what happens to DEADLINE by typing it. Finishing an ending starts a fresh run, and the game remembers what you've seen.
 
 Acts happen on different nights. When you finish one, the board lets you poke around for a few more minutes, then ROOT hangs up on you. Log in again to start the next act.
-
-## Installation
-
-You need a recent Rust toolchain. I've been building with Rust 1.96.
-
-```bash
-git clone https://github.com/pinkpixel-dev/deadline.git
-cd deadline
-cargo run --release
-```
-
-The game uses truecolor, so a modern terminal works best. I'd go for at least 96 columns wide so the sidebar shows up, but it still plays fine in a narrow window (the sidebar just hides).
 
 ## Playing
 
@@ -89,10 +117,12 @@ Mostly.
 ### Starting over
 
 ```bash
-cargo run --release -- --reset
+deadline --reset
 ```
 
 That hangs up your old session and dials in fresh. Some things survive anyway.
+
+(From a source checkout, that's `cargo run --release -- --reset`.)
 
 ## Where your data lives
 
@@ -100,7 +130,7 @@ Saves go in your platform's data directory (`~/.local/share/deadline` on Linux).
 
 ## Writing story content
 
-The whole story lives in `.ron` files under `assets/story/`, so the engine and the writing stay separate. Boards, posts, mail, files, users, conversations, scheduled events and scripted commands are all data. Sprites are plain-text pixel grids in `assets/sprites/`.
+This part is for working from a clone of the repo. The whole story lives in `.ron` files under `assets/story/`, so the engine and the writing stay separate. Boards, posts, mail, files, users, conversations, scheduled events and scripted commands are all data. Sprites are plain-text pixel grids in `assets/sprites/`.
 
 If you edit content, run the validator. It catches typos in flag names, broken conversation links and missing sprites:
 
@@ -108,13 +138,13 @@ If you edit content, run the validator. It catches typos in flag names, broken c
 cargo run -- --check
 ```
 
-`DOCS/OVERVIEW.md` explains the content format in more detail.
-
 ## License
 
 Apache 2.0. See [LICENSE](LICENSE).
 
 The visual style was inspired by [Rebels in the Sky](https://github.com/ricott1/rebels-in-the-sky), which proved Ratatui can do real pixel art.
+
+If you liked it and want to say thanks, you can [buy me a coffee](https://www.buymeacoffee.com/pinkpixel) or find me on [Ko-fi](https://ko-fi.com/sizzlebop).
 
 ---
 
