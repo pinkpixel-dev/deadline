@@ -11,6 +11,7 @@
 - `whoami`, `scan` and your command history get a bit stranger the deeper you go, and JANUS writes in your notes again
 - Everyone can use `recover` and `listen` on the last night, even if you never learned them earlier
 - None of this is required. Every ending command still works from the first minute, and reading the core only nudges a couple of gates by a point
+- Every ending picks up a line or two about what you found in the core, like drive 2 finally powering off, node 03 logging off, or the test spec loading in JANUS v2.0
 
 ### ⏱️ Timing
 

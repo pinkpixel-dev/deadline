@@ -337,3 +337,34 @@ fn locked_core_files_say_how_to_open_them() {
     let s = screen(&a);
     assert!(s.contains("MAINTAINER KEY") && s.contains("listen"), "{s}");
 }
+
+#[test]
+fn endings_remember_what_you_found_in_the_core() {
+    let (mut a, _) = act5("core-ending", &["read_origin", "saw_node03"]);
+    assert!(cinematic_text(&mut a, "ending_root").contains("label: DON'T"));
+    assert!(cinematic_text(&mut a, "ending_root_yes").contains("node 03 is reading over their shoulder"));
+
+    let (mut b, _) = act5("core-ending-plain", &[]);
+    let t = cinematic_text(&mut b, "ending_root");
+    assert!(!t.is_empty() && !t.contains("DRIVE 2"), "nothing about the drive if you never read origin.log");
+}
+
+/// Play one cinematic and collect its text as it goes.
+fn cinematic_text(a: &mut App, id: &str) -> String {
+    use super::flow::SeqLine;
+    a.start_sequence(id);
+    let mut text = String::new();
+    for _ in 0..1200 {
+        let Some(seq) = a.seq.as_ref().filter(|s| s.id == id) else { break };
+        for l in &seq.lines {
+            if let SeqLine::Text { markup, .. } = l
+                && !text.contains(markup.as_str())
+            {
+                text.push_str(markup);
+                text.push('\n');
+            }
+        }
+        run(a, 0.1);
+    }
+    text
+}
